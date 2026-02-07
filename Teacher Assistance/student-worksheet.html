@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet - Deciph.AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Modern Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .timer-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            padding: 0.5rem 1.25rem;
+            border-radius: 2rem;
+            border: 2px solid #667eea;
+        }
+
+        .timer-bar.warning {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+        }
+
+        .timer-bar.danger {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #fef2f2, #fecaca);
+            animation: pulse-danger 1s infinite;
+        }
+
+        @keyframes pulse-danger {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .timer-display {
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            color: #1f2937;
+        }
+
+        .timer-bar.danger .timer-display {
+            color: #ef4444;
+        }
+
+        /* Main Container - Full width layout */
+        .main-container {
+            max-width: 100%;
+            margin: 1.5rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Worksheet Header */
+        .worksheet-header {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .worksheet-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .worksheet-subtitle {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .worksheet-info {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #4b5563;
+            font-size: 0.9rem;
+        }
+
+        .info-item i {
+            color: #667eea;
+        }
+
+        /* Worksheet Content */
+        .worksheet-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        .worksheet-content.no-media {
+            grid-template-columns: 1fr;
+        }
+
+        /* Question Section */
+        .question-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        .image-viewer {
+            position: relative;
+            width: 100%;
+            background: #f9fafb;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border: 2px solid #e5e7eb;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-viewer img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .image-viewer iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 450px;
+            border: none;
+            display: block;
+        }
+
+        /* Media navigation controls */
+        .media-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .media-nav-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .media-nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .media-nav-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .media-nav-counter {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4b5563;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .media-thumbnails-strip {
+            display: flex;
+            gap: 0.4rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .media-thumb-student {
+            width: 56px;
+            height: 56px;
+            border-radius: 0.375rem;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            flex-shrink: 0;
+            object-fit: cover;
+            transition: all 0.2s ease;
+        }
+
+        .media-thumb-student:hover {
+            border-color: #667eea;
+        }
+
+        .media-thumb-student.active {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .media-thumb-yt {
+            width: 56px;
+            height: 56px;
+            border-radius: 0.375rem;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1f2937;
+            color: #ef4444;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .media-thumb-yt:hover,
+        .media-thumb-yt.active {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+        }
+
+        .answer-format {
+            background: linear-gradient(135deg, #ede9fe, #dbeafe);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .answer-format strong {
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+
+        .answer-format p {
+            color: #4b5563;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Answer Section */
+        .answer-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-grid {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .question-item {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .question-body {
+            flex: 1;
+        }
+
+        .question-text-display {
+            font-size: 0.95rem;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .question-input {
+            width: 100%;
+        }
+
+        .question-input input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .question-input input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .question-input input.correct {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+
+        .question-input input.incorrect {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .question-input input:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Multiple Choice */
+        .mc-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .mc-option-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .mc-option-label:hover { border-color: #667eea; background: #f0f4ff; }
+        .mc-option-label input[type="radio"] { accent-color: #667eea; width: 18px; height: 18px; }
+        .mc-option-text { font-size: 0.95rem; }
+        .mc-option-label.correct { border-color: #10b981; background: #f0fdf4; }
+        .mc-option-label.incorrect { border-color: #ef4444; background: #fef2f2; }
+
+        /* True/False */
+        .tf-options {
+            display: flex;
+            gap: 1rem;
+        }
+        .tf-option-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .tf-option-label:hover { border-color: #667eea; }
+        .tf-option-label input[type="radio"] { accent-color: #667eea; width: 18px; height: 18px; }
+        .tf-option-text.tf-true { color: #059669; }
+        .tf-option-text.tf-false { color: #dc2626; }
+        .tf-option-label.correct { border-color: #10b981; background: #f0fdf4; }
+        .tf-option-label.incorrect { border-color: #ef4444; background: #fef2f2; }
+
+        @media (max-width: 600px) {
+            .mc-options-grid { grid-template-columns: 1fr; }
+            .tf-options { flex-direction: column; }
+        }
+
+        /* =============================================
+           AUTO-NAVIGATION MODE STYLES
+           ============================================= */
+
+        /* Hide all questions except current in auto-nav mode */
+        .auto-nav-mode .question-item {
+            display: none;
+        }
+
+        .auto-nav-mode .question-item.active-question {
+            display: flex;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Auto-nav question navigation */
+        .auto-nav-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn-prev {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .nav-btn-prev:hover:not(:disabled) {
+            background: #d1d5db;
+        }
+
+        .nav-btn-check {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-size: 1rem;
+            padding: 0.875rem 2rem;
+        }
+
+        .nav-btn-check:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Question progress indicator */
+        .question-progress {
+            text-align: center;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 0.5rem;
+        }
+
+        .progress-text {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-wrapper {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+        }
+
+        /* Celebration Overlay */
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .celebration-overlay.show {
+            display: flex;
+            animation: fadeInOverlay 0.3s ease;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .celebration-content {
+            text-align: center;
+            background: white;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 90%;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .celebration-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .celebration-text {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .celebration-subtext {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        /* Wrong answer feedback */
+        .wrong-answer-feedback {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .wrong-answer-feedback .feedback-icon {
+            color: #dc2626;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .wrong-answer-feedback .feedback-msg {
+            color: #991b1b;
+            font-weight: 600;
+        }
+
+        /* Submit Section */
+        .submit-section {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .submit-btn {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Extra Time Button */
+        .extra-time-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .extra-time-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .extra-time-btn.show {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .extra-time-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Feedback Section */
+        .feedback-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .feedback-section.show {
+            display: block;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .feedback-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .ai-badge-feedback {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        .overall-feedback {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 2px solid #667eea;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            color: #374151;
+        }
+
+        .feedback-item {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .feedback-item.correct {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+        }
+
+        .feedback-item.incorrect {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+
+        .feedback-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .feedback-icon.correct {
+            color: #10b981;
+        }
+
+        .feedback-icon.incorrect {
+            color: #ef4444;
+        }
+
+        .feedback-text {
+            flex: 1;
+        }
+
+        .feedback-text strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .feedback-detail {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Loading State */
+        .loading-container {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-container {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: white;
+        }
+
+        .error-container i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .error-container h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .error-container p {
+            opacity: 0.8;
+        }
+
+        /* Loading overlay for submission */
+        .submit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .submit-overlay.show {
+            display: flex;
+        }
+
+        .submit-overlay-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .worksheet-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .submit-section {
+                flex-direction: column;
+            }
+
+            .submit-btn, .extra-time-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .worksheet-header {
+                padding: 1.5rem;
+            }
+
+            .question-section, .answer-section {
+                padding: 1.5rem;
+            }
+
+            .question-item {
+                flex-direction: column;
+            }
+
+            .question-number {
+                width: auto;
+                height: auto;
+                padding: 0.25rem 0.75rem;
+                border-radius: 0.25rem;
+                display: inline-flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Submission Loading Overlay -->
+    <div class="submit-overlay" id="submitOverlay">
+        <div class="submit-overlay-content">
+            <div class="spinner"></div>
+            <h4>Evaluating Your Answers...</h4>
+            <p style="color: #6b7280;">AI is reviewing your responses</p>
+        </div>
+    </div>
+
+    <!-- Modern Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i> DECIPH.AI
+            </div>
+            <div class="timer-bar" id="timerBar">
+                <i class="fas fa-clock"></i>
+                <span class="timer-display" id="timerDisplay">00:00:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container" id="mainContainer">
+        <!-- Loading State (shown initially) -->
+        <div class="loading-container" id="loadingState">
+            <div class="spinner"></div>
+            <h3 style="color: white;">Loading Worksheet...</h3>
+            <p style="color: rgba(255,255,255,0.8);">Please wait while we prepare your worksheet</p>
+        </div>
+    </div>
+
+    <!-- Celebration Overlay (for auto-navigation mode) -->
+    <div class="celebration-overlay" id="celebrationOverlay">
+        <div class="celebration-content">
+            <div class="celebration-icon" id="celebrationIcon"></div>
+            <div class="celebration-text" id="celebrationText"></div>
+            <div class="celebration-subtext" id="celebrationSubtext"></div>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Task ID Setup for Worksheet Task Tracker (MUST be before tracker script) -->
+    <script>
+    (function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var taskId = urlParams.get('taskId');
+        if (taskId) {
+            sessionStorage.setItem('currentTaskId', taskId);
+            localStorage.setItem('currentTaskId', taskId);
+            window.TASK_ID = taskId;
+            var metaTag = document.createElement('meta');
+            metaTag.name = 'task-id';
+            metaTag.content = taskId;
+            document.head.appendChild(metaTag);
+        }
+    })();
+    </script>
+
+    <script>
+        // =============================================
+        // WORKSHEET DATA & STATE
+        // =============================================
+        let worksheetData = null;
+        let worksheetAnswers = null; // expected answers from API
+        let timerInterval = null;
+        let remainingSeconds = 0;
+        let extraTimeUsed = false;
+        let isSubmitted = false;
+        let startTime = null;
+        let currentMediaIndex = 0;
+        let mediaFilesList = []; // resolved list of media items
+
+        // =============================================
+        // AUTO-NAVIGATION MODE STATE
+        // =============================================
+        let isAutoNavMode = false;
+        let currentQuestionIndex = 0;
+        let autoNavCorrectCount = 0;
+
+        // Positive feedback words (10 total)
+        const positiveFeedback = [
+            { text: 'Great Job!', icon: '🌟', audio: 'great-job.mp3' },
+            { text: 'Brilliant!', icon: '💎', audio: 'brilliant.mp3' },
+            { text: 'Bravo!', icon: '👏', audio: 'bravo.mp3' },
+            { text: 'Sensational!', icon: '🔥', audio: 'sensational.mp3' },
+            { text: 'Fantastic!', icon: '✨', audio: 'fantastic.mp3' },
+            { text: 'Amazing!', icon: '🎯', audio: 'amazing.mp3' },
+            { text: 'Superb!', icon: '🏆', audio: 'superb.mp3' },
+            { text: 'Excellent!', icon: '💫', audio: 'excellent.mp3' },
+            { text: 'Outstanding!', icon: '🌈', audio: 'outstanding.mp3' },
+            { text: 'Perfect!', icon: '💯', audio: 'perfect.mp3' }
+        ];
+
+        // =============================================
+        // INITIALIZATION
+        // =============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const worksheetId = urlParams.get('id');
+
+            if (!worksheetId) {
+                showError('No Worksheet ID', 'Please use a valid worksheet link to access this page.');
+                return;
+            }
+
+            loadWorksheet(worksheetId);
+        });
+
+        // =============================================
+        // LOAD WORKSHEET FROM API
+        // =============================================
+        async function loadWorksheet(worksheetId) {
+            try {
+                const response = await fetch(`/api/student/worksheet/${worksheetId}`);
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || 'Worksheet not found');
+                }
+
+                worksheetData = await response.json();
+                document.title = `${worksheetData.title} - Deciph.AI`;
+
+                // Also fetch expected answers for local fallback evaluation
+                try {
+                    const ansResp = await fetch(`/api/internal/worksheet-answers/${worksheetId}`);
+                    if (ansResp.ok) {
+                        worksheetAnswers = await ansResp.json();
+                    }
+                } catch(e) {
+                    console.log('Could not fetch answers for local evaluation:', e);
+                }
+
+                renderWorksheet();
+                startTimer();
+                startTime = Date.now();
+
+            } catch (error) {
+                console.error('Error loading worksheet:', error);
+                showError('Worksheet Not Found', error.message || 'The worksheet you are looking for does not exist or has been removed.');
+            }
+        }
+
+        // =============================================
+        // RENDER WORKSHEET
+        // =============================================
+        function renderWorksheet() {
+            const container = document.getElementById('mainContainer');
+            const ws = worksheetData;
+            const includeQuestions = ws.includeQuestions;
+
+            // Format time limit for display
+            const tl = ws.timeLimit || {};
+            const hours = tl.hours || Math.floor((tl.totalSeconds || 0) / 3600);
+            const minutes = tl.minutes || Math.floor(((tl.totalSeconds || 0) % 3600) / 60);
+            const seconds = tl.seconds || ((tl.totalSeconds || 0) % 60);
+            const timeStr = [];
+            if (hours > 0) timeStr.push(`${hours}h`);
+            if (minutes > 0) timeStr.push(`${minutes}m`);
+            if (seconds > 0) timeStr.push(`${seconds}s`);
+
+            // Build resolved media list from mediaFiles or single mediaFile
+            mediaFilesList = ws.mediaFiles && ws.mediaFiles.length > 0
+                ? ws.mediaFiles
+                : (ws.mediaFile && ws.mediaFile.url ? [ws.mediaFile] : []);
+            const hasMedia = mediaFilesList.length > 0;
+            const hasMultipleMedia = mediaFilesList.length > 1;
+            currentMediaIndex = 0;
+
+            let html = `
+                <!-- Worksheet Header -->
+                <div class="worksheet-header">
+                    <h1 class="worksheet-title">${escapeHtml(ws.title)}</h1>
+                    <p class="worksheet-subtitle">Complete all questions within the time limit</p>
+
+                    <div class="worksheet-info">
+                        <div class="info-item">
+                            <i class="fas fa-book-open"></i>
+                            <span>Subject: ${escapeHtml(ws.subject)}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-list-ol"></i>
+                            <span>${ws.questions.length} Questions</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Time: ${timeStr.join(' ') || 'Untimed'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Worksheet Content -->
+                <div class="worksheet-content ${hasMedia ? '' : 'no-media'}">
+            `;
+
+            // Media Section (Left Side) - only if media exists
+            if (hasMedia) {
+                const hasImages = mediaFilesList.some(m => m.type === 'image');
+                const hasVideos = mediaFilesList.some(m => m.type === 'youtube');
+                let mediaTypeLabel = 'Media';
+                if (hasImages && hasVideos) mediaTypeLabel = 'Images & Videos';
+                else if (hasImages) mediaTypeLabel = mediaFilesList.length > 1 ? 'Images' : 'Image';
+                else if (hasVideos) mediaTypeLabel = mediaFilesList.length > 1 ? 'Videos' : 'Video';
+
+                html += `
+                    <div class="question-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-clipboard-question"></i>
+                            ${escapeHtml(mediaTypeLabel)} & Questions
+                        </h2>
+
+                        <div class="answer-format">
+                            <strong><i class="fas fa-info-circle"></i> Instructions:</strong>
+                            <p>${includeQuestions
+                                ? 'Study the media content and answer the questions on the right. Read each question carefully.'
+                                : 'Study the media content carefully and provide your answers for each question.'
+                            }${hasMultipleMedia ? ' Use the navigation buttons to view all media.' : ''}</p>
+                        </div>
+
+                        ${hasMultipleMedia ? `
+                        <div class="media-thumbnails-strip" id="mediaThumbnails"></div>
+                        ` : ''}
+
+                        <div class="image-viewer" id="mediaViewer"></div>
+
+                        ${hasMultipleMedia ? `
+                        <div class="media-nav">
+                            <button class="media-nav-btn" id="mediaPrevBtn" onclick="navigateMedia(-1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="media-nav-counter" id="mediaNavCounter">1 / ${mediaFilesList.length}</span>
+                            <button class="media-nav-btn" id="mediaNextBtn" onclick="navigateMedia(1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            // Answer Section (Right Side or Full Width)
+            html += `
+                <div class="answer-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-pen-to-square"></i>
+                        Your Answers
+                    </h2>
+
+                    <form id="worksheetForm" onsubmit="submitWorksheet(event)">
+                        <div class="question-grid">
+            `;
+
+            // Render questions dynamically with different answer formats
+            ws.questions.forEach((q, index) => {
+                const qNum = q.questionNumber || (index + 1);
+                const questionText = q.questionText || '';
+                const showQuestion = includeQuestions && questionText;
+                const answerFormat = q.answer_format || 'input';
+                const options = q.options || [];
+
+                let answerHtml = '';
+                if (answerFormat === 'multiple_choice' && options.length > 0) {
+                    answerHtml = `<div class="mc-options-grid">` +
+                        options.map((opt, i) => {
+                            const optId = `q${qNum}_opt${i}`;
+                            return `
+                            <label class="mc-option-label" for="${optId}">
+                                <input type="radio" id="${optId}" name="q${qNum}" value="${escapeHtml(opt)}" required>
+                                <span class="mc-option-text">${escapeHtml(opt)}</span>
+                            </label>`;
+                        }).join('') + `</div>`;
+                } else if (answerFormat === 'true_false') {
+                    answerHtml = `<div class="tf-options">
+                        <label class="tf-option-label" for="q${qNum}_true">
+                            <input type="radio" id="q${qNum}_true" name="q${qNum}" value="True" required>
+                            <span class="tf-option-text tf-true">True</span>
+                        </label>
+                        <label class="tf-option-label" for="q${qNum}_false">
+                            <input type="radio" id="q${qNum}_false" name="q${qNum}" value="False" required>
+                            <span class="tf-option-text tf-false">False</span>
+                        </label>
+                    </div>`;
+                } else {
+                    answerHtml = `<div class="question-input">
+                        <input type="text" id="q${qNum}" name="q${qNum}"
+                               placeholder="Enter your answer..." required
+                               autocomplete="off">
+                    </div>`;
+                }
+
+                html += `
+                    <div class="question-item" id="questionItem-${qNum}" data-format="${answerFormat}">
+                        <div class="question-number">${qNum}</div>
+                        <div class="question-body">
+                            ${showQuestion ? `<div class="question-text-display">${escapeHtml(questionText)}</div>` : ''}
+                            ${answerHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                        </div>
+
+                        <div class="submit-section">
+                            <div style="margin-bottom: 1rem; text-align: left;">
+                                <label for="studentNameInput" style="display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.9rem; color: #374151;">Your Name</label>
+                                <input type="text" id="studentNameInput" placeholder="Enter your name" style="width: 100%; padding: 0.6rem 0.8rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.95rem; outline: none; transition: border 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'" />
+                            </div>
+                            <button type="submit" class="submit-btn" id="submitBtn">
+                                <i class="fas fa-check-circle"></i> Submit Answers
+                            </button>
+            `;
+
+            // Extra time button
+            if (ws.extraTime && ws.extraTime.allowed) {
+                html += `
+                            <button type="button" class="extra-time-btn" id="extraTimeBtn" onclick="requestExtraTime()">
+                                <i class="fas fa-plus-circle"></i> Request Extra Time (+${ws.extraTime.minutes || Math.floor(ws.extraTime.seconds / 60)}min)
+                            </button>
+                `;
+            }
+
+            html += `
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="feedback-section" id="feedbackSection">
+                <div class="feedback-header">
+                    <h2 class="feedback-title">
+                        <i class="fas fa-chart-line"></i> Your Results
+                        <span class="ai-badge-feedback" id="aiBadge" style="display:none;">AI Evaluated</span>
+                    </h2>
+                    <div class="score-badge" id="scoreBadge">0/0</div>
+                </div>
+
+                <div class="overall-feedback" id="overallFeedback" style="display:none;"></div>
+
+                <div id="feedbackContainer">
+                    <!-- Feedback items will be inserted here -->
+                </div>
+
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <button class="action-btn btn-primary" onclick="resetWorksheet()">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                </div>
+            </div>
+            `;
+
+            container.innerHTML = html;
+
+            // Render initial media if present
+            if (mediaFilesList.length > 0) {
+                showMediaItem(0);
+                if (mediaFilesList.length > 1) {
+                    renderThumbnails();
+                }
+            }
+        }
+
+        // =============================================
+        // MEDIA NAVIGATION
+        // =============================================
+        function navigateMedia(direction) {
+            const newIndex = currentMediaIndex + direction;
+            if (newIndex < 0 || newIndex >= mediaFilesList.length) return;
+            showMediaItem(newIndex);
+        }
+
+        function showMediaItem(index) {
+            currentMediaIndex = index;
+            const viewer = document.getElementById('mediaViewer');
+            if (!viewer) return;
+
+            const item = mediaFilesList[index];
+            if (!item) return;
+
+            if (item.type === 'image') {
+                viewer.innerHTML = `<img src="${escapeHtml(item.url)}" alt="Worksheet Image ${index + 1}"
+                    onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27400%27 height=%27300%27%3E%3Crect fill=%27%23f3f4f6%27 width=%27400%27 height=%27300%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 text-anchor=%27middle%27 fill=%27%236b7280%27 font-size=%2720%27%3EImage%3C/text%3E%3C/svg%3E'">`;
+            } else if (item.type === 'youtube') {
+                const ytUrl = item.url || (item.youtubeId ? `https://www.youtube.com/embed/${item.youtubeId}` : '');
+                viewer.innerHTML = `<iframe src="${escapeHtml(ytUrl)}?rel=0" allowfullscreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    title="Worksheet Video ${index + 1}"></iframe>`;
+            }
+
+            // Update nav counter
+            const counter = document.getElementById('mediaNavCounter');
+            if (counter) counter.textContent = `${index + 1} / ${mediaFilesList.length}`;
+
+            // Update prev/next buttons
+            const prevBtn = document.getElementById('mediaPrevBtn');
+            const nextBtn = document.getElementById('mediaNextBtn');
+            if (prevBtn) prevBtn.disabled = (index === 0);
+            if (nextBtn) nextBtn.disabled = (index === mediaFilesList.length - 1);
+
+            // Update thumbnail active state
+            updateThumbnailActive();
+        }
+
+        function renderThumbnails() {
+            const strip = document.getElementById('mediaThumbnails');
+            if (!strip) return;
+            strip.innerHTML = '';
+
+            mediaFilesList.forEach((item, idx) => {
+                if (item.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = item.url;
+                    img.className = `media-thumb-student ${idx === currentMediaIndex ? 'active' : ''}`;
+                    img.alt = `Thumbnail ${idx + 1}`;
+                    img.onclick = () => showMediaItem(idx);
+                    strip.appendChild(img);
+                } else if (item.type === 'youtube') {
+                    const div = document.createElement('div');
+                    div.className = `media-thumb-yt ${idx === currentMediaIndex ? 'active' : ''}`;
+                    div.innerHTML = '<i class="fab fa-youtube"></i>';
+                    div.onclick = () => showMediaItem(idx);
+                    strip.appendChild(div);
+                }
+            });
+        }
+
+        function updateThumbnailActive() {
+            const strip = document.getElementById('mediaThumbnails');
+            if (!strip) return;
+            const children = strip.children;
+            for (let i = 0; i < children.length; i++) {
+                children[i].classList.toggle('active', i === currentMediaIndex);
+            }
+        }
+
+        // =============================================
+        // TIMER
+        // =============================================
+        function startTimer() {
+            if (!worksheetData || !worksheetData.timeLimit) return;
+
+            remainingSeconds = worksheetData.timeLimit.totalSeconds || 0;
+            if (remainingSeconds <= 0) return;
+
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+
+                if (remainingSeconds <= 0) {
+                    remainingSeconds = 0;
+                    clearInterval(timerInterval);
+                    autoSubmit();
+                }
+
+                updateTimerDisplay();
+
+                // Show extra time button when < 2 minutes remain
+                const extraTimeBtn = document.getElementById('extraTimeBtn');
+                if (extraTimeBtn && remainingSeconds <= 120 && !extraTimeUsed) {
+                    extraTimeBtn.classList.add('show');
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('timerDisplay');
+            const bar = document.getElementById('timerBar');
+            if (!display || !bar) return;
+
+            const h = Math.floor(remainingSeconds / 3600);
+            const m = Math.floor((remainingSeconds % 3600) / 60);
+            const s = remainingSeconds % 60;
+
+            display.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+            // Warning states
+            const totalTime = worksheetData.timeLimit.totalSeconds || 1;
+            const pctRemaining = remainingSeconds / totalTime;
+
+            bar.classList.remove('warning', 'danger');
+            if (pctRemaining <= 0.1) {
+                bar.classList.add('danger');
+            } else if (pctRemaining <= 0.25) {
+                bar.classList.add('warning');
+            }
+        }
+
+        function requestExtraTime() {
+            if (extraTimeUsed || !worksheetData.extraTime) return;
+
+            const extraSeconds = worksheetData.extraTime.seconds || (worksheetData.extraTime.minutes || 0) * 60;
+            remainingSeconds += extraSeconds;
+            extraTimeUsed = true;
+
+            const btn = document.getElementById('extraTimeBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-check"></i> Extra Time Added';
+            }
+
+            updateTimerDisplay();
+        }
+
+        function autoSubmit() {
+            if (isSubmitted) return;
+            alert('Time is up! Your answers will be submitted automatically.');
+            submitWorksheet(null, true);
+        }
+
+        // =============================================
+        // SUBMIT WORKSHEET
+        // =============================================
+        async function submitWorksheet(event, autoSubmitted = false) {
+            if (event) event.preventDefault();
+            if (isSubmitted) return;
+
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Evaluating...';
+            }
+
+            // Show loading overlay
+            document.getElementById('submitOverlay').classList.add('show');
+
+            // Collect answers (supports text input, radio buttons for MC/TF)
+            const answers = {};
+            worksheetData.questions.forEach((q, index) => {
+                const qNum = q.questionNumber || (index + 1);
+                const answerFormat = q.answer_format || 'input';
+
+                if (answerFormat === 'multiple_choice' || answerFormat === 'true_false') {
+                    const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+                    answers[`q${qNum}`] = selected ? selected.value.trim() : '';
+                } else {
+                    const input = document.getElementById(`q${qNum}`);
+                    answers[`q${qNum}`] = input ? input.value.trim() : '';
+                }
+            });
+
+            const timeTaken = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+
+            // Get the worksheet ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const worksheetId = urlParams.get('id');
+
+            // Build questions with expected answers from worksheetAnswers
+            let questionsWithAnswers = worksheetData.questions;
+            if (worksheetAnswers && worksheetAnswers.questions) {
+                questionsWithAnswers = worksheetAnswers.questions;
+            }
+
+            try {
+                const studentNameInput = document.getElementById('studentNameInput');
+                const studentName = studentNameInput ? studentNameInput.value.trim() : '';
+
+                const response = await fetch('/api/student/submit-worksheet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        worksheet_id: worksheetId,
+                        answers: answers,
+                        questions: questionsWithAnswers,
+                        subject: worksheetData.subject,
+                        title: worksheetData.title,
+                        time_taken: timeTaken,
+                        extra_time_used: extraTimeUsed,
+                        auto_submitted: autoSubmitted,
+                        student_name: studentName || 'Anonymous Student'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showResults(result);
+                } else {
+                    throw new Error(result.error || 'Evaluation failed');
+                }
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                // Fallback local evaluation
+                const localResults = evaluateLocally(answers);
+                showResults(localResults);
+            } finally {
+                document.getElementById('submitOverlay').classList.remove('show');
+            }
+        }
+
+        // =============================================
+        // LOCAL FALLBACK EVALUATION
+        // =============================================
+        function evaluateLocally(answers) {
+            const results = [];
+            let totalScore = 0;
+            let totalPossible = 0;
+
+            const positiveMessages = [
+                "Well done! You got this one right.",
+                "Great work! That's the correct answer.",
+                "Excellent! You clearly understand this concept.",
+                "Nice job! You nailed it.",
+                "Spot on! Keep up the great work.",
+                "That's right! You're doing really well.",
+                "Perfect answer! You've got a solid grasp on this.",
+                "Correct! Your understanding is showing through."
+            ];
+            const encouragingMessages = [
+                "Don't worry — review this topic and you'll get it next time!",
+                "Keep practicing, you're making progress!",
+                "Almost there — a little more study and you'll master this!",
+                "No worries! Every mistake is a learning opportunity.",
+                "Keep going — understanding comes with practice!"
+            ];
+
+            const expectedQuestions = (worksheetAnswers && worksheetAnswers.questions) || [];
+
+            worksheetData.questions.forEach((q, index) => {
+                const qNum = q.questionNumber || (index + 1);
+                const studentAnswer = (answers[`q${qNum}`] || '').toLowerCase().trim();
+                const points = q.points || 10;
+                totalPossible += points;
+
+                // Find expected answer
+                const expectedQ = expectedQuestions.find(eq => eq.questionNumber === qNum);
+                const expectedAnswer = (expectedQ ? expectedQ.expectedAnswer : '').toLowerCase().trim();
+
+                // Flexible matching
+                const isCorrect = expectedAnswer && (
+                    studentAnswer === expectedAnswer ||
+                    studentAnswer.includes(expectedAnswer) ||
+                    expectedAnswer.includes(studentAnswer) ||
+                    normalize(studentAnswer) === normalize(expectedAnswer)
+                );
+
+                const pointsAwarded = isCorrect ? points : 0;
+                totalScore += pointsAwarded;
+
+                let feedback;
+                if (isCorrect) {
+                    feedback = positiveMessages[Math.floor(Math.random() * positiveMessages.length)];
+                } else {
+                    const correctAns = expectedQ ? expectedQ.expectedAnswer : 'N/A';
+                    const encouragement = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
+                    feedback = `The correct answer is: ${correctAns}. ${encouragement}`;
+                }
+
+                results.push({
+                    questionNumber: qNum,
+                    isCorrect: isCorrect,
+                    pointsAwarded: pointsAwarded,
+                    feedback: feedback,
+                    expectedAnswer: expectedQ ? expectedQ.expectedAnswer : '',
+                    studentAnswer: answers[`q${qNum}`] || ''
+                });
+            });
+
+            // Generate dynamic overall feedback
+            const percentage = totalPossible > 0 ? (totalScore / totalPossible * 100) : 0;
+            let overallFeedback;
+            if (percentage === 100) {
+                overallFeedback = `Outstanding! You scored ${totalScore}/${totalPossible} — a perfect score! You've demonstrated excellent understanding of the material.`;
+            } else if (percentage >= 80) {
+                overallFeedback = `Great job! You scored ${totalScore}/${totalPossible}. You have a strong grasp of the material. Review the questions you missed to aim for a perfect score!`;
+            } else if (percentage >= 60) {
+                overallFeedback = `Good effort! You scored ${totalScore}/${totalPossible}. You're on the right track — revisit the topics you missed and you'll improve in no time.`;
+            } else if (percentage >= 40) {
+                overallFeedback = `You scored ${totalScore}/${totalPossible}. Don't be discouraged — review the material and try again. Every attempt helps you learn!`;
+            } else {
+                overallFeedback = `You scored ${totalScore}/${totalPossible}. This is a great opportunity to review the material. Take your time studying the topics and give it another go — you've got this!`;
+            }
+
+            return {
+                success: true,
+                results: results,
+                totalScore: totalScore,
+                totalPossible: totalPossible,
+                overallFeedback: overallFeedback,
+                evaluatedByAI: false
+            };
+        }
+
+        function normalize(str) {
+            return str.replace(/[,$\s]/g, '').replace(/[^a-z0-9]/g, '');
+        }
+
+        // =============================================
+        // SHOW RESULTS
+        // =============================================
+        function showResults(result) {
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            const scoreBadge = document.getElementById('scoreBadge');
+            const feedbackSection = document.getElementById('feedbackSection');
+            const aiBadge = document.getElementById('aiBadge');
+            const overallFeedback = document.getElementById('overallFeedback');
+
+            feedbackContainer.innerHTML = '';
+
+            // AI badge
+            if (result.evaluatedByAI) {
+                aiBadge.style.display = 'inline';
+            }
+
+            // Overall feedback
+            if (result.overallFeedback) {
+                overallFeedback.style.display = 'block';
+                overallFeedback.innerHTML = `<i class="fas fa-robot" style="color: #667eea;"></i> ${escapeHtml(result.overallFeedback)}`;
+            }
+
+            // Score
+            scoreBadge.textContent = `${result.totalScore}/${result.totalPossible}`;
+
+            // Individual results
+            (result.results || []).forEach(r => {
+                const qNum = r.questionNumber;
+                const questionItem = document.getElementById(`questionItem-${qNum}`);
+                const fmt = questionItem?.dataset?.format || 'input';
+
+                if (fmt === 'multiple_choice' || fmt === 'true_false') {
+                    // Disable all radio buttons and highlight correct/incorrect
+                    const radios = document.querySelectorAll(`input[name="q${qNum}"]`);
+                    const expected = (r.expectedAnswer || '').trim().toLowerCase();
+                    radios.forEach(radio => {
+                        radio.disabled = true;
+                        const label = radio.closest('label') || radio.parentElement;
+                        if (radio.checked && !r.isCorrect) {
+                            label.classList.add('incorrect');
+                        }
+                        if (radio.checked && r.isCorrect) {
+                            label.classList.add('correct');
+                        }
+                        // Highlight the correct option so students can see the right answer
+                        if (!r.isCorrect && expected && radio.value.trim().toLowerCase() === expected) {
+                            label.classList.add('correct');
+                        }
+                    });
+                } else {
+                    const input = document.getElementById(`q${qNum}`);
+                    if (input) {
+                        input.disabled = true;
+                        input.classList.add(r.isCorrect ? 'correct' : 'incorrect');
+                    }
+                }
+
+                const feedbackItem = document.createElement('div');
+                feedbackItem.className = `feedback-item ${r.isCorrect ? 'correct' : 'incorrect'}`;
+
+                // Build feedback HTML
+                let feedbackHtml = `
+                    <div class="feedback-icon ${r.isCorrect ? 'correct' : 'incorrect'}">
+                        <i class="fas ${r.isCorrect ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+                    </div>
+                    <div class="feedback-text">
+                        <strong>Question ${qNum}</strong>
+                        <span style="color: #6b7280;">Your answer: ${escapeHtml(r.studentAnswer || '(No answer)')}</span>`;
+
+                // Always show feedback from AI if available
+                if (r.feedback) {
+                    feedbackHtml += `<div class="feedback-detail" style="margin-top: 6px; line-height: 1.5;">${escapeHtml(r.feedback)}</div>`;
+                }
+
+                // For incorrect answers, also show the expected answer if not already in the feedback
+                if (!r.isCorrect && r.expectedAnswer) {
+                    feedbackHtml += `<div class="feedback-detail" style="margin-top: 4px; font-weight: 600; color: #059669;"><i class="fas fa-lightbulb" style="margin-right: 4px;"></i>Correct answer: ${escapeHtml(r.expectedAnswer)}</div>`;
+                }
+
+                feedbackHtml += `</div>`;
+                feedbackItem.innerHTML = feedbackHtml;
+                feedbackContainer.appendChild(feedbackItem);
+            });
+
+            // Show feedback section
+            feedbackSection.classList.add('show');
+            feedbackSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Disable submit
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submitted';
+            }
+        }
+
+        // =============================================
+        // RESET
+        // =============================================
+        function resetWorksheet() {
+            isSubmitted = false;
+            extraTimeUsed = false;
+
+            const form = document.getElementById('worksheetForm');
+            if (form) form.reset();
+
+            // Remove feedback styles from all question types
+            worksheetData.questions.forEach((q, index) => {
+                const qNum = q.questionNumber || (index + 1);
+                const answerFormat = q.answer_format || 'input';
+
+                if (answerFormat === 'multiple_choice' || answerFormat === 'true_false') {
+                    const radios = document.querySelectorAll(`input[name="q${qNum}"]`);
+                    radios.forEach(radio => {
+                        radio.disabled = false;
+                        radio.checked = false;
+                        const label = radio.closest('label') || radio.parentElement;
+                        if (label) label.classList.remove('correct', 'incorrect');
+                    });
+                } else {
+                    const input = document.getElementById(`q${qNum}`);
+                    if (input) {
+                        input.classList.remove('correct', 'incorrect');
+                        input.disabled = false;
+                    }
+                }
+            });
+
+            document.getElementById('feedbackSection').classList.remove('show');
+
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submit Answers';
+            }
+
+            // Restart timer
+            startTimer();
+            startTime = Date.now();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // =============================================
+        // ERROR STATE
+        // =============================================
+        function showError(title, message) {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = `
+                <div class="error-container">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h2>${escapeHtml(title)}</h2>
+                    <p>${escapeHtml(message)}</p>
+                </div>
+            `;
+        }
+
+        // =============================================
+        // KEYBOARD NAVIGATION FOR MEDIA
+        // =============================================
+        document.addEventListener('keydown', function(e) {
+            if (isSubmitted || mediaFilesList.length <= 1) return;
+            // Don't intercept when typing in input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === 'ArrowLeft') navigateMedia(-1);
+            if (e.key === 'ArrowRight') navigateMedia(1);
+        });
+
+        // =============================================
+        // AUTO-NAVIGATION MODE FUNCTIONS
+        // =============================================
+
+        function initAutoNavigationMode() {
+            if (!worksheetData || worksheetData.questionMode !== 'auto_navigation') {
+                isAutoNavMode = false;
+                return;
+            }
+
+            isAutoNavMode = true;
+            currentQuestionIndex = 0;
+            autoNavCorrectCount = 0;
+
+            // Add auto-nav class to question grid
+            const questionGrid = document.querySelector('.question-grid');
+            if (questionGrid) {
+                questionGrid.classList.add('auto-nav-mode');
+            }
+
+            // Hide the submit section in auto-nav mode
+            const submitSection = document.querySelector('.submit-section');
+            if (submitSection) {
+                submitSection.style.display = 'none';
+            }
+
+            // Add progress indicator before questions
+            addProgressIndicator();
+
+            // Add auto-nav controls after question grid
+            addAutoNavControls();
+
+            // Show first question
+            showQuestion(0);
+
+            // Initialize confetti canvas
+            initConfettiCanvas();
+        }
+
+        function addProgressIndicator() {
+            const questionGrid = document.querySelector('.question-grid');
+            if (!questionGrid) return;
+
+            const totalQuestions = worksheetData.questions.length;
+            const progressHtml = `
+                <div class="question-progress" id="questionProgress">
+                    <div class="progress-text">Question <span id="currentQNum">1</span> of ${totalQuestions}</div>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar-fill" id="progressBarFill" style="width: ${(1/totalQuestions)*100}%"></div>
+                    </div>
+                </div>
+            `;
+            questionGrid.insertAdjacentHTML('beforebegin', progressHtml);
+        }
+
+        function addAutoNavControls() {
+            const questionGrid = document.querySelector('.question-grid');
+            if (!questionGrid) return;
+
+            const controlsHtml = `
+                <div class="auto-nav-controls" id="autoNavControls">
+                    <button type="button" class="nav-btn nav-btn-prev" id="prevQuestionBtn" onclick="navigateQuestion(-1)" disabled>
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <button type="button" class="nav-btn nav-btn-check" id="checkAnswerBtn" onclick="checkCurrentAnswer()">
+                        <i class="fas fa-check"></i> Check Answer
+                    </button>
+                </div>
+            `;
+            questionGrid.insertAdjacentHTML('afterend', controlsHtml);
+        }
+
+        function showQuestion(index) {
+            const questions = document.querySelectorAll('.question-item');
+            questions.forEach((q, i) => {
+                q.classList.toggle('active-question', i === index);
+            });
+
+            // Update progress
+            const totalQuestions = worksheetData.questions.length;
+            const currentQNum = document.getElementById('currentQNum');
+            const progressBar = document.getElementById('progressBarFill');
+            if (currentQNum) currentQNum.textContent = index + 1;
+            if (progressBar) progressBar.style.width = `${((index + 1) / totalQuestions) * 100}%`;
+
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prevQuestionBtn');
+            const checkBtn = document.getElementById('checkAnswerBtn');
+            if (prevBtn) prevBtn.disabled = (index === 0);
+
+            // Change button text on last question
+            if (checkBtn) {
+                if (index === totalQuestions - 1) {
+                    checkBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Submit Final Answer';
+                } else {
+                    checkBtn.innerHTML = '<i class="fas fa-check"></i> Check Answer';
+                }
+            }
+
+            currentQuestionIndex = index;
+
+            // Remove any previous wrong answer feedback
+            const existingFeedback = document.querySelector('.wrong-answer-feedback');
+            if (existingFeedback) existingFeedback.remove();
+        }
+
+        function navigateQuestion(direction) {
+            const newIndex = currentQuestionIndex + direction;
+            if (newIndex >= 0 && newIndex < worksheetData.questions.length) {
+                showQuestion(newIndex);
+            }
+        }
+
+        function checkCurrentAnswer() {
+            const question = worksheetData.questions[currentQuestionIndex];
+            const qNum = question.questionNumber || (currentQuestionIndex + 1);
+            const answerFormat = question.answer_format || 'input';
+
+            // Get student's answer
+            let studentAnswer = '';
+            if (answerFormat === 'multiple_choice' || answerFormat === 'true_false') {
+                const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+                studentAnswer = selected ? selected.value : '';
+            } else {
+                const input = document.getElementById(`q${qNum}`);
+                studentAnswer = input ? input.value.trim() : '';
+            }
+
+            if (!studentAnswer) {
+                alert('Please provide an answer before checking.');
+                return;
+            }
+
+            // Get expected answer
+            let expectedAnswer = '';
+            if (worksheetAnswers && worksheetAnswers.questions) {
+                const qData = worksheetAnswers.questions.find(q => q.questionNumber === qNum);
+                expectedAnswer = qData ? qData.expectedAnswer : '';
+            }
+
+            // Compare answers (case-insensitive for input, exact for MC/TF)
+            let isCorrect = false;
+            if (answerFormat === 'multiple_choice' || answerFormat === 'true_false') {
+                isCorrect = studentAnswer.toLowerCase() === expectedAnswer.toLowerCase();
+            } else {
+                // For input, be more flexible
+                const normalizedStudent = studentAnswer.toLowerCase().trim();
+                const normalizedExpected = expectedAnswer.toLowerCase().trim();
+                isCorrect = normalizedStudent === normalizedExpected ||
+                            normalizedExpected.includes(normalizedStudent) ||
+                            normalizedStudent.includes(normalizedExpected);
+            }
+
+            if (isCorrect) {
+                autoNavCorrectCount++;
+                showCelebration();
+            } else {
+                showWrongAnswerFeedback(expectedAnswer);
+            }
+        }
+
+        function showCelebration() {
+            // Pick a random positive feedback
+            const feedback = positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)];
+
+            // Update celebration overlay content
+            document.getElementById('celebrationIcon').textContent = feedback.icon;
+            document.getElementById('celebrationText').textContent = feedback.text;
+            document.getElementById('celebrationSubtext').textContent = 'Moving to next question...';
+
+            // Show celebration overlay
+            document.getElementById('celebrationOverlay').classList.add('show');
+
+            // Start confetti
+            startConfetti();
+
+            // Play audio feedback
+            playFeedbackAudio(feedback.audio);
+
+            // Hide after delay and move to next question
+            setTimeout(() => {
+                document.getElementById('celebrationOverlay').classList.remove('show');
+                stopConfetti();
+
+                // Move to next question or submit
+                if (currentQuestionIndex < worksheetData.questions.length - 1) {
+                    showQuestion(currentQuestionIndex + 1);
+                } else {
+                    // Last question answered correctly - auto submit
+                    submitWorksheet(new Event('submit'));
+                }
+            }, 2500);
+        }
+
+        function showWrongAnswerFeedback(expectedAnswer) {
+            // Remove any existing feedback
+            const existing = document.querySelector('.wrong-answer-feedback');
+            if (existing) existing.remove();
+
+            const currentQuestion = document.querySelector('.question-item.active-question');
+            if (!currentQuestion) return;
+
+            const feedbackHtml = `
+                <div class="wrong-answer-feedback">
+                    <div class="feedback-icon"><i class="fas fa-times-circle"></i></div>
+                    <div class="feedback-msg">Not quite! Try again or move to the next question.</div>
+                </div>
+            `;
+            currentQuestion.insertAdjacentHTML('beforeend', feedbackHtml);
+        }
+
+        function playFeedbackAudio(filename) {
+            // Extract the spoken word from filename (e.g., 'great-job.mp3' -> 'great job')
+            const spokenWord = filename.replace('.mp3', '').replace(/-/g, ' ');
+
+            // Try audio file first, fall back to Web Speech API
+            try {
+                const audio = new Audio(`/feedback-audio/${filename}`);
+                audio.volume = 0.7;
+                audio.play().then(() => {
+                    // Audio file played successfully
+                }).catch(e => {
+                    // Audio file failed, use Speech Synthesis
+                    console.log('Audio file not available, using speech synthesis');
+                    speakFeedback(spokenWord);
+                });
+            } catch (e) {
+                // Fallback to Speech Synthesis
+                speakFeedback(spokenWord);
+            }
+        }
+
+        function speakFeedback(text) {
+            try {
+                if ('speechSynthesis' in window) {
+                    // Cancel any ongoing speech
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.2;
+                    utterance.volume = 0.8;
+                    // Try to use a friendly English voice
+                    const voices = window.speechSynthesis.getVoices();
+                    const preferredVoice = voices.find(v =>
+                        v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google'))
+                    ) || voices.find(v => v.lang.startsWith('en'));
+                    if (preferredVoice) utterance.voice = preferredVoice;
+                    window.speechSynthesis.speak(utterance);
+                }
+            } catch (e) {
+                console.log('Speech synthesis not available');
+            }
+        }
+
+        // Preload speech synthesis voices
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = function() {
+                window.speechSynthesis.getVoices();
+            };
+        }
+
+        // =============================================
+        // CONFETTI ANIMATION
+        // =============================================
+        let confettiAnimationId = null;
+        let confettiParticles = [];
+
+        function initConfettiCanvas() {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas) return;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        function startConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            // Create particles - mix of confetti pieces and ribbons
+            confettiParticles = [];
+            const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#fbbf24', '#34d399'];
+            const shapes = ['circle', 'rect', 'ribbon', 'ribbon', 'rect']; // More ribbons
+
+            for (let i = 0; i < 180; i++) {
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                confettiParticles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: shape === 'ribbon' ? Math.random() * 4 + 3 : Math.random() * 6 + 4,
+                    d: Math.random() * 150,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10 - 10,
+                    tiltAngle: 0,
+                    tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+                    shape: shape,
+                    ribbonLength: shape === 'ribbon' ? Math.random() * 20 + 15 : 0,
+                    wobble: Math.random() * 10,
+                    wobbleSpeed: Math.random() * 0.1 + 0.05
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                confettiParticles.forEach((p, index) => {
+                    ctx.beginPath();
+                    ctx.fillStyle = p.color;
+
+                    if (p.shape === 'circle') {
+                        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (p.shape === 'ribbon') {
+                        // Draw ribbon - wavy elongated strip
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.tilt * Math.PI / 180);
+                        ctx.globalAlpha = 0.85;
+                        const wave = Math.sin(p.wobble) * 3;
+                        ctx.beginPath();
+                        ctx.moveTo(-p.r, 0);
+                        ctx.quadraticCurveTo(0, wave, p.r, 0);
+                        ctx.quadraticCurveTo(0, -wave + p.ribbonLength, -p.r, p.ribbonLength);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.globalAlpha = 1;
+                        ctx.restore();
+                    } else {
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.tilt * Math.PI / 180);
+                        ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+                        ctx.restore();
+                        ctx.fill();
+                    }
+
+                    // Update position
+                    p.y += p.shape === 'ribbon' ? 2.5 : 3;
+                    p.tiltAngle += p.tiltAngleIncrement;
+                    p.tilt = Math.sin(p.tiltAngle) * 15;
+                    p.x += Math.sin(p.d) * 2;
+                    if (p.wobble !== undefined) p.wobble += p.wobbleSpeed;
+
+                    // Reset if off screen
+                    if (p.y > canvas.height) {
+                        confettiParticles[index] = {
+                            x: Math.random() * canvas.width,
+                            y: -10,
+                            r: p.r,
+                            d: p.d,
+                            color: p.color,
+                            tilt: p.tilt,
+                            tiltAngle: p.tiltAngle,
+                            tiltAngleIncrement: p.tiltAngleIncrement,
+                            shape: p.shape,
+                            ribbonLength: p.ribbonLength,
+                            wobble: p.wobble,
+                            wobbleSpeed: p.wobbleSpeed
+                        };
+                    }
+                });
+
+                confettiAnimationId = requestAnimationFrame(draw);
+            }
+
+            draw();
+        }
+
+        function stopConfetti() {
+            if (confettiAnimationId) {
+                cancelAnimationFrame(confettiAnimationId);
+                confettiAnimationId = null;
+            }
+            const canvas = document.getElementById('confettiCanvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            confettiParticles = [];
+        }
+
+        // Initialize auto-nav mode after worksheet loads
+        const originalRenderWorksheet = renderWorksheet;
+        renderWorksheet = function() {
+            originalRenderWorksheet();
+            initAutoNavigationMode();
+        };
+
+        // =============================================
+        // UTILITY
+        // =============================================
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+
+    <!-- Worksheet Task Tracker - sends completion data to dashboard -->
+    <script src="worksheet-task-tracker.js"></script>
+</body>
+</html>

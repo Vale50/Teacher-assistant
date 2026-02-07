@@ -1,0 +1,2630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet Creator - Deciph.AI Tutor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #059669;
+            --accent-color: #dc2626;
+            --warning-color: #f59e0b;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #16a34a;
+        }
+
+        body {
+            background: var(--light-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .worksheet-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .worksheet-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .worksheet-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            min-height: 600px;
+        }
+
+        .media-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .media-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        .media-upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .media-upload-area.dragover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .media-preview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Multi-media gallery */
+        .media-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .media-gallery-main {
+            position: relative;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9fafb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .media-gallery-main img {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .media-gallery-main iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .media-thumbnails {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+
+        .media-thumb {
+            width: 70px;
+            height: 70px;
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            flex-shrink: 0;
+            object-fit: cover;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .media-thumb:hover {
+            border-color: var(--primary-color);
+        }
+
+        .media-thumb.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+        }
+
+        .media-thumb-video {
+            width: 70px;
+            height: 70px;
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1f2937;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .media-thumb-video:hover,
+        .media-thumb-video.active {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3);
+        }
+
+        .media-item-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .media-item-badge:hover {
+            background: #b91c1c;
+        }
+
+        .youtube-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .youtube-input-group input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .youtube-input-group input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .youtube-add-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .youtube-add-btn:hover {
+            background: #b91c1c;
+        }
+
+        .media-counter {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .questions-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .ai-generation-panel {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-generation-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .ai-icon {
+            background: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .generate-buttons-row {
+            display: flex;
+            gap: 0.75rem;
+            margin: 1rem auto;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.875rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .generate-btn.answers-only {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .generate-btn.answers-only:hover {
+            box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
+        }
+
+        .generate-btn:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .generate-btn .btn-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 400;
+            white-space: nowrap;
+            z-index: 100;
+            transition: opacity 0.2s, visibility 0.2s;
+            pointer-events: none;
+        }
+
+        .generate-btn .btn-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #1f2937;
+        }
+
+        .generate-btn:hover .btn-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .edit-question-btn {
+            background: none;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 0.25rem 0.6rem;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            margin-left: 0.5rem;
+        }
+
+        .edit-question-btn:hover {
+            background: #f3f4f6;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .edit-question-btn.editing {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .question-input:disabled, .answer-input:disabled {
+            background: #f9fafb;
+            border-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .generation-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-status {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .ai-status.show {
+            display: block;
+        }
+
+        .ai-status.generating {
+            border-color: var(--warning-color);
+        }
+
+        .ai-status.success {
+            border-color: var(--secondary-color);
+        }
+
+        .ai-status.error {
+            border-color: var(--accent-color);
+        }
+
+        .settings-panel {
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .timer-settings-panel {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid var(--warning-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-settings-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        .timer-icon {
+            background: var(--warning-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        .time-input-group {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .time-input-group:focus-within {
+            border-color: var(--warning-color);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .time-input {
+            border: none;
+            background: transparent;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            width: 60px;
+        }
+
+        .time-input:focus {
+            outline: none;
+        }
+
+        .time-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .extra-time-toggle {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .extra-time-toggle.active {
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+        }
+
+        .question-item {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .question-item:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-item.ai-generated {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-color: var(--primary-color);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .question-number {
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .ai-badge {
+            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .format-badge {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-left: 0.35rem;
+            color: white;
+        }
+        .format-badge.format-input { background: #6b7280; }
+        .format-badge.format-multiple_choice { background: #8b5cf6; }
+        .format-badge.format-true_false { background: #f59e0b; color: #1a1a1a; }
+
+        .mc-options-preview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+        }
+        .mc-option {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .remove-question-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .remove-question-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .question-input, .answer-input {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem;
+            width: 100%;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .question-input:focus, .answer-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .add-question-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem auto;
+        }
+
+        .add-question-btn:hover {
+            background: #047857;
+            transform: translateY(-2px);
+        }
+
+        .assign-worksheet-btn {
+            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        .assign-worksheet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .form-switch {
+            margin-bottom: 1rem;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .media-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .media-control-btn {
+            background: var(--text-secondary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .media-control-btn:hover {
+            background: var(--text-primary);
+        }
+
+        .timer-preview {
+            background: white;
+            border: 2px solid var(--warning-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--warning-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e5e7eb;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-highlight {
+            0% { background: linear-gradient(135deg, #f0f9ff, #e0f2fe); transform: scale(1); }
+            50% { background: linear-gradient(135deg, #dbeafe, #bfdbfe); transform: scale(1.02); }
+            100% { background: linear-gradient(135deg, #f0f9ff, #e0f2fe); transform: scale(1); }
+        }
+
+        /* Enhanced Modal Styles */
+        .worksheet-link-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .worksheet-link-modal.show {
+            display: flex;
+        }
+
+        .link-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 700px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success-color);
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        .worksheet-link-display {
+            background: var(--light-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .copy-btn, .share-btn, .qr-btn {
+            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn:hover, .share-btn:hover, .qr-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .copy-btn.copied {
+            background: var(--success-color);
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        .qr-code-container {
+            display: none;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .qr-code-container.show {
+            display: block;
+        }
+
+        .worksheet-info-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .info-value {
+            color: var(--text-secondary);
+        }
+
+        .close-modal-btn {
+            background: var(--text-secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .close-modal-btn:hover {
+            background: var(--text-primary);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+
+        @media (max-width: 768px) {
+            .worksheet-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .generation-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .link-modal-content {
+                padding: 2rem;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h5 id="loadingText">Generating Questions...</h5>
+            <p class="text-muted mb-0">AI is analyzing your image and creating questions</p>
+        </div>
+    </div>
+
+    <div class="container main-container">
+        <!-- Header -->
+        <div class="worksheet-header">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <h1 class="worksheet-title">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        Worksheet Creator
+                    </h1>
+                    <p class="text-muted mb-0">Create engaging worksheets with media, interactive questions, and time management</p>
+                </div>
+                <a href="/existing-worksheets" class="btn btn-outline-primary" style="white-space: nowrap;">
+                    <i class="fas fa-folder-open"></i>
+                    Use Existing Worksheet
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Worksheet Container -->
+        <div class="worksheet-container">
+            <!-- Media Section -->
+            <div class="media-section">
+                <h3 class="mb-3">
+                    <i class="fas fa-photo-video"></i>
+                    Media Content
+                </h3>
+                <!-- File input lives outside upload area so it won't be destroyed -->
+                <input type="file" id="mediaFileInput" accept="image/*" multiple style="display: none;">
+
+                <div class="media-upload-area" id="mediaUploadArea">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <h5>Upload Images or Add Video</h5>
+                    <p class="text-muted mb-3">Drag & drop images, click to select, or paste a YouTube link</p>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('mediaFileInput').click()">
+                            <i class="fas fa-images"></i> Choose Images
+                        </button>
+                    </div>
+                    <div class="youtube-input-group" style="max-width: 500px; margin: 0.75rem auto 0;">
+                        <input type="text" id="youtubeUrlInput" placeholder="Paste YouTube link here..."
+                               onkeydown="if(event.key==='Enter'){event.preventDefault(); addYoutubeVideo();}">
+                        <button class="youtube-add-btn" onclick="event.stopPropagation(); addYoutubeVideo()">
+                            <i class="fab fa-youtube"></i> Add
+                        </button>
+                    </div>
+                    <small class="text-info mt-2 d-block">
+                        <i class="fas fa-robot"></i> Upload images to enable AI question generation
+                    </small>
+                </div>
+
+                <!-- Media Gallery (shown when media is added) -->
+                <div class="media-gallery" id="mediaGallery" style="display: none;">
+                    <div class="media-gallery-main" id="mediaGalleryMain"></div>
+                    <div class="media-thumbnails" id="mediaThumbnails"></div>
+                    <div class="media-counter" id="mediaCounter"></div>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 0.5rem;">
+                        <button class="media-control-btn" onclick="document.getElementById('mediaFileInput').click()">
+                            <i class="fas fa-plus"></i> Add Image
+                        </button>
+                        <button class="media-control-btn" id="addVideoBtn" onclick="toggleYoutubeInput()">
+                            <i class="fab fa-youtube"></i> Add Video
+                        </button>
+                        <button class="media-control-btn" onclick="removeCurrentMedia()">
+                            <i class="fas fa-trash"></i> Remove Current
+                        </button>
+                        <button class="media-control-btn" onclick="removeAllMedia()">
+                            <i class="fas fa-trash-alt"></i> Remove All
+                        </button>
+                    </div>
+                    <div class="youtube-input-group" id="galleryYoutubeInput" style="display: none; max-width: 500px; margin: 0.5rem auto 0;">
+                        <input type="text" id="galleryYoutubeUrl" placeholder="Paste YouTube link..."
+                               onkeydown="if(event.key==='Enter'){event.preventDefault(); addYoutubeVideoFromGallery();}">
+                        <button class="youtube-add-btn" onclick="addYoutubeVideoFromGallery()">
+                            <i class="fab fa-youtube"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <div class="media-controls" id="mediaControls" style="display: none;">
+                </div>
+            </div>
+
+            <!-- Questions Section -->
+            <div class="questions-section">
+                <h3 class="mb-3">
+                    <i class="fas fa-question-circle"></i>
+                    Questions & Settings
+                </h3>
+
+                <!-- AI Question Generation Panel -->
+                <div class="ai-generation-panel" id="aiGenerationPanel" style="display: none;">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="ai-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">🤖 AI Question Generator</h5>
+                            <small class="text-muted">AI analyzes your worksheet image and extracts questions with answers</small>
+                        </div>
+                    </div>
+
+                    <div class="generation-controls">
+                        <div>
+                            <label class="form-label fw-bold">Number of Questions</label>
+                            <select class="form-select" id="numQuestions">
+                                <option value="3">3 Questions</option>
+                                <option value="4">4 Questions</option>
+                                <option value="5" selected>5 Questions</option>
+                                <option value="6">6 Questions</option>
+                                <option value="7">7 Questions</option>
+                                <option value="8">8 Questions</option>
+                                <option value="9">9 Questions</option>
+                                <option value="10">10 Questions</option>
+                                <option value="12">12 Questions</option>
+                                <option value="15">15 Questions</option>
+                                <option value="20">20 Questions</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label fw-bold">Difficulty Level</label>
+                            <select class="form-select" id="difficultyLevel">
+                                <option value="easy">Easy</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Answer Format</label>
+                        <select class="form-select" id="answerFormat">
+                            <option value="input">Input Field (type answer)</option>
+                            <option value="multiple_choice">Multiple Choice (A, B, C, D)</option>
+                            <option value="true_false">True or False</option>
+                            <option value="mixed" selected>Mix of All Types</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Question Types</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="factual" id="typeFactual" checked>
+                            <label class="form-check-label" for="typeFactual">
+                                Factual (What, Where, When, How many)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="descriptive" id="typeDescriptive" checked>
+                            <label class="form-check-label" for="typeDescriptive">
+                                Descriptive (Describe, Identify, Name)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="analytical" id="typeAnalytical">
+                            <label class="form-check-label" for="typeAnalytical">
+                                Analytical (Why, How, Explain, Compare)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="generate-buttons-row">
+                        <button class="generate-btn" id="generateQuestionsBtn" onclick="generateQuestionsFromImage()">
+                            <i class="fas fa-magic"></i>
+                            Generate Questions
+                            <span class="btn-tooltip">AI reads the image and creates new questions with answers from the content</span>
+                        </button>
+                        <button class="generate-btn answers-only" id="generateAnswersBtn" onclick="generateAnswersOnly()">
+                            <i class="fas fa-check-double"></i>
+                            Generate Answers Only
+                            <span class="btn-tooltip">Use when questions are already on the worksheet — AI reads and solves them</span>
+                        </button>
+                    </div>
+
+                    <div class="ai-status" id="aiStatus">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span id="aiStatusText">Ready to generate questions</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timer Settings Panel -->
+                <div class="timer-settings-panel">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="timer-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">⏰ Timer Settings</h5>
+                            <small class="text-muted">Set time limits for your worksheet</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Main Time Limit</label>
+                            <div class="time-input-group">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <div class="text-center">
+                                        <input type="number" class="time-input" id="hours" min="0" max="23" value="0" onchange="updateTimerPreview()">
+                                        <div class="time-label">Hours</div>
+                                    </div>
+                                    <span class="fs-3 fw-bold">:</span>
+                                    <div class="text-center">
+                                        <input type="number" class="time-input" id="minutes" min="0" max="59" value="30" onchange="updateTimerPreview()">
+                                        <div class="time-label">Minutes</div>
+                                    </div>
+                                    <span class="fs-3 fw-bold">:</span>
+                                    <div class="text-center">
+                                        <input type="number" class="time-input" id="seconds" min="0" max="59" value="0" onchange="updateTimerPreview()">
+                                        <div class="time-label">Seconds</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="extra-time-toggle" id="extraTimeToggle">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="allowExtraTime" onchange="toggleExtraTime()">
+                                    <label class="form-check-label fw-bold" for="allowExtraTime">
+                                        <i class="fas fa-plus-circle text-success"></i>
+                                        Allow Extra Time Request
+                                    </label>
+                                </div>
+                                
+                                <div id="extraTimeSettings" style="display: none;">
+                                    <label class="form-label">Extra Time Amount</label>
+                                    <div class="time-input-group">
+                                        <div class="d-flex justify-content-center align-items-center gap-2">
+                                            <div class="text-center">
+                                                <input type="number" class="time-input" id="extraMinutes" min="1" max="60" value="10" onchange="updateTimerPreview()">
+                                                <div class="time-label">Minutes</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timer Preview -->
+                    <div class="timer-preview">
+                        <div class="timer-display" id="timerPreview">00:30:00</div>
+                        <small class="text-muted">Timer Preview</small>
+                        <div id="extraTimeInfo" class="mt-2" style="display: none;">
+                            <small class="text-success">
+                                <i class="fas fa-plus"></i>
+                                + <span id="extraTimeDisplay">10</span> minutes available on request
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+<!-- Settings Panel -->
+               <div class="settings-panel">
+                   <h5 class="mb-3">Worksheet Settings</h5>
+
+                   <div class="form-check form-switch mb-3">
+                       <input class="form-check-input" type="checkbox" id="includeQuestions" checked>
+                       <label class="form-check-label" for="includeQuestions">
+                           Include question text above input fields
+                       </label>
+                   </div>
+
+                   <div class="row mb-3">
+                       <div class="col-md-6">
+                           <label class="form-label">Worksheet Title</label>
+                           <input type="text" class="form-control" id="worksheetTitle" placeholder="Enter worksheet title">
+                       </div>
+                       <div class="col-md-6">
+                           <label class="form-label">Subject</label>
+                           <select class="form-select" id="worksheetSubject">
+                               <option value="general">General</option>
+                               <option value="mathematics">Mathematics</option>
+                               <option value="english">English</option>
+                               <option value="science">Science</option>
+                               <option value="history">History</option>
+                               <option value="geography">Geography</option>
+                           </select>
+                       </div>
+                   </div>
+
+                   <div class="row">
+                       <div class="col-md-6">
+                           <label class="form-label">Topic (Optional)</label>
+                           <input type="text" class="form-control" id="worksheetTopic" placeholder="e.g., Algebra, Cell Biology...">
+                       </div>
+                       <div class="col-md-6">
+                           <label class="form-label">Question Display Mode</label>
+                           <select class="form-select" id="questionMode">
+                               <option value="list">List Mode (All questions visible)</option>
+                               <option value="auto_navigation">Auto Navigation (One at a time with celebration)</option>
+                           </select>
+                           <small class="text-muted">Auto Navigation shows confetti and positive feedback when students answer correctly</small>
+                       </div>
+                   </div>
+               </div>
+
+               <!-- Questions Container -->
+               <div id="questionsContainer">
+                   <!-- Questions will be dynamically added here -->
+               </div>
+
+               <!-- Manual Add Question Button -->
+               <button class="add-question-btn" onclick="addQuestion()">
+                   <i class="fas fa-plus"></i>
+                   Add Manual Question
+               </button>
+
+               <!-- Assign Worksheet Button -->
+               <div class="text-center mt-4">
+                   <button class="assign-worksheet-btn" onclick="assignWorksheet()">
+                       <i class="fas fa-paper-plane"></i>
+                       Create Worksheet
+                   </button>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   <!-- Enhanced Worksheet Link Modal -->
+   <div class="worksheet-link-modal" id="worksheetLinkModal">
+       <div class="link-modal-content">
+           <div class="success-icon">🎉</div>
+           <h2 class="text-primary mb-3">Worksheet Created Successfully!</h2>
+           <p class="text-muted mb-4">Your worksheet is ready! Share this link with your students.</p>
+           
+           <!-- Worksheet Info Card -->
+           <div class="worksheet-info-card" id="worksheetInfoCard">
+               <div class="info-row">
+                   <span class="info-label">📝 Title:</span>
+                   <span class="info-value" id="modalWorksheetTitle">-</span>
+               </div>
+               <div class="info-row">
+                   <span class="info-label">📚 Subject:</span>
+                   <span class="info-value" id="modalWorksheetSubject">-</span>
+               </div>
+               <div class="info-row">
+                   <span class="info-label">❓ Questions:</span>
+                   <span class="info-value" id="modalQuestionCount">-</span>
+               </div>
+               <div class="info-row">
+                   <span class="info-label">⏰ Time Limit:</span>
+                   <span class="info-value" id="modalTimeLimit">-</span>
+               </div>
+               <div class="info-row">
+                   <span class="info-label">🤖 AI Questions:</span>
+                   <span class="info-value" id="modalAiQuestions">-</span>
+               </div>
+           </div>
+
+           <!-- Shareable Link Display -->
+           <div class="worksheet-link-display" id="worksheetLinkDisplay">
+               <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                   📎 Student Access Link:
+               </div>
+               <a id="shareableLink" href="#" target="_blank" style="font-size: 1rem; color: var(--primary-color); font-weight: 600; text-decoration: underline; cursor: pointer; display: inline-block;">
+                   Loading...
+               </a>
+           </div>
+
+           <!-- Link Actions -->
+           <div class="link-actions">
+               <button class="copy-btn" id="copyLinkBtn" onclick="copyWorksheetLink()">
+                   <i class="fas fa-copy"></i>
+                   <span id="copyBtnText">Copy Link</span>
+               </button>
+               
+               <button class="share-btn" onclick="shareWorksheet()">
+                   <i class="fas fa-share-alt"></i>
+                   Share
+               </button>
+               
+               <button class="qr-btn" onclick="toggleQRCode()">
+                   <i class="fas fa-qrcode"></i>
+                   QR Code
+               </button>
+           </div>
+
+           <!-- QR Code Container -->
+           <div class="qr-code-container" id="qrCodeContainer">
+               <h6>📱 QR Code for Easy Access</h6>
+               <div id="qrCodeDisplay" style="display: inline-block; padding: 1rem; background: white; border-radius: 8px;">
+                   <!-- QR code will be generated here -->
+               </div>
+               <p class="text-muted small mt-2">Students can scan this QR code to access the worksheet</p>
+           </div>
+
+           <!-- Additional Actions -->
+           <div class="mt-4">
+               <button class="close-modal-btn" onclick="closeWorksheetLinkModal()">
+                   <i class="fas fa-check"></i>
+                   Done
+               </button>
+           </div>
+       </div>
+   </div>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+   <script>
+       let questionCount = 0;
+       let uploadedMedia = null; // kept for AI generation compat (first image)
+       let mediaItems = [];     // array of {type:'image'|'youtube', url, base64?, youtubeId?, file?}
+       let activeMediaIndex = 0;
+       let generatedQuestions = [];
+       let currentWorksheetData = null;
+
+       // Initialize with setup
+       document.addEventListener('DOMContentLoaded', function() {
+           setupMediaUpload();
+           updateTimerPreview();
+
+           // Check for edit mode
+           const urlParams = new URLSearchParams(window.location.search);
+           const editId = urlParams.get('edit');
+           if (editId) {
+               loadWorksheetForEdit(editId);
+           } else {
+               addQuestion(); // Add initial manual question
+           }
+       });
+
+       // Load existing worksheet for editing
+       async function loadWorksheetForEdit(worksheetId) {
+           try {
+               showLoading('Loading Worksheet...', 'Fetching worksheet data for editing');
+               const response = await fetch(`/api/tutor/worksheet/${worksheetId}`);
+               const data = await response.json();
+
+               if (!data.success || !data.worksheet) {
+                   throw new Error('Worksheet not found');
+               }
+
+               const ws = data.worksheet;
+
+               // Populate title, subject, topic
+               document.getElementById('worksheetTitle').value = ws.title || '';
+               document.getElementById('worksheetSubject').value = ws.subject || 'general';
+               const topicEl = document.getElementById('worksheetTopic');
+               if (topicEl) topicEl.value = ws.topic || '';
+
+               // Set question mode
+               const modeEl = document.getElementById('questionMode');
+               if (modeEl && ws.questionMode) modeEl.value = ws.questionMode;
+
+               // Set include questions
+               document.getElementById('includeQuestions').checked = ws.includeQuestions !== false;
+
+               // Set timer
+               if (ws.timeLimit) {
+                   document.getElementById('hours').value = ws.timeLimit.hours || 0;
+                   document.getElementById('minutes').value = ws.timeLimit.minutes || 0;
+                   document.getElementById('seconds').value = ws.timeLimit.seconds || 0;
+                   updateTimerPreview();
+               }
+
+               // Set extra time
+               if (ws.extraTime && ws.extraTime.allowed) {
+                   document.getElementById('allowExtraTime').checked = true;
+                   document.getElementById('extraMinutes').value = ws.extraTime.minutes || 10;
+                   toggleExtraTime();
+               }
+
+               // Load media if available
+               if (ws.mediaFiles && ws.mediaFiles.length > 0) {
+                   ws.mediaFiles.forEach(m => {
+                       mediaItems.push({
+                           type: m.type,
+                           url: m.url,
+                           base64: m.type === 'image' ? m.url : undefined,
+                           youtubeId: m.youtubeId,
+                           thumbnail: m.thumbnail,
+                           name: m.name || ''
+                       });
+                   });
+                   activeMediaIndex = 0;
+                   renderMediaGallery();
+                   showAIPanel();
+               }
+
+               // Load questions
+               const questions = ws.questions || [];
+               questions.forEach((q, index) => {
+                   addAIGeneratedQuestion({
+                       question_text: q.questionText || q.question_text || '',
+                       expected_answer: q.expectedAnswer || q.expected_answer || '',
+                       answer_format: q.answer_format || 'input',
+                       options: q.options || [],
+                       question_type: q.question_type || 'factual',
+                       difficulty: q.difficulty || 'medium'
+                   }, index + 1);
+               });
+
+               // Update page title to indicate edit mode
+               document.querySelector('.worksheet-title').innerHTML = `
+                   <i class="fas fa-chalkboard-teacher"></i>
+                   Edit Worksheet
+               `;
+
+               // Change button to "Update Worksheet"
+               const assignBtn = document.querySelector('.assign-worksheet-btn');
+               if (assignBtn) {
+                   assignBtn.innerHTML = '<i class="fas fa-save"></i> Update Worksheet';
+               }
+
+           } catch (error) {
+               console.error('Error loading worksheet for edit:', error);
+               alert('Failed to load worksheet for editing: ' + error.message);
+               addQuestion(); // Fallback to empty
+           } finally {
+               hideLoading();
+           }
+       }
+
+       function updateTimerPreview() {
+           const hours = parseInt(document.getElementById('hours').value) || 0;
+           const minutes = parseInt(document.getElementById('minutes').value) || 0;
+           const seconds = parseInt(document.getElementById('seconds').value) || 0;
+           
+           const timerPreview = document.getElementById('timerPreview');
+           timerPreview.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+           
+           // Update extra time info
+           const extraTimeInfo = document.getElementById('extraTimeInfo');
+           const allowExtraTime = document.getElementById('allowExtraTime').checked;
+           const extraMinutes = parseInt(document.getElementById('extraMinutes').value) || 10;
+           
+           if (allowExtraTime) {
+               extraTimeInfo.style.display = 'block';
+               document.getElementById('extraTimeDisplay').textContent = extraMinutes;
+           } else {
+               extraTimeInfo.style.display = 'none';
+           }
+       }
+
+       function toggleExtraTime() {
+           const checkbox = document.getElementById('allowExtraTime');
+           const settings = document.getElementById('extraTimeSettings');
+           const toggle = document.getElementById('extraTimeToggle');
+           
+           if (checkbox.checked) {
+               settings.style.display = 'block';
+               toggle.classList.add('active');
+           } else {
+               settings.style.display = 'none';
+               toggle.classList.remove('active');
+           }
+           updateTimerPreview();
+       }
+
+       function setupMediaUpload() {
+           const uploadArea = document.getElementById('mediaUploadArea');
+           const fileInput = document.getElementById('mediaFileInput');
+
+           // Drag and drop
+           uploadArea.addEventListener('dragover', (e) => {
+               e.preventDefault();
+               uploadArea.classList.add('dragover');
+           });
+
+           uploadArea.addEventListener('dragleave', () => {
+               uploadArea.classList.remove('dragover');
+           });
+
+           uploadArea.addEventListener('drop', (e) => {
+               e.preventDefault();
+               uploadArea.classList.remove('dragover');
+               const files = e.dataTransfer.files;
+               if (files.length > 0) {
+                   handleMultiFileUpload(files);
+               }
+           });
+
+           // File input change (supports multiple)
+           fileInput.addEventListener('change', (e) => {
+               if (e.target.files.length > 0) {
+                   handleMultiFileUpload(e.target.files);
+               }
+           });
+
+           // Click upload area to select files (only when no media yet)
+           uploadArea.addEventListener('click', (e) => {
+               if (mediaItems.length === 0 && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+                   fileInput.click();
+               }
+           });
+       }
+
+       function handleMultiFileUpload(files) {
+           Array.from(files).forEach(file => {
+               if (!file.type.startsWith('image/')) {
+                   alert(`"${file.name}" is not an image. Only image files are supported for upload. Use the YouTube link input for videos.`);
+                   return;
+               }
+               const reader = new FileReader();
+               reader.onload = function(e) {
+                   mediaItems.push({
+                       type: 'image',
+                       file: file,
+                       url: e.target.result,
+                       base64: e.target.result,
+                       name: file.name
+                   });
+
+                   // Set uploadedMedia to first image for AI compat
+                   const firstImage = mediaItems.find(m => m.type === 'image');
+                   if (firstImage) {
+                       uploadedMedia = firstImage;
+                   }
+
+                   activeMediaIndex = mediaItems.length - 1;
+                   renderMediaGallery();
+                   showAIPanel();
+
+                   // Auto-suggest title from first file
+                   const titleInput = document.getElementById('worksheetTitle');
+                   if (!titleInput.value.trim() && mediaItems.length === 1) {
+                       const filename = file.name.replace(/\.[^/.]+$/, "");
+                       const suggested = filename.charAt(0).toUpperCase() + filename.slice(1).replace(/[-_]/g, ' ');
+                       titleInput.value = `${suggested} Worksheet`;
+                   }
+               };
+               reader.readAsDataURL(file);
+           });
+           // Reset file input so re-selecting same file works
+           document.getElementById('mediaFileInput').value = '';
+       }
+
+       // YouTube helpers
+       function extractYoutubeId(url) {
+           if (!url) return null;
+           const patterns = [
+               /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+               /^([a-zA-Z0-9_-]{11})$/
+           ];
+           for (const p of patterns) {
+               const m = url.match(p);
+               if (m) return m[1];
+           }
+           return null;
+       }
+
+       function addYoutubeVideo() {
+           const input = document.getElementById('youtubeUrlInput');
+           const url = input.value.trim();
+           const ytId = extractYoutubeId(url);
+           if (!ytId) {
+               alert('Please paste a valid YouTube URL.');
+               return;
+           }
+           mediaItems.push({
+               type: 'youtube',
+               youtubeId: ytId,
+               url: `https://www.youtube.com/embed/${ytId}`,
+               thumbnail: `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`,
+               name: `YouTube: ${ytId}`
+           });
+           activeMediaIndex = mediaItems.length - 1;
+           input.value = '';
+           renderMediaGallery();
+
+           const firstImage = mediaItems.find(m => m.type === 'image');
+           if (firstImage) uploadedMedia = firstImage;
+           showAIPanel();
+       }
+
+       function addYoutubeVideoFromGallery() {
+           const input = document.getElementById('galleryYoutubeUrl');
+           const url = input.value.trim();
+           const ytId = extractYoutubeId(url);
+           if (!ytId) {
+               alert('Please paste a valid YouTube URL.');
+               return;
+           }
+           mediaItems.push({
+               type: 'youtube',
+               youtubeId: ytId,
+               url: `https://www.youtube.com/embed/${ytId}`,
+               thumbnail: `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`,
+               name: `YouTube: ${ytId}`
+           });
+           activeMediaIndex = mediaItems.length - 1;
+           input.value = '';
+           document.getElementById('galleryYoutubeInput').style.display = 'none';
+           renderMediaGallery();
+           showAIPanel();
+       }
+
+       function toggleYoutubeInput() {
+           const el = document.getElementById('galleryYoutubeInput');
+           el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+           if (el.style.display !== 'none') {
+               document.getElementById('galleryYoutubeUrl').focus();
+           }
+       }
+
+       function renderMediaGallery() {
+           const uploadArea = document.getElementById('mediaUploadArea');
+           const gallery = document.getElementById('mediaGallery');
+           const mainView = document.getElementById('mediaGalleryMain');
+           const thumbs = document.getElementById('mediaThumbnails');
+           const counter = document.getElementById('mediaCounter');
+
+           if (mediaItems.length === 0) {
+               gallery.style.display = 'none';
+               uploadArea.style.display = 'flex';
+               return;
+           }
+
+           uploadArea.style.display = 'none';
+           gallery.style.display = 'flex';
+
+           // Clamp index
+           if (activeMediaIndex >= mediaItems.length) activeMediaIndex = mediaItems.length - 1;
+           if (activeMediaIndex < 0) activeMediaIndex = 0;
+
+           const current = mediaItems[activeMediaIndex];
+
+           // Main view
+           if (current.type === 'image') {
+               mainView.innerHTML = `<img src="${current.url}" alt="${current.name || 'Image'}" class="media-preview" style="max-width:100%; max-height:400px; object-fit:contain;">`;
+           } else if (current.type === 'youtube') {
+               mainView.innerHTML = `<iframe src="${current.url}?rel=0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" style="width:100%; aspect-ratio:16/9; border:none; border-radius:8px;"></iframe>`;
+           }
+
+           // Thumbnails
+           thumbs.innerHTML = '';
+           mediaItems.forEach((item, idx) => {
+               if (item.type === 'image') {
+                   const wrapper = document.createElement('div');
+                   wrapper.style.position = 'relative';
+                   wrapper.style.flexShrink = '0';
+                   wrapper.innerHTML = `
+                       <img src="${item.url}" class="media-thumb ${idx === activeMediaIndex ? 'active' : ''}"
+                            onclick="setActiveMedia(${idx})" alt="Thumb ${idx + 1}">
+                       <div class="media-item-badge" onclick="event.stopPropagation(); removeMediaAt(${idx})" title="Remove">
+                           <i class="fas fa-times"></i>
+                       </div>
+                   `;
+                   thumbs.appendChild(wrapper);
+               } else if (item.type === 'youtube') {
+                   const wrapper = document.createElement('div');
+                   wrapper.style.position = 'relative';
+                   wrapper.style.flexShrink = '0';
+                   wrapper.innerHTML = `
+                       <div class="media-thumb-video ${idx === activeMediaIndex ? 'active' : ''}"
+                            onclick="setActiveMedia(${idx})">
+                           <i class="fab fa-youtube"></i>
+                       </div>
+                       <div class="media-item-badge" onclick="event.stopPropagation(); removeMediaAt(${idx})" title="Remove"
+                            style="position:absolute; top:2px; right:2px;">
+                           <i class="fas fa-times"></i>
+                       </div>
+                   `;
+                   thumbs.appendChild(wrapper);
+               }
+           });
+
+           // Counter
+           const imgCount = mediaItems.filter(m => m.type === 'image').length;
+           const vidCount = mediaItems.filter(m => m.type === 'youtube').length;
+           const parts = [];
+           if (imgCount > 0) parts.push(`${imgCount} image${imgCount > 1 ? 's' : ''}`);
+           if (vidCount > 0) parts.push(`${vidCount} video${vidCount > 1 ? 's' : ''}`);
+           counter.textContent = `${activeMediaIndex + 1} / ${mediaItems.length} — ${parts.join(', ')}`;
+       }
+
+       function setActiveMedia(idx) {
+           activeMediaIndex = idx;
+           renderMediaGallery();
+       }
+
+       function removeMediaAt(idx) {
+           mediaItems.splice(idx, 1);
+           if (activeMediaIndex >= mediaItems.length) activeMediaIndex = Math.max(0, mediaItems.length - 1);
+
+           // Update uploadedMedia compat
+           const firstImage = mediaItems.find(m => m.type === 'image');
+           uploadedMedia = firstImage || null;
+
+           if (mediaItems.length === 0) {
+               const aiPanel = document.getElementById('aiGenerationPanel');
+               if (aiPanel) aiPanel.style.display = 'none';
+           }
+
+           renderMediaGallery();
+       }
+
+       function removeCurrentMedia() {
+           removeMediaAt(activeMediaIndex);
+       }
+
+       function removeAllMedia() {
+           mediaItems = [];
+           uploadedMedia = null;
+           activeMediaIndex = 0;
+           const aiPanel = document.getElementById('aiGenerationPanel');
+           if (aiPanel) aiPanel.style.display = 'none';
+           document.getElementById('mediaFileInput').value = '';
+           renderMediaGallery();
+       }
+
+       // Legacy compat aliases
+       function removeMedia() {
+           removeAllMedia();
+       }
+
+       function replaceMedia() {
+           document.getElementById('mediaFileInput').click();
+       }
+
+       function showAIPanel() {
+           // Show AI panel if at least one image or YouTube video exists
+           const hasMedia = mediaItems.some(m => m.type === 'image' || m.type === 'youtube');
+           const panel = document.getElementById('aiGenerationPanel');
+           if (panel && hasMedia) {
+               panel.style.display = 'block';
+               panel.style.animation = 'pulse-highlight 1s ease-in-out';
+               setTimeout(() => { panel.style.animation = ''; }, 1000);
+               setTimeout(() => {
+                   panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+               }, 300);
+           }
+       }
+
+       async function generateQuestionsFromImage() {
+           const images = mediaItems.filter(m => m.type === 'image' && m.base64);
+           const videos = mediaItems.filter(m => m.type === 'youtube' && m.youtubeId);
+
+           if (images.length === 0 && videos.length === 0) {
+               alert('Please upload an image or add a YouTube video first.');
+               return;
+           }
+
+           const numQuestions = parseInt(document.getElementById('numQuestions').value);
+           const difficultyLevel = document.getElementById('difficultyLevel').value;
+           const subject = document.getElementById('worksheetSubject').value;
+           const answerFormat = document.getElementById('answerFormat').value;
+
+           const questionTypes = [];
+           if (document.getElementById('typeFactual').checked) questionTypes.push('factual');
+           if (document.getElementById('typeDescriptive').checked) questionTypes.push('descriptive');
+           if (document.getElementById('typeAnalytical').checked) questionTypes.push('analytical');
+
+           if (questionTypes.length === 0) {
+               alert('Please select at least one question type.');
+               return;
+           }
+
+           // If we have images, use image endpoint; also queue video requests
+           const requests = [];
+
+           if (images.length > 0) {
+               requests.push({
+                   endpoint: '/api/tutor/generate-questions-from-image',
+                   payload: {
+                       image_data: images[0].base64,
+                       additional_images: images.slice(1).map(m => m.base64),
+                       num_questions: videos.length > 0 ? Math.ceil(numQuestions / 2) : numQuestions,
+                       subject, difficulty_level: difficultyLevel, question_types: questionTypes,
+                       answer_format: answerFormat
+                   },
+                   desc: `${images.length} image${images.length > 1 ? 's' : ''}`
+               });
+           }
+
+           for (const vid of videos) {
+               requests.push({
+                   endpoint: '/api/tutor/generate-questions-from-video',
+                   payload: {
+                       youtube_id: vid.youtubeId,
+                       num_questions: images.length > 0 ? Math.floor(numQuestions / 2) : numQuestions,
+                       subject, difficulty_level: difficultyLevel, question_types: questionTypes,
+                       answer_format: answerFormat,
+                       answers_only: false
+                   },
+                   desc: `video "${vid.name || vid.youtubeId}"`
+               });
+           }
+
+           const totalDesc = requests.map(r => r.desc).join(' + ');
+           await runMultiAIGeneration(requests, 'generateQuestionsBtn',
+               'Analyzing Content...', `AI is analyzing ${totalDesc}`);
+       }
+
+       async function generateAnswersOnly() {
+           const images = mediaItems.filter(m => m.type === 'image' && m.base64);
+           const videos = mediaItems.filter(m => m.type === 'youtube' && m.youtubeId);
+
+           if (images.length === 0 && videos.length === 0) {
+               alert('Please upload an image or add a YouTube video first.');
+               return;
+           }
+
+           const subject = document.getElementById('worksheetSubject').value;
+           const answerFormat = document.getElementById('answerFormat').value;
+           const requests = [];
+
+           if (images.length > 0) {
+               requests.push({
+                   endpoint: '/api/tutor/generate-answers-from-image',
+                   payload: {
+                       image_data: images[0].base64,
+                       additional_images: images.slice(1).map(m => m.base64),
+                       subject,
+                       answer_format: answerFormat
+                   },
+                   desc: `${images.length} image${images.length > 1 ? 's' : ''}`
+               });
+           }
+
+           for (const vid of videos) {
+               requests.push({
+                   endpoint: '/api/tutor/generate-questions-from-video',
+                   payload: { youtube_id: vid.youtubeId, subject, answer_format: answerFormat, answers_only: true },
+                   desc: `video "${vid.name || vid.youtubeId}"`
+               });
+           }
+
+           const totalDesc = requests.map(r => r.desc).join(' + ');
+           await runMultiAIGeneration(requests, 'generateAnswersBtn',
+               'Extracting Answers...', `AI is reading ${totalDesc} and solving problems`);
+       }
+
+       async function runMultiAIGeneration(requests, buttonId, loadingTitle, loadingDesc) {
+           // Remove blank manual questions so AI numbering starts at 1
+           const manualItems = document.querySelectorAll('.question-item:not(.ai-generated)');
+           manualItems.forEach(item => {
+               const inputs = item.querySelectorAll('input[type="text"]');
+               const allEmpty = Array.from(inputs).every(inp => !inp.value.trim());
+               if (allEmpty) item.remove();
+           });
+
+           // Run one or more AI requests sequentially, appending results
+           showLoading(loadingTitle, loadingDesc);
+
+           const btn = document.getElementById(buttonId);
+           const originalText = btn.innerHTML;
+           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+           btn.disabled = true;
+
+           const otherBtnId = buttonId === 'generateQuestionsBtn' ? 'generateAnswersBtn' : 'generateQuestionsBtn';
+           const otherBtn = document.getElementById(otherBtnId);
+           if (otherBtn) otherBtn.disabled = true;
+
+           const aiStatus = document.getElementById('aiStatus');
+           const aiStatusText = document.getElementById('aiStatusText');
+           aiStatus.className = 'ai-status show generating';
+           aiStatusText.textContent = loadingDesc;
+
+           let totalNew = 0;
+           let lastError = null;
+           let lastDescription = '';
+
+           try {
+               for (const req of requests) {
+                   try {
+                       const response = await fetch(req.endpoint, {
+                           method: 'POST',
+                           headers: { 'Content-Type': 'application/json' },
+                           body: JSON.stringify(req.payload)
+                       });
+
+                       if (response.ok) {
+                           const result = await response.json();
+
+                           if (result.suggested_title && !document.getElementById('worksheetTitle').value) {
+                               document.getElementById('worksheetTitle').value = result.suggested_title;
+                           }
+
+                           const existingCount = document.querySelectorAll('.question-item').length;
+                           const newQuestions = result.questions || [];
+                           generatedQuestions = generatedQuestions.concat(newQuestions);
+
+                           newQuestions.forEach((question, index) => {
+                               addAIGeneratedQuestion(question, existingCount + index + 1);
+                           });
+
+                           totalNew += newQuestions.length;
+                           if (result.image_description) lastDescription = result.image_description;
+                       } else {
+                           const errorData = await response.json().catch(() => ({}));
+                           lastError = errorData.error || 'AI generation failed';
+                       }
+                   } catch (err) {
+                       lastError = err.message;
+                   }
+               }
+
+               const totalCount = document.querySelectorAll('.question-item').length;
+
+               if (totalNew > 0) {
+                   aiStatus.className = 'ai-status show success';
+                   aiStatusText.innerHTML = `<i class="fas fa-check-circle"></i> Generated ${totalNew} AI results! (${totalCount} total)`;
+                   if (lastDescription) {
+                       aiStatusText.innerHTML += `<br><small style="opacity:0.8;">${lastDescription}</small>`;
+                   }
+                   setTimeout(() => {
+                       document.getElementById('questionsContainer').scrollIntoView({ behavior: 'smooth' });
+                   }, 500);
+               } else if (lastError) {
+                   aiStatus.className = 'ai-status show error';
+                   aiStatusText.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${lastError}`;
+               }
+
+           } finally {
+               hideLoading();
+               btn.innerHTML = originalText;
+               btn.disabled = false;
+               if (otherBtn) otherBtn.disabled = false;
+           }
+       }
+
+
+
+       function addAIGeneratedQuestion(questionData, questionNumber) {
+           questionCount++;
+           const qId = questionCount;
+           const container = document.getElementById('questionsContainer');
+           const includeQuestions = document.getElementById('includeQuestions').checked;
+
+           // Escape values for safe HTML attribute insertion
+           const qText = (questionData.question_text || '').replace(/"/g, '&quot;');
+           const aText = (questionData.expected_answer || '').replace(/"/g, '&quot;');
+           const aFormat = questionData.answer_format || 'input';
+           const options = questionData.options || [];
+
+           // Build answer section based on format
+           let answerSection = '';
+           if (aFormat === 'multiple_choice' && options.length > 0) {
+               const optionsJson = JSON.stringify(options).replace(/"/g, '&quot;');
+               answerSection = `
+               <div class="mb-3">
+                   <label class="form-label">Options</label>
+                   <div class="mc-options-preview" id="optionsPreview-${qId}">
+                       ${options.map((opt, i) => `<div class="mc-option">${opt}</div>`).join('')}
+                   </div>
+                   <input type="hidden" id="optionsData-${qId}" value="${optionsJson}">
+               </div>
+               <div class="mb-3">
+                   <label class="form-label">Correct Answer</label>
+                   <input type="text" class="answer-input" value="${aText}" id="expectedAnswer-${qId}" required disabled>
+               </div>`;
+           } else if (aFormat === 'true_false') {
+               answerSection = `
+               <div class="mb-3">
+                   <label class="form-label">Correct Answer</label>
+                   <select class="answer-input form-select" id="expectedAnswer-${qId}" disabled>
+                       <option value="True" ${aText === 'True' ? 'selected' : ''}>True</option>
+                       <option value="False" ${aText === 'False' ? 'selected' : ''}>False</option>
+                   </select>
+               </div>`;
+           } else {
+               answerSection = `
+               <div class="mb-3">
+                   <label class="form-label">Expected Answer</label>
+                   <input type="text" class="answer-input" value="${aText}" id="expectedAnswer-${qId}" required disabled>
+               </div>`;
+           }
+
+           // Format badge
+           const formatLabels = { input: 'Input', multiple_choice: 'Multiple Choice', true_false: 'True/False' };
+           const formatBadge = `<span class="format-badge format-${aFormat}">${formatLabels[aFormat] || aFormat}</span>`;
+
+           const questionDiv = document.createElement('div');
+           questionDiv.className = 'question-item ai-generated';
+           questionDiv.id = `question-${qId}`;
+           questionDiv.dataset.answerFormat = aFormat;
+
+           questionDiv.innerHTML = `
+               <div class="question-header">
+                   <div class="d-flex align-items-center">
+                       <div class="question-number">${questionNumber}</div>
+                       <h6 class="mb-0">Question ${questionNumber}</h6>
+                       <span class="ai-badge">
+                           <i class="fas fa-robot"></i> AI Generated
+                       </span>
+                       ${formatBadge}
+                       <button class="edit-question-btn" onclick="toggleEditQuestion(${qId})" title="Edit this question">
+                           <i class="fas fa-pen"></i> Edit
+                       </button>
+                   </div>
+                   <button class="remove-question-btn" onclick="removeQuestion(${qId})">
+                       <i class="fas fa-times"></i>
+                   </button>
+               </div>
+
+               ${includeQuestions ? `
+               <div class="mb-3">
+                   <label class="form-label">Question Text</label>
+                   <input type="text" class="question-input" value="${qText}" id="questionText-${qId}" disabled>
+               </div>
+               ` : ''}
+
+               ${answerSection}
+
+               <div class="row">
+                   <div class="col-md-4">
+                       <label class="form-label">Answer Format</label>
+                       <select class="form-select form-select-sm" id="answerFormatQ-${qId}" disabled>
+                           <option value="input" ${aFormat === 'input' ? 'selected' : ''}>Input</option>
+                           <option value="multiple_choice" ${aFormat === 'multiple_choice' ? 'selected' : ''}>Multiple Choice</option>
+                           <option value="true_false" ${aFormat === 'true_false' ? 'selected' : ''}>True/False</option>
+                       </select>
+                   </div>
+                   <div class="col-md-4">
+                       <label class="form-label">Question Type</label>
+                       <select class="form-select form-select-sm" id="questionType-${qId}" disabled>
+                           <option value="factual" ${questionData.question_type === 'factual' ? 'selected' : ''}>Factual</option>
+                           <option value="descriptive" ${questionData.question_type === 'descriptive' ? 'selected' : ''}>Descriptive</option>
+                           <option value="analytical" ${questionData.question_type === 'analytical' ? 'selected' : ''}>Analytical</option>
+                       </select>
+                   </div>
+                   <div class="col-md-4">
+                       <label class="form-label">Difficulty</label>
+                       <select class="form-select form-select-sm" id="difficulty-${qId}" disabled>
+                           <option value="easy" ${questionData.difficulty === 'easy' ? 'selected' : ''}>Easy</option>
+                           <option value="medium" ${questionData.difficulty === 'medium' ? 'selected' : ''}>Medium</option>
+                           <option value="hard" ${questionData.difficulty === 'hard' ? 'selected' : ''}>Hard</option>
+                       </select>
+                   </div>
+               </div>
+           `;
+
+           container.appendChild(questionDiv);
+       }
+
+       function toggleEditQuestion(qId) {
+           const questionDiv = document.getElementById(`question-${qId}`);
+           if (!questionDiv) return;
+
+           const inputs = questionDiv.querySelectorAll('input, select');
+           const editBtn = questionDiv.querySelector('.edit-question-btn');
+           const isEditing = editBtn.classList.contains('editing');
+
+           if (isEditing) {
+               // Save — lock fields
+               inputs.forEach(inp => inp.disabled = true);
+               editBtn.classList.remove('editing');
+               editBtn.innerHTML = '<i class="fas fa-pen"></i> Edit';
+           } else {
+               // Enable editing
+               inputs.forEach(inp => inp.disabled = false);
+               editBtn.classList.add('editing');
+               editBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+               // Focus the first text input
+               const firstInput = questionDiv.querySelector('input[type="text"]');
+               if (firstInput) firstInput.focus();
+           }
+       }
+
+       function addQuestion() {
+           questionCount++;
+           const container = document.getElementById('questionsContainer');
+           const includeQuestions = document.getElementById('includeQuestions').checked;
+           
+           const questionDiv = document.createElement('div');
+           questionDiv.className = 'question-item';
+           questionDiv.id = `question-${questionCount}`;
+           
+           questionDiv.innerHTML = `
+               <div class="question-header">
+                   <div class="d-flex align-items-center">
+                       <div class="question-number">${questionCount}</div>
+                       <h6 class="mb-0">Question ${questionCount}</h6>
+                       <span class="badge bg-secondary ms-2">Manual</span>
+                   </div>
+                   ${questionCount > 1 ? `<button class="remove-question-btn" onclick="removeQuestion(${questionCount})">
+                       <i class="fas fa-times"></i>
+                   </button>` : ''}
+               </div>
+               
+               ${includeQuestions ? `
+               <div class="mb-3">
+                   <label class="form-label">Question Text</label>
+                   <input type="text" class="question-input" placeholder="Enter your question here..." id="questionText-${questionCount}">
+               </div>
+               ` : ''}
+               
+               <div class="mb-3">
+                   <label class="form-label">Expected Answer</label>
+                   <input type="text" class="answer-input" placeholder="Enter the expected answer..." id="expectedAnswer-${questionCount}" required>
+               </div>
+           `;
+           
+           container.appendChild(questionDiv);
+       }
+
+       function removeQuestion(questionId) {
+           const questionElement = document.getElementById(`question-${questionId}`);
+           if (questionElement) {
+               questionElement.remove();
+               renumberQuestions();
+           }
+       }
+
+       function clearAllQuestions() {
+           const container = document.getElementById('questionsContainer');
+           container.innerHTML = '';
+           questionCount = 0;
+           generatedQuestions = [];
+       }
+
+       function renumberQuestions() {
+           const questions = document.querySelectorAll('.question-item');
+           questions.forEach((question, index) => {
+               const newNumber = index + 1;
+               const questionNumber = question.querySelector('.question-number');
+               const questionTitle = question.querySelector('h6');
+               
+               questionNumber.textContent = newNumber;
+               questionTitle.textContent = `Question ${newNumber}`;
+               
+               // Update IDs
+               const questionText = question.querySelector('.question-input');
+               const expectedAnswer = question.querySelector('.answer-input');
+               const questionType = question.querySelector('select[id^="questionType-"]');
+               const difficulty = question.querySelector('select[id^="difficulty-"]');
+               
+               if (questionText) {
+                   questionText.id = `questionText-${newNumber}`;
+               }
+               if (expectedAnswer) {
+                   expectedAnswer.id = `expectedAnswer-${newNumber}`;
+               }
+               if (questionType) {
+                   questionType.id = `questionType-${newNumber}`;
+               }
+               if (difficulty) {
+                   difficulty.id = `difficulty-${newNumber}`;
+               }
+               const answerFormatSel = question.querySelector('select[id^="answerFormatQ-"]');
+               if (answerFormatSel) answerFormatSel.id = `answerFormatQ-${newNumber}`;
+               const optionsDataHidden = question.querySelector('input[id^="optionsData-"]');
+               if (optionsDataHidden) optionsDataHidden.id = `optionsData-${newNumber}`;
+
+               question.id = `question-${newNumber}`;
+               
+               // Update remove button onclick
+               const removeBtn = question.querySelector('.remove-question-btn');
+               if (removeBtn) {
+                   removeBtn.setAttribute('onclick', `removeQuestion(${newNumber})`);
+               }
+           });
+           
+           questionCount = questions.length;
+       }
+
+       // Handle include questions toggle
+       document.getElementById('includeQuestions').addEventListener('change', function() {
+           const questions = document.querySelectorAll('.question-item');
+           questions.forEach(question => {
+               question.remove();
+           });
+           questionCount = 0;
+           addQuestion();
+       });
+
+       function showLoading(title, subtitle) {
+           const overlay = document.getElementById('loadingOverlay');
+           const loadingText = document.getElementById('loadingText');
+           const loadingSubtitle = overlay.querySelector('.text-muted');
+           
+           loadingText.textContent = title;
+           loadingSubtitle.textContent = subtitle;
+           overlay.classList.add('show');
+       }
+
+       function hideLoading() {
+           document.getElementById('loadingOverlay').classList.remove('show');
+       }
+
+       async function assignWorksheet() {
+           const title = document.getElementById('worksheetTitle').value;
+           const subject = document.getElementById('worksheetSubject').value;
+           const topic = document.getElementById('worksheetTopic')?.value || '';
+           const questionMode = document.getElementById('questionMode')?.value || 'list';
+           const includeQuestions = document.getElementById('includeQuestions').checked;
+           
+           // Get timer settings
+           const hours = parseInt(document.getElementById('hours').value) || 0;
+           const minutes = parseInt(document.getElementById('minutes').value) || 0;
+           const seconds = parseInt(document.getElementById('seconds').value) || 0;
+           const totalTimeInSeconds = (hours * 3600) + (minutes * 60) + seconds;
+           
+           const allowExtraTime = document.getElementById('allowExtraTime').checked;
+           const extraMinutes = allowExtraTime ? (parseInt(document.getElementById('extraMinutes').value) || 10) : 0;
+           
+           if (!title.trim()) {
+               alert('Please enter a worksheet title.');
+               return;
+           }
+
+           if (totalTimeInSeconds === 0) {
+               alert('Please set a time limit for the worksheet.');
+               return;
+           }
+
+           // Collect all questions and answers
+           const questions = [];
+           const questionElements = document.querySelectorAll('.question-item');
+           
+           for (let index = 0; index < questionElements.length; index++) {
+               const element = questionElements[index];
+               const questionNumber = index + 1;
+
+               // Query by class to handle non-sequential IDs
+               const questionText = element.querySelector('.question-input')?.value || '';
+               const expectedAnswerEl = element.querySelector('.answer-input');
+               const expectedAnswer = expectedAnswerEl?.value || '';
+               const questionType = element.querySelector('select[id^="questionType-"]')?.value || 'factual';
+               const difficulty = element.querySelector('select[id^="difficulty-"]')?.value || 'medium';
+               const qAnswerFormat = element.querySelector('select[id^="answerFormatQ-"]')?.value
+                                     || element.dataset?.answerFormat || 'input';
+
+               if (!expectedAnswer.trim()) {
+                   alert(`Please provide an expected answer for question ${questionNumber}.`);
+                   if (expectedAnswerEl) expectedAnswerEl.focus();
+                   return;
+               }
+
+               const questionObj = {
+                   questionNumber: questionNumber,
+                   questionText: includeQuestions ? questionText : '',
+                   expectedAnswer: expectedAnswer.trim(),
+                   includeQuestion: includeQuestions,
+                   question_type: questionType,
+                   difficulty: difficulty,
+                   answer_format: qAnswerFormat
+               };
+
+               // Include options for multiple choice
+               const optionsDataEl = element.querySelector('input[id^="optionsData-"]');
+               if (optionsDataEl && optionsDataEl.value) {
+                   try { questionObj.options = JSON.parse(optionsDataEl.value); } catch(e) {}
+               }
+               // True/false always has fixed options
+               if (qAnswerFormat === 'true_false') {
+                   questionObj.options = ['True', 'False'];
+               }
+
+               questions.push(questionObj);
+           }
+
+           if (questions.length === 0) {
+               alert('Please add at least one question.');
+               return;
+           }
+
+           // Prepare worksheet data with timer settings
+           const worksheetData = {
+               title: title.trim(),
+               subject: subject,
+               topic: topic.trim(),
+               questionMode: questionMode,
+               includeQuestions: includeQuestions,
+               questions: questions,
+               
+               // Timer settings
+               timeLimit: {
+                   hours: hours,
+                   minutes: minutes,
+                   seconds: seconds,
+                   totalSeconds: totalTimeInSeconds
+               },
+               extraTime: {
+                   allowed: allowExtraTime,
+                   minutes: extraMinutes,
+                   seconds: extraMinutes * 60
+               },
+               
+               // Multi-media support: array of images and YouTube videos
+               mediaFiles: mediaItems.map(m => {
+                   if (m.type === 'image') {
+                       return { type: 'image', name: m.name || '', url: m.url };
+                   } else if (m.type === 'youtube') {
+                       return { type: 'youtube', youtubeId: m.youtubeId, url: m.url, thumbnail: m.thumbnail };
+                   }
+                   return m;
+               }),
+               // Keep single mediaFile for backwards compat (first item)
+               mediaFile: mediaItems.length > 0 ? (function() {
+                   const first = mediaItems[0];
+                   if (first.type === 'image') return { type: 'image', name: first.name, url: first.url };
+                   if (first.type === 'youtube') return { type: 'youtube', youtubeId: first.youtubeId, url: first.url, thumbnail: first.thumbnail };
+                   return null;
+               })() : null,
+               createdAt: new Date().toISOString(),
+               tutorId: getCurrentTutorId(),
+               hasAIQuestions: document.querySelectorAll('.question-item.ai-generated').length > 0
+           };
+
+           try {
+               // Show loading
+               showLoading('Creating Worksheet...', 'Processing your worksheet and questions');
+               
+               const assignBtn = document.querySelector('.assign-worksheet-btn');
+               const originalText = assignBtn.innerHTML;
+               assignBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Worksheet...';
+               assignBtn.disabled = true;
+
+               // Send to backend
+               const response = await fetch('/api/tutor/create-worksheet', {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'application/json'
+                   },
+                   body: JSON.stringify(worksheetData)
+               });
+
+               if (response.ok) {
+                   const result = await response.json();
+                   
+                   // Store worksheet data for the modal
+                   currentWorksheetData = {
+                       ...worksheetData,
+                       worksheetId: result.worksheet_id,
+                       shareableLink: result.shareable_link
+                   };
+                   
+                   // Show the link modal
+                   showWorksheetLinkModal(result);
+                   
+               } else {
+                   const error = await response.json();
+                   throw new Error(error.error || 'Failed to create worksheet');
+               }
+
+           } catch (error) {
+               console.error('Error creating worksheet:', error);
+               alert('Failed to create worksheet: ' + error.message);
+           } finally {
+               hideLoading();
+               // Reset button
+               const assignBtn = document.querySelector('.assign-worksheet-btn');
+               assignBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Create Worksheet';
+               assignBtn.disabled = false;
+           }
+       }
+
+       function showWorksheetLinkModal(result) {
+           const modal = document.getElementById('worksheetLinkModal');
+           
+           // Update modal content with worksheet data
+           updateModalContent(result);
+           
+           // Show modal
+           modal.classList.add('show');
+           
+           // Generate QR code
+           if (result.shareable_link) {
+               generateQRCode(result.shareable_link);
+           }
+       }
+
+       function updateModalContent(result) {
+           if (!currentWorksheetData) return;
+           
+           // Update worksheet info
+           document.getElementById('modalWorksheetTitle').textContent = currentWorksheetData.title;
+           document.getElementById('modalWorksheetSubject').textContent = currentWorksheetData.subject;
+           document.getElementById('modalQuestionCount').textContent = currentWorksheetData.questions.length;
+           
+           // Format time limit
+           const timeLimit = `${currentWorksheetData.timeLimit.hours}h ${currentWorksheetData.timeLimit.minutes}m ${currentWorksheetData.timeLimit.seconds}s`;
+           document.getElementById('modalTimeLimit').textContent = timeLimit;
+           
+           // AI questions count
+           const aiQuestionsCount = document.querySelectorAll('.question-item.ai-generated').length;
+           document.getElementById('modalAiQuestions').textContent = aiQuestionsCount > 0 ? `${aiQuestionsCount} questions` : 'None';
+           
+           // Update shareable link
+           const shareableLink = result.shareable_link || `${window.location.origin}/student-worksheet?id=${result.worksheet_id}`;
+           const linkEl = document.getElementById('shareableLink');
+           linkEl.textContent = shareableLink;
+           linkEl.href = shareableLink;
+       }
+
+       function copyWorksheetLink() {
+           const linkElement = document.getElementById('shareableLink');
+           const copyBtn = document.getElementById('copyLinkBtn');
+           const copyBtnText = document.getElementById('copyBtnText');
+           
+           // Copy to clipboard
+           navigator.clipboard.writeText(linkElement.href || linkElement.textContent).then(() => {
+               // Update button appearance
+               copyBtn.classList.add('copied');
+               copyBtnText.textContent = 'Copied!';
+               
+               // Reset after 2 seconds
+               setTimeout(() => {
+                   copyBtn.classList.remove('copied');
+                   copyBtnText.textContent = 'Copy Link';
+               }, 2000);
+           }).catch(err => {
+               console.error('Failed to copy: ', err);
+               // Fallback for older browsers
+               const textArea = document.createElement('textarea');
+               textArea.value = linkElement.href || linkElement.textContent;
+               document.body.appendChild(textArea);
+               textArea.select();
+               document.execCommand('copy');
+               document.body.removeChild(textArea);
+               
+               copyBtn.classList.add('copied');
+               copyBtnText.textContent = 'Copied!';
+               setTimeout(() => {
+                   copyBtn.classList.remove('copied');
+                   copyBtnText.textContent = 'Copy Link';
+               }, 2000);
+           });
+       }
+
+       function shareWorksheet() {
+           const linkEl = document.getElementById('shareableLink');
+           const shareableLink = linkEl.href || linkEl.textContent;
+           const title = currentWorksheetData?.title || 'Worksheet';
+           
+           if (navigator.share) {
+               // Use native sharing API if available
+               navigator.share({
+                   title: `${title} - Deciph.AI Worksheet`,
+                   text: `Complete this worksheet: ${title}`,
+                   url: shareableLink
+               }).catch(err => console.log('Error sharing:', err));
+           } else {
+               // Fallback: copy to clipboard and show message
+               copyWorksheetLink();
+               alert('Link copied to clipboard! You can now paste it anywhere to share.');
+           }
+       }
+
+function toggleQRCode() {
+           const qrContainer = document.getElementById('qrCodeContainer');
+           qrContainer.classList.toggle('show');
+       }
+
+       function generateQRCode(text) {
+           // Simple QR code generation using an online service
+           const qrDisplay = document.getElementById('qrCodeDisplay');
+           const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}`;
+           
+           qrDisplay.innerHTML = `
+               <img src="${qrUrl}" alt="QR Code" style="max-width: 200px; height: auto; border-radius: 8px;">
+           `;
+       }
+
+       function closeWorksheetLinkModal() {
+           const modal = document.getElementById('worksheetLinkModal');
+           modal.classList.remove('show');
+           // Preserve worksheet content - do NOT reset the form
+       }
+
+       function createNewWorksheet() {
+           // Only reset when user explicitly wants to start fresh
+           resetWorksheetForm();
+       }
+
+       function resetWorksheetForm() {
+           document.getElementById('worksheetTitle').value = '';
+           document.getElementById('worksheetSubject').value = 'general';
+           document.getElementById('includeQuestions').checked = true;
+           
+           // Reset timer settings
+           document.getElementById('hours').value = 0;
+           document.getElementById('minutes').value = 30;
+           document.getElementById('seconds').value = 0;
+           document.getElementById('allowExtraTime').checked = false;
+           document.getElementById('extraMinutes').value = 10;
+           toggleExtraTime();
+           updateTimerPreview();
+           
+           // Reset AI generation settings
+           document.getElementById('numQuestions').value = 5;
+           document.getElementById('difficultyLevel').value = 'medium';
+           document.getElementById('typeFactual').checked = true;
+           document.getElementById('typeDescriptive').checked = true;
+           document.getElementById('typeAnalytical').checked = false;
+           
+           // Clear all questions
+           clearAllQuestions();
+           addQuestion();
+           
+           // Clear media
+           removeMedia();
+           
+           // Hide AI status
+           const aiStatus = document.getElementById('aiStatus');
+           aiStatus.classList.remove('show');
+           
+           generatedQuestions = [];
+           currentWorksheetData = null;
+       }
+
+                function getCurrentTutorId() {
+                const storedId = localStorage.getItem('tutor_id') ||
+                    localStorage.getItem('userId') ||
+                    '1';
+                // Convert to integer to match database schema (tutor_id is INTEGER in DB)
+                return parseInt(storedId, 10) || 1;
+            }
+       
+
+       function getTutorToken() {
+           return localStorage.getItem('tutor_token') || 'demo-token';
+       }
+
+       // Close modal when clicking outside
+       document.getElementById('worksheetLinkModal').addEventListener('click', function(e) {
+           if (e.target === this) {
+               closeWorksheetLinkModal();
+           }
+       });
+
+       // Auto-save functionality
+       function autoSave() {
+           const worksheetData = {
+               title: document.getElementById('worksheetTitle').value,
+               subject: document.getElementById('worksheetSubject').value,
+               includeQuestions: document.getElementById('includeQuestions').checked,
+               timeLimit: {
+                   hours: parseInt(document.getElementById('hours').value) || 0,
+                   minutes: parseInt(document.getElementById('minutes').value) || 0,
+                   seconds: parseInt(document.getElementById('seconds').value) || 0
+               },
+               extraTime: {
+                   allowed: document.getElementById('allowExtraTime').checked,
+                   minutes: parseInt(document.getElementById('extraMinutes').value) || 10
+               },
+               hasMedia: mediaItems.length > 0,
+               questionCount: questionCount,
+               lastSaved: new Date().toISOString()
+           };
+           
+           localStorage.setItem('worksheet_draft', JSON.stringify(worksheetData));
+       }
+
+       // Auto-save every 30 seconds
+       setInterval(autoSave, 30000);
+
+       // Keyboard shortcuts
+       document.addEventListener('keydown', function(e) {
+           // Ctrl/Cmd + S to save draft
+           if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+               e.preventDefault();
+               autoSave();
+               
+               // Show brief save indicator
+               const indicator = document.createElement('div');
+               indicator.style.cssText = `
+                   position: fixed;
+                   top: 20px;
+                   right: 20px;
+                   background: var(--secondary-color);
+                   color: white;
+                   padding: 0.5rem 1rem;
+                   border-radius: 6px;
+                   z-index: 10000;
+                   font-size: 0.875rem;
+               `;
+               indicator.innerHTML = '<i class="fas fa-save"></i> Draft saved';
+               document.body.appendChild(indicator);
+               
+               setTimeout(() => {
+                   indicator.remove();
+               }, 2000);
+           }
+           
+           // Ctrl/Cmd + G to generate questions (if image uploaded)
+           if ((e.ctrlKey || e.metaKey) && e.key === 'g' && mediaItems.some(m => m.type === 'image')) {
+               e.preventDefault();
+               generateQuestionsFromImage();
+           }
+       });
+
+       // Warn before leaving if there are unsaved changes
+       window.addEventListener('beforeunload', function(e) {
+           const hasContent = document.getElementById('worksheetTitle').value.trim() ||
+                            questionCount > 1 ||
+                            mediaItems.length > 0;
+           
+           if (hasContent) {
+               autoSave();
+               e.preventDefault();
+               e.returnValue = '';
+           }
+       });
+   </script>
+</body>
+</html>

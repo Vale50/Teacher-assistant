@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Worksheets - Deciph.AI Tutor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #059669;
+            --accent-color: #dc2626;
+            --warning-color: #f59e0b;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        body {
+            background: var(--light-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            font-size: 1.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-create {
+            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            color: white;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            min-width: 180px;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .worksheets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .worksheet-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .worksheet-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .worksheet-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .worksheet-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .worksheet-mode-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .mode-list {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .mode-auto {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .worksheet-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .worksheet-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .worksheet-stats {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .worksheet-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #047857;
+        }
+
+        .btn-preview {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-preview:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-edit {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #d97706;
+        }
+
+        .btn-delete {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #b91c1c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Preview Modal */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .preview-modal.show {
+            display: flex;
+        }
+
+        .preview-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .preview-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .preview-close:hover {
+            color: var(--accent-color);
+        }
+
+        .preview-question {
+            background: var(--light-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .preview-question-num {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-answer {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            margin-top: 0.5rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--secondary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Login Prompt Modal */
+        .login-prompt-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .login-prompt-overlay.show {
+            display: flex;
+        }
+
+        .login-prompt-box {
+            background: white;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .login-prompt-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+
+        .login-prompt-icon i {
+            font-size: 1.75rem;
+            color: white;
+        }
+
+        .login-prompt-box h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .login-prompt-box p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .login-features {
+            text-align: left;
+            background: var(--light-bg);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 0;
+            font-size: 0.88rem;
+            color: var(--text-primary);
+        }
+
+        .login-feature-item i {
+            color: var(--primary-color);
+            font-size: 0.85rem;
+            width: 18px;
+            text-align: center;
+        }
+
+        .login-prompt-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-login-prompt {
+            flex: 1;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-login-go {
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+            color: white;
+        }
+
+        .btn-login-go:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-login-cancel {
+            background: var(--light-bg);
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-login-cancel:hover {
+            background: var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .worksheets-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-row {
+                flex-direction: column;
+            }
+
+            .filter-group select,
+            .filter-group input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-folder-open"></i>
+                My Worksheets
+            </h1>
+            <div class="header-actions">
+                <a href="/create-worksheet" class="btn-create">
+                    <i class="fas fa-plus"></i>
+                    Create New Worksheet
+                </a>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label>Subject</label>
+                    <select id="subjectFilter">
+                        <option value="">All Subjects</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Search Topic</label>
+                    <input type="text" id="topicSearch" placeholder="Search by topic...">
+                </div>
+                <div class="filter-group">
+                    <label>Question Mode</label>
+                    <select id="modeFilter">
+                        <option value="">All Modes</option>
+                        <option value="list">List Mode</option>
+                        <option value="auto_navigation">Auto Navigation</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Worksheets Grid -->
+        <div id="worksheetsContainer">
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading your worksheets...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="preview-modal">
+        <div class="preview-content">
+            <div class="preview-header">
+                <h2 id="previewTitle">Worksheet Preview</h2>
+                <button class="preview-close" onclick="closePreview()">&times;</button>
+            </div>
+            <div id="previewBody"></div>
+        </div>
+    </div>
+
+    <!-- Login Prompt Modal -->
+    <div id="loginPromptOverlay" class="login-prompt-overlay">
+        <div class="login-prompt-box">
+            <div class="login-prompt-icon">
+                <i class="fas fa-lock-open"></i>
+            </div>
+            <h3>Unlock Full Access</h3>
+            <p>Log in to access powerful tools for managing your worksheets and tracking student progress.</p>
+            <div class="login-features">
+                <div class="login-feature-item"><i class="fas fa-chart-bar"></i> View student worksheet scores &amp; performance reports</div>
+                <div class="login-feature-item"><i class="fas fa-book-open"></i> Lesson plan creator</div>
+                <div class="login-feature-item"><i class="fas fa-shapes"></i> Generate geometry shapes &amp; graphs</div>
+                <div class="login-feature-item"><i class="fas fa-layer-group"></i> Flashcard creator</div>
+            </div>
+            <div class="login-prompt-actions">
+                <button class="btn-login-prompt btn-login-cancel" onclick="dismissLoginPrompt()">Cancel</button>
+                <button class="btn-login-prompt btn-login-go" onclick="window.location.href='/index.html'">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let worksheets = [];
+        let subjects = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWorksheets();
+
+            // Add filter event listeners
+            document.getElementById('subjectFilter').addEventListener('change', filterWorksheets);
+            document.getElementById('topicSearch').addEventListener('input', debounce(filterWorksheets, 300));
+            document.getElementById('modeFilter').addEventListener('change', filterWorksheets);
+
+            // Show login prompt after 2.5s if user is not logged in
+            setTimeout(() => {
+                const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+                const dismissed = sessionStorage.getItem('loginPromptDismissed');
+                if (!token && !dismissed) {
+                    document.getElementById('loginPromptOverlay').classList.add('show');
+                }
+            }, 2500);
+        });
+
+        // Dismiss login prompt
+        function dismissLoginPrompt() {
+            document.getElementById('loginPromptOverlay').classList.remove('show');
+            sessionStorage.setItem('loginPromptDismissed', 'true');
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Load all worksheets from API (worksheets are public, not filtered by tutor)
+        async function loadWorksheets() {
+            try {
+                const response = await fetch('/api/tutor/worksheets');
+                const data = await response.json();
+
+                if (data.success) {
+                    worksheets = data.worksheets;
+                    subjects = data.subjects;
+                    populateSubjectFilter();
+                    renderWorksheets(worksheets);
+                } else {
+                    showError('Failed to load worksheets');
+                }
+            } catch (error) {
+                console.error('Error loading worksheets:', error);
+                showError('Error connecting to server');
+            }
+        }
+
+        // Populate subject filter dropdown
+        function populateSubjectFilter() {
+            const select = document.getElementById('subjectFilter');
+            select.innerHTML = '<option value="">All Subjects</option>';
+            subjects.forEach(subject => {
+                select.innerHTML += `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}</option>`;
+            });
+        }
+
+        // Filter worksheets
+        function filterWorksheets() {
+            const subject = document.getElementById('subjectFilter').value;
+            const topic = document.getElementById('topicSearch').value.toLowerCase();
+            const mode = document.getElementById('modeFilter').value;
+
+            const filtered = worksheets.filter(ws => {
+                if (subject && ws.subject !== subject) return false;
+                if (topic && !ws.topic.toLowerCase().includes(topic) && !ws.title.toLowerCase().includes(topic)) return false;
+                if (mode && ws.questionMode !== mode) return false;
+                return true;
+            });
+
+            renderWorksheets(filtered);
+        }
+
+        // Render worksheets grid
+        function renderWorksheets(worksheetList) {
+            const container = document.getElementById('worksheetsContainer');
+
+            if (worksheetList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>No Worksheets Found</h3>
+                        <p>Create your first worksheet to get started!</p>
+                        <a href="/create-worksheet" class="btn-create">
+                            <i class="fas fa-plus"></i>
+                            Create Worksheet
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="worksheets-grid">
+                    ${worksheetList.map(ws => renderWorksheetCard(ws)).join('')}
+                </div>
+            `;
+        }
+
+        // Render single worksheet card
+        function renderWorksheetCard(ws) {
+            const modeLabel = ws.questionMode === 'auto_navigation' ? 'Auto Nav' : 'List';
+            const modeClass = ws.questionMode === 'auto_navigation' ? 'mode-auto' : 'mode-list';
+            const timeMinutes = Math.floor(ws.timeLimitSeconds / 60);
+            const createdDate = ws.createdAt ? new Date(ws.createdAt).toLocaleDateString() : 'N/A';
+
+            return `
+                <div class="worksheet-card" data-id="${ws.id}">
+                    <div class="worksheet-card-header">
+                        <h3 class="worksheet-title">${escapeHtml(ws.title)}</h3>
+                        <span class="worksheet-mode-badge ${modeClass}">${modeLabel}</span>
+                    </div>
+                    <div class="worksheet-meta">
+                        <span><i class="fas fa-book"></i> ${escapeHtml(ws.subject)}</span>
+                        ${ws.topic ? `<span><i class="fas fa-tag"></i> ${escapeHtml(ws.topic)}</span>` : ''}
+                        <span><i class="fas fa-calendar"></i> ${createdDate}</span>
+                    </div>
+                    <div class="worksheet-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${ws.questionCount}</div>
+                            <div class="stat-label">Questions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${timeMinutes}</div>
+                            <div class="stat-label">Minutes</div>
+                        </div>
+                    </div>
+                    <div class="worksheet-actions">
+                        <button class="action-btn btn-copy" onclick="copyLink('${ws.id}')">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                        <button class="action-btn btn-preview" onclick="previewWorksheet('${ws.id}')">
+                            <i class="fas fa-eye"></i> Preview
+                        </button>
+                        <button class="action-btn btn-edit" onclick="editWorksheet('${ws.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn btn-delete" onclick="deleteWorksheet('${ws.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Copy worksheet link
+        function copyLink(worksheetId) {
+            const link = `${window.location.origin}/student-worksheet?id=${encodeURIComponent(worksheetId)}`;
+            navigator.clipboard.writeText(link).then(() => {
+                showToast('Link copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const input = document.createElement('input');
+                input.value = link;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showToast('Link copied to clipboard!');
+            });
+        }
+
+        // Preview worksheet
+        async function previewWorksheet(worksheetId) {
+            try {
+                const response = await fetch(`/api/tutor/worksheet/${worksheetId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const ws = data.worksheet;
+                    document.getElementById('previewTitle').textContent = ws.title;
+
+                    let questionsHtml = '';
+                    (ws.questions || []).forEach((q, i) => {
+                        const formatLabel = q.answer_format === 'multiple_choice' ? ' (Multiple Choice)' :
+                                           q.answer_format === 'true_false' ? ' (True/False)' : '';
+                        questionsHtml += `
+                            <div class="preview-question">
+                                <div class="preview-question-num">Question ${q.questionNumber}${formatLabel}</div>
+                                <div>${escapeHtml(q.questionText || 'No question text')}</div>
+                                ${q.options && q.options.length > 0 ? `
+                                    <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #666;">
+                                        Options: ${q.options.map(o => escapeHtml(o)).join(', ')}
+                                    </div>
+                                ` : ''}
+                                <div class="preview-answer">
+                                    <strong>Expected Answer:</strong> ${escapeHtml(q.expectedAnswer)}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    document.getElementById('previewBody').innerHTML = `
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Subject:</strong> ${escapeHtml(ws.subject)}<br>
+                            <strong>Topic:</strong> ${escapeHtml(ws.topic || 'N/A')}<br>
+                            <strong>Mode:</strong> ${ws.questionMode === 'auto_navigation' ? 'Auto Navigation' : 'List Mode'}<br>
+                            <strong>Time Limit:</strong> ${Math.floor(ws.timeLimit.totalSeconds / 60)} minutes
+                        </div>
+                        <h4>Questions (${ws.questions?.length || 0})</h4>
+                        ${questionsHtml}
+                    `;
+
+                    document.getElementById('previewModal').classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error loading preview:', error);
+                showToast('Error loading preview');
+            }
+        }
+
+        // Close preview modal
+        function closePreview() {
+            document.getElementById('previewModal').classList.remove('show');
+        }
+
+        // Edit worksheet - redirect to create-worksheet with edit mode
+        function editWorksheet(worksheetId) {
+            window.location.href = `/create-worksheet?edit=${worksheetId}`;
+        }
+
+        // Delete worksheet
+        async function deleteWorksheet(worksheetId) {
+            if (!confirm('Are you sure you want to delete this worksheet?')) return;
+
+            try {
+                const response = await fetch(`/api/tutor/worksheet/${worksheetId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    worksheets = worksheets.filter(ws => ws.id !== worksheetId);
+                    filterWorksheets();
+                    showToast('Worksheet deleted');
+                } else {
+                    showToast('Error deleting worksheet');
+                }
+            } catch (error) {
+                console.error('Error deleting worksheet:', error);
+                showToast('Error deleting worksheet');
+            }
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Show error state
+        function showError(message) {
+            document.getElementById('worksheetsContainer').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle" style="color: var(--accent-color);"></i>
+                    <h3>Error</h3>
+                    <p>${escapeHtml(message)}</p>
+                    <button onclick="loadWorksheets()" class="btn-create">
+                        <i class="fas fa-refresh"></i>
+                        Try Again
+                    </button>
+                </div>
+            `;
+        }
+
+        // Escape HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Close modal on outside click
+        document.getElementById('previewModal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('preview-modal')) {
+                closePreview();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePreview();
+            }
+        });
+    </script>
+</body>
+</html>

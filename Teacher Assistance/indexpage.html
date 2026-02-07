@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+<head>
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="img/fav.png">
+    <!-- Author Meta -->
+    <meta name="author" content="colorlib">
+    <!-- Meta Description -->
+    <meta name="description" content="">
+    <!-- Meta Keyword -->
+    <meta name="keywords" content="">
+    <!-- meta character set -->
+    <meta charset="UTF-8">
+    <!-- Site Title -->
+    <title>Education</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
+        <!--
+        CSS
+        ============================================= -->
+        <link rel="stylesheet" href="css/linearicons.css">
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/magnific-popup.css">
+        <link rel="stylesheet" href="css/nice-select.css">							
+        <link rel="stylesheet" href="css/animate.min.css">
+        <link rel="stylesheet" href="css/owl.carousel.css">			
+        <link rel="stylesheet" href="css/jquery-ui.css">			
+        <link rel="stylesheet" href="css/main.css">
+        <style>
+            body{
+                background:#f8f9fa;
+            }
+            .header-top{
+                background:#00bdef;
+            }
+            .overlay overlay-bg{
+                width:;
+            }
+           .col single-detials{
+            width:;
+           }
+
+/* Header Styling */
+.header-top {
+    padding: 15px 0;
+}
+
+.header-top-left .logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.header-logo {
+    height: 80px;
+    width: auto;
+    max-width: 100%;
+}
+
+.header-top-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.header-right-content {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.contact-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.contact-info a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.contact-info a:hover {
+    color: #ffcb05;
+}
+
+.top-navigation {
+    display: flex;
+    align-items: center;
+}
+
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.hamburger-menu span {
+    height: 3px;
+    width: 25px;
+    background: white;
+    margin: 4px 0;
+    transition: 0.4s;
+}
+
+.hamburger-menu.active span:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.nav-links a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffcb05;
+}
+
+.social-icons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.social-icons a {
+    color: white;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    background: #ffcb05;
+    color: #00bdef;
+}
+
+/* Responsive Header Navigation */
+@media (max-width: 992px) {
+    .header-right-content {
+        gap: 15px;
+    }
+
+    .contact-info {
+        display: none;
+    }
+
+    .nav-links {
+        gap: 10px;
+    }
+
+    .nav-links a {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-logo {
+        height: 60px;
+    }
+
+    .header-top {
+        position: relative;
+    }
+
+    .hamburger-menu {
+        display: flex;
+        z-index: 1001;
+    }
+
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background: #00bdef;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        text-align: center;
+        padding: 20px 0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+    }
+
+    .nav-links a {
+        margin: 10px 0;
+        width: 100%;
+        padding: 10px 20px;
+        display: block;
+        color: white !important;
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .header-right-content {
+        justify-content: flex-end;
+        position: relative;
+    }
+
+    .top-navigation {
+        position: static;
+    }
+
+    .social-icons {
+        display: none;
+    }
+}
+
+            /* Style for the slideshow container */
+.slideshow-container {
+    max-width: 500px;
+    margin: auto;
+    position: relative;
+  }
+  
+  /* Hide all slides by default */
+  .quote-slide {
+    display: none;
+  }
+  
+  /* Style for the quotes */
+ /* Additional CSS for enhanced quote styling */
+.slideshow-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin: 25px 0 40px;
+  height: 60px; /* Adjust based on your quote height */
+}
+
+.quote-slide {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: transform 1s ease, opacity 0.5s ease;
+}
+
+.quote-slide.active {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.quote-slide.exit {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+blockquote {
+  margin: 0;
+  padding: 0;
+  font-style: italic;
+  font-size: 1.2em;
+  font-weight: 300;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  letter-spacing: 0.5px;
+}
+
+/* Optional: Add a subtle left border to the blockquote for additional styling */
+blockquote:before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 20px;
+  background-color: #f7631b; /* Use your site's accent color */
+  margin-right: 10px;
+  vertical-align: middle;
+}
+.details p {
+    color: #ffffff !important;
+}
+
+/* Make sure the banner has enough height for the quotes */
+.banner-area {
+  min-height: 600px;
+}
+
+@media (max-width: 768px) {
+  .slideshow-container {
+    height: 80px; /* Taller on mobile for multi-line quotes */
+  }
+  
+  blockquote {
+    font-size: 1em;
+  }
+}
+
+/* Decipher Academy Features Styling */
+.features-section {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.features-section .section-title {
+    color: white;
+    margin-bottom: 50px;
+}
+
+.features-section .row {
+    margin-bottom: 20px;
+}
+
+.features-section .col-lg-4,
+.features-section .col-md-6 {
+    margin-bottom: 30px;
+}
+
+.feature-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 15px;
+    padding: 35px 25px;
+    margin-bottom: 50px;
+    border-left: 5px solid #00bdef;
+    transition: all 0.4s ease;
+    position: relative;
+    height: 100%;
+    min-height: 420px;
+}
+
+.feature-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border-left-color: #f39c12;
+}
+
+.feature-card .icon-header {
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.feature-card .feature-icon {
+    font-size: 55px;
+    color: #00bdef;
+    display: inline-block;
+    padding: 15px;
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    line-height: 60px;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: rotate(360deg);
+    background: linear-gradient(135deg, #00bdef 0%, #0097a7 100%);
+    color: white;
+}
+
+.feature-card .access-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 3px 10px rgba(243, 156, 18, 0.4);
+}
+
+.feature-card h4 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    color: #2c3e50;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.feature-card .feature-description {
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.7;
+    text-align: center;
+    font-size: 14px;
+}
+
+.feature-card .feature-highlights {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 25px;
+}
+
+.feature-card .feature-highlights li {
+    padding: 8px 0;
+    color: #444;
+    position: relative;
+    padding-left: 30px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.feature-card .feature-highlights li:before {
+    content: "►";
+    position: absolute;
+    left: 0;
+    color: #00bdef;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.feature-card .btn-action {
+    background: linear-gradient(135deg, #00bdef 0%, #0097a7 100%);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(0, 189, 239, 0.3);
+    width: 100%;
+    text-align: center;
+}
+
+.feature-card .btn-action:hover {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* Enhanced Popular Courses Section */
+.popular-course-area {
+    background: #f8f9fa;
+    padding: 80px 0;
+}
+
+.course-category-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #00bdef;
+    display: inline-block;
+}
+
+.course-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.course-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 30px rgba(0, 189, 239, 0.2);
+}
+
+.course-card .course-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-bottom: 3px solid #00bdef;
+}
+
+.course-card .course-content {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.course-card h4 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    min-height: 50px;
+}
+
+.course-card p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.course-card .course-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-top: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+.course-card .course-meta {
+    color: #666;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.course-card .course-meta i {
+    color: #00bdef;
+}
+
+.course-card .course-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: #00bdef;
+}
+
+.btn-start-course {
+    background: linear-gradient(135deg, #00bdef 0%, #0097a7 100%);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(0, 189, 239, 0.3);
+}
+
+.btn-start-course:hover {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+        </style>
+        <script> src="quote.js" </script>
+    </head>
+    <br>	
+      <header id="header" id="home">
+          <div class="header-top">
+              <div class="container">
+                  <div class="row align-items-center">
+                      <div class="col-lg-3 col-md-3 col-6 header-top-left">
+                          <!-- Logo -->
+                          <div class="logo-container">
+                            <a href="indexpage.html">
+                                <img src="img/logo.PNG" alt="Decipher Academy" class="header-logo" />
+                            </a>
+                          </div>
+                      </div>
+
+                      <div class="col-lg-9 col-md-9 col-6 header-top-right">
+                          <div class="header-right-content">
+                              <!-- Contact Info -->
+                              <div class="contact-info">
+                                  <a href="tel:+447979145157"><span class="lnr lnr-phone-handset"></span> <span class="text">+447979145157</span></a>
+                                  <a href="mailto:decipheracad140@gmail.com"><span class="lnr lnr-envelope"></span> <span class="text">deciphersacad.online</span></a>
+                              </div>
+
+                              <!-- Navigation Links -->
+                              <nav class="top-navigation">
+                                  <div class="hamburger-menu">
+                                      <span></span>
+                                      <span></span>
+                                      <span></span>
+                                  </div>
+                                  <div class="nav-links">
+                                    <a href="https://deciph.ai.deciphersacad.online/role-user">Services</a>
+                                    <a href="https://deciph.ai.deciphersacad.online/resource">Resources</a>
+                                    <a href="https://deciph.ai.deciphersacad.online/programs">Programs</a>
+                                    <a href="https://deciph.ai.deciphersacad.online/Event">Events</a>
+                                    <a href="https://deciph.ai.deciphersacad.online/stem">STEM</a>
+                                    <a href="https://deciph.ai.deciphersacad.online/blog">Blog</a>
+                                    <a href="https://deciph.ai.deciphersacad.online/customer-support">Contact</a>
+                                  </div>
+                              </nav>
+
+                              <!-- Social Media -->
+                              <div class="social-icons">
+                                  <a href="#"><i class="fa fa-facebook"></i></a>
+                                  <a href="#"><i class="fa fa-twitter"></i></a>
+                                  <a href="#"><i class="fa fa-dribbble"></i></a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+        </div>
+      </header><!-- #header -->
+        <!-- start banner Area -->
+        </br>
+    </br>
+</br>
+</br>
+        <section class="banner-area relative" id="home">
+            <div class="overlay overlay-bg"></div>	
+            <div class="container">
+                <div class="row fullscreen d-flex align-items-center justify-content-between">
+                    <div class="banner-content col-lg-9 col-md-12">
+                        <h1 class="text-uppercase"> The best online place.
+                     <div class="slideshow-container">
+                    <div class="quote-slide fade">
+                        <blockquote>"The best online place."</blockquote>
+          </div>
+          <div class="quote-slide">
+            <blockquote>"Education is the best provision for old age."</blockquote>
+          </div>
+          <div class="quote-slide">
+            <blockquote>"Education is a waste without Application."</blockquote>
+          </div>
+          <div class="quote-slide">
+            <blockquote>"Education is not preparation for life; education is life itself."</blockquote>
+          </div>
+          <div class="quote-slide">
+            <blockquote>"The roots of education are bitter, but the fruit is sweet."</blockquote>
+          </div>
+        </div>
+        
+                  <script src="script.js"></script>
+
+                        </br>
+                            <h1 style="color:#00bdef;">Grade 1 - 10</h1>
+                        </h1>
+                        <div>
+                        <p class="pt-10 pb-10" style="background-color: white">
+                            Select your preferred days and schedule a start date to connect with a tutor.
+                        </p>
+                        <a href="https://deciph.ai.deciphersacad.online/programs" style="background-color: #00bdef"href="#" class="primary-btn text-uppercase">Get Started</a>
+                    
+                    </div>		
+                </br>								
+                </div>
+            </div>					
+        </section>
+    </br>
+        <!-- End banner Area -->
+
+     <!-- Start popular-course Area -->
+     <section class="popular-course-area section-gap">
+            <div class="container">
+                <div class="row d-flex justify-content-center mb-5">
+                    <div class="col-lg-10 text-center">
+                        <h1 class="mb-3">Our Courses</h1>
+                        <p class="lead">Explore our comprehensive range of academic and skill-based courses</p>
+                    </div>
+                </div>
+
+                <!-- Academy Courses Section -->
+                <div class="row mb-5">
+                    <div class="col-12">
+                        <h2 class="course-category-title">Academy Courses</h2>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <!-- Mathematics Course -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <img src="img/math.JPG" alt="Mathematics" class="course-image">
+                            <div class="course-content">
+                                <h4>Mathematics</h4>
+                                <p>Master essential concepts, from foundational arithmetic to advanced calculus, with real-world applications.</p>
+                                <div class="course-footer">
+                                    <div class="course-meta">
+                                        <i class="fa fa-users"></i> Students: 500+
+                                    </div>
+                                    <!-- <div class="course-price">$15</div> -->
+                                </div>
+                                <a href="start-course" class="btn-start-course">Start Course</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- English & Literacy Course -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <img src="img/english.JPG" alt="English & Literacy" class="course-image">
+                            <div class="course-content">
+                                <h4>English & Literacy</h4>
+                                <p>Develop strong reading, writing, and communication skills for academic excellence and everyday life.</p>
+                                <div class="course-footer">
+                                    <div class="course-meta">
+                                        <i class="fa fa-users"></i> Students: 450+
+                                    </div>
+                                    <!-- <div class="course-price">$15</div> -->
+                                </div>
+                                <a href="start-course" class="btn-start-course">Start Course</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Biology Course -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <img src="img/biology.JPG" alt="Biology" class="course-image">
+                            <div class="course-content">
+                                <h4>Biology for College Students</h4>
+                                <p>Explore life sciences from cellular biology to ecology, preparing for advanced studies and careers.</p>
+                                <div class="course-footer">
+                                    <div class="course-meta">
+                                        <i class="fa fa-users"></i> Students: 320+
+                                    </div>
+                                    <!-- <div class="course-price">$12</div> -->
+                                </div>
+                                <a href="start-course" class="btn-start-course">Start Course</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chemistry Course -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <img src="img/chemistry.PNG" alt="Chemistry" class="course-image">
+                            <div class="course-content">
+                                <h4>Chemistry for College Students</h4>
+                                <p>Explore core and relevant areas in chemistry applicable in current and future industries.</p>
+                                <div class="course-footer">
+                                    <div class="course-meta">
+                                        <i class="fa fa-users"></i> Students: 380+
+                                    </div>
+                                    <!-- <div class="course-price">$10</div> -->
+                                </div>
+                                <a href="start-course" class="btn-start-course">Start Course</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Physics Course -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <img src="img/physics.JPG" alt="Physics" class="course-image">
+                            <div class="course-content">
+                                <h4>Physics for College Students</h4>
+                                <p>Delve into fundamental principles of physics from mechanics to quantum theory.</p>
+                                <div class="course-footer">
+                                    <div class="course-meta">
+                                        <i class="fa fa-users"></i> Students: 290+
+                                    </div>
+                                    <!-- <div class="course-price">$10</div> -->
+                                </div>
+                                <a href="start-course" class="btn-start-course">Start Course</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skill Courses Section -->
+                <div class="row mb-4 mt-5">
+                    <div class="col-12">
+                        <h2 class="course-category-title">Skill Courses</h2>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Coding Course -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <img src="img/coding.PNG" alt="Coding" class="course-image">
+                            <div class="course-content">
+                                <h4>Web Development (HTML, CSS, JS)</h4>
+                                <p>Build responsive websites from scratch—master design, styling, and interactivity with JavaScript.</p>
+                                <div class="course-footer">
+                                    <div class="course-meta">
+                                        <i class="fa fa-users"></i> Students: 650+
+                                    </div>
+                                    <!-- <div class="course-price">$20</div> -->
+                                </div>
+                                <a href="start-course" class="btn-start-course">Start Course</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Graphic Design Course -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <img src="img/graphics.PNG" alt="Graphic Design" class="course-image">
+                            <div class="course-content">
+                                <h4>Graphic Design</h4>
+                                <p>Master typography, color theory, and visual design to create stunning graphics and branding.</p>
+                                <div class="course-footer">
+                                    <div class="course-meta">
+                                        <i class="fa fa-users"></i> Students: 420+
+                                    </div>
+                                    <!-- <div class="course-price">$20</div> -->
+                                </div>
+                                <a href="start-course" class="btn-start-course">Start Course</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Editing Course -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <img src="img/video.PNG" alt="Video Editing" class="course-image">
+                            <div class="course-content">
+                                <h4>Video Editing & Production</h4>
+                                <p>Learn professional video editing techniques, transitions, effects, and storytelling for digital media.</p>
+                                <div class="course-footer">
+                                    <div class="course-meta">
+                                        <i class="fa fa-users"></i> Students: 340+
+                                    </div>
+                                    <!-- <div class="course-price">$25</div> -->
+                                </div>
+                                <a href="start-course" class="btn-start-course">Start Course</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- End popular-course Area -->
+
+        <!-- Start feature Area -->
+        <section class="features-section">
+            <div class="container">
+                <div class="row mb-5">
+                    <div class="col-12 text-center section-title">
+                        <h1 class="mb-3">What We Offer at Decipher Academy</h1>
+                        <p class="lead">Empowering students with innovative learning tools and personalized support</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Interactive Online Classes -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="feature-card">
+                            <span class="access-label">OPEN ACCESS</span>
+                            <div class="icon-header">
+                                <div class="feature-icon">
+                                    <i class="fa fa-laptop"></i>
+                                </div>
+                            </div>
+                            <h4>Live Online Classes</h4>
+                            <p class="feature-description">Join interactive virtual classrooms designed for students from Grade 1 to Grade 10.</p>
+                            <ul class="feature-highlights">
+                                <li>Real-time instruction in Mathematics, English, and Science</li>
+                                <li>Flexible scheduling to fit your availability</li>
+                                <li>Small group sessions for personalized attention</li>
+                            </ul>
+                            <a href="https://deciph.ai.deciphersacad.online/student-login" class="btn-action">Join Class</a>
+                        </div>
+                    </div>
+
+                    <!-- Personalized Tutoring -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="feature-card">
+                            <div class="icon-header">
+                                <div class="feature-icon">
+                                    <i class="fa fa-user-plus"></i>
+                                </div>
+                            </div>
+                            <h4>1-on-1 Tutoring</h4>
+                            <p class="feature-description">Connect with expert tutors for personalized learning experiences tailored to your needs.</p>
+                            <ul class="feature-highlights">
+                                <li>Carefully vetted and experienced educators</li>
+                                <li>Custom lesson plans based on your learning goals</li>
+                                <li>Affordable rates starting from £20 per session</li>
+                            </ul>
+                            <a href="https://deciph.ai.deciphersacad.online/Programs" class="btn-action">Book Tutor</a>
+                        </div>
+                    </div>
+
+                    <!-- AI-Powered Quiz Creator -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="feature-card">
+                            <span class="access-label">24/7 AVAILABLE</span>
+                            <div class="icon-header">
+                                <div class="feature-icon">
+                                    <i class="fa fa-question-circle"></i>
+                                </div>
+                            </div>
+                            <h4>Smart Quiz Platform</h4>
+                            <p class="feature-description">Practice anytime with our adaptive quiz system that adjusts to your skill level.</p>
+                            <ul class="feature-highlights">
+                                <li>Thousands of questions across all subjects</li>
+                                <li>Instant feedback and detailed explanations</li>
+                                <li>Track your progress over time</li>
+                            </ul>
+                            <a href="https://deciph.ai.deciphersacad.online" class="btn-action">Start Quiz</a>
+                        </div>
+                    </div>
+
+                    <!-- Study Materials Library -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="feature-card">
+                            <span class="access-label">FREE CONTENT</span>
+                            <div class="icon-header">
+                                <div class="feature-icon">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                            </div>
+                            <h4>Digital Library</h4>
+                            <p class="feature-description">Access our extensive collection of study materials and learning resources.</p>
+                            <ul class="feature-highlights">
+                                <li>Downloadable worksheets and practice tests</li>
+                                <li>Video tutorials and interactive lessons</li>
+                                <li>Curriculum-aligned content for all levels</li>
+                            </ul>
+                            <a href="https://deciph.ai.deciphersacad.online/Library class="btn-action">Browse Library</a>
+                        </div>
+                    </div>
+
+                    <!-- Educator Support Hub -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="feature-card">
+                            <span class="access-label">FOR TEACHERS</span>
+                            <div class="icon-header">
+                                <div class="feature-icon">
+                                    <i class="fa fa-chalkboard-teacher"></i>
+                                </div>
+                            </div>
+                            <h4>Teacher Tools</h4>
+                            <p class="feature-description">Empower educators with professional resources and collaborative tools.</p>
+                            <ul class="feature-highlights">
+                                <li>Ready-to-use lesson templates</li>
+                                <li>Assessment and grading tools</li>
+                                <li>Community forum for sharing best practices</li>
+                            </ul>
+                            <a href="https://deciph.ai.deciphersacad.online/tools" class="btn-action">Access Tools</a>
+                        </div>
+                    </div>
+
+                    <!-- STEM Learning Hub -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="feature-card">
+                            <span class="access-label">FREE ACCESS</span>
+                            <div class="icon-header">
+                                <div class="feature-icon">
+                                    <i class="fa fa-rocket"></i>
+                                </div>
+                            </div>
+                            <h4>STEM Discovery</h4>
+                            <p class="feature-description">Explore Science, Technology, Engineering, and Mathematics through hands-on projects.</p>
+                            <ul class="feature-highlights">
+                                <li>Interactive experiments and simulations</li>
+                                <li>Career guidance in STEM fields</li>
+                                <li>Project-based learning activities</li>
+                            </ul>
+                            <a href="https://deciph.ai.deciphersacad.online/stem" class="btn-action">Explore STEM</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- End feature Area -->
+
+         <!-- Start upcoming-event Area -->
+         <!-- <section class="upcoming-event-area section-gap">
+            <div class="container">
+                <div class="row d-flex justify-content-center">
+                    <div class="menu-content pb-70 col-lg-8">
+                        <div class="title text-center">
+                           
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+                        <div class="single-review item">
+                            <div class="title justify-content-start d-flex">
+                                <a href="#"><h4>Mathematics Tutors</h4></a>
+                                <div class="star">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                </div>
+                            </div>
+                           
+                        <div class="single-review item">
+                            <img src="img/r1.png" alt="">
+                            <div class="title justify-content-start d-flex">
+                                <a href="#"><h4>Science Tutors</h4></a>
+                                <div class="star">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                </div>  
+                        </div>
+                        <div class="single-review item">
+                            <div class="title justify-content-start d-flex">
+                                <a href="#"><h4>Technology Tutors</h4></a>
+                                <div class="star">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                </div>
+                            </div>-->
+                         
+                        
+                      
+        <!-- End cta-one Area -->
+
+
+        <!-- Start search-course Area -->
+        <section class="search-course-area relative">
+            <div class="overlay overlay-bg"></div>
+            <div class="container">
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-lg-6 col-md-6 search-course-left">
+                        <h1 class="text-white">
+                            About us <br>
+                           
+
+                        </h1>
+                        <p>
+                            Welcome to our online school! We believe that education should be accessible to everyone, no matter where they are in the world or what their schedule looks like. That's why we've created an online school that offers high-quality courses, taught by experienced instructors, at an affordable price.
+
+                            Our online school is perfect for students who want to learn at their own pace, on their own schedule, and from the comfort of their own home. Whether you're an adult learner looking to advance your career, a student looking to get ahead in your studies, or a homeschooling family looking for additional resources, we've got you covered.
+                            
+                            Our courses cover a wide range of subjects, from math and science to history and literature to programming and technology. And because our courses are all online, you can take them from anywhere with an internet connection. 
+                            
+                            We pride ourselves on delivering engaging and interactive courses that provide students with a deep understanding of the material. Our instructors are committed to helping you succeed, and we offer a variety of tools and resources to support your learning, including virtual office hours, discussion forums, and online assessments.
+                            
+                            So why choose our online school? Because we believe that education is the key to unlocking a world of possibilities, and we're here to help you achieve your goals. Join us today and start your journey of building the next generational work-force!
+                        </p>
+                        <div class="row details-content">
+                            <div class="col single-detials">
+                                <span class="lnr lnr-graduation-hat"></span>
+                                <a href="#"><h4>Expert Instructors</h4></a>		
+                                <p>
+                                  
+                                </p>						
+                            </div>
+                            <div class="col single-detials">
+                                <span class="lnr lnr-license"></span>
+                                <a href="#"><h4>Certification</h4></a>		
+                                						
+                            </div>								
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 search-course-right section-gap">
+                        <form class="form-wrap" action="#">
+                            <h4 class="text-white pb-20 text-center mb-30">Search for Available Course</h4>		
+                            <input type="text" class="form-control" name="name" placeholder="Your Name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your Name'" >
+                            <input type="phone" class="form-control" name="phone" placeholder="Your Phone Number" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your Phone Number'" >
+                            <input type="email" class="form-control" name="email" placeholder="Your Email Address" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your Email Address'" >
+                            <div class="form-select" id="service-select">
+                                <select>
+                                    <option datd-display="">Choose Course</option>
+                                    <option value="1">MATHEMATICS</option>
+                                    <option value="2">SCIENCE</option>
+                                    <option value="3">CODING</option>
+                                    <option value="4">GRAPHICS</option>
+                                </select>
+                            </div>									
+                            <button class="primary-btn text-uppercase">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>	
+        </section>
+        <!-- End search-course Area -->
+        
+    
+       
+        <!-- Start blog Area -->
+         <section class="blog-area section-gap" id="blog">
+            <div class="container">
+                <div class="row d-flex justify-content-center">
+                    <div class="menu-content pb-70 col-lg-8">
+                        <div class="title text-center">
+                            <h1 class="mb-10">Latest posts from our Blog</h1>
+                            <p></p>
+                        </div>
+                    </div>
+                </div>					
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 single-blog">
+                        <div class="thumb">
+                            <img class="img-fluid" src="updateblog-3/blog3.PNG" alt="">								
+                        </div>
+                        <p class="meta">05 Oct, 2024  |  By <a href="#">Diamond</a></p>
+                        <a href="updateblog-3/blog3.html">
+                            <h5> Are electric cars worse for the environment</h5>
+                        </a>
+                        
+                        <a href="updateblog-3/blogTopics.html" class="details-btn d-flex justify-content-center align-items-center"><span class="details">Details</span><span class="lnr lnr-arrow-right"></span></a>		
+                    </div>
+                    <div class="col-lg-3 col-md-6 single-blog">
+                        <div class="thumb">
+                            <img class="img-fluid" src="updateblog-3/Remote_work.jpeg" alt="">								
+                        </div>
+                        <p class="meta">15 Oct, 2024   |  By <a href="#">Miracle</a></p>
+                        <a href="updateblog-3/blog18.html">
+                            <h5>The advent of remote work</h5>
+                        </a>
+                        <p>
+                        </p>
+                        <a href="#" class="details-btn d-flex justify-content-center align-items-center"><span class="details">Details</span><span class="lnr lnr-arrow-right"></span></a>						
+                    </div>
+                    <div class="col-lg-3 col-md-6 single-blog">
+                        <div class="thumb">
+                            <img class="img-fluid" src="updateblog-3/phones.jpeg" alt="">								
+                        </div>
+                        <p class="meta">25 Oct, 2024  |  By <a href="#">Diamond</a></p>
+                        <a href="updateblog-3/blog9.html">
+                            <h5>Your Device is endagering you?</h5>
+                        </a>
+                        <p>
+                           
+                        </p>
+                        <a href="#" class="details-btn d-flex justify-content-center align-items-center"><span class="details">Details</span><span class="lnr lnr-arrow-right"></span></a>									
+                    </div>
+                    <div class="col-lg-3 col-md-6 single-blog">
+                      
+            </div>	
+        </section> 
+      
+        <!--End blog Area -->			
+        
+
+        <!-- Start cta-two Area -->
+        <chat-bot platform_id="2c6cab13-8672-4bcc-a3fc-c2844d45c226" user_id="6fac29d1-a7bf-4f7c-9697-d74c6ef1eb68" chatbot_id="ac299e17-ab69-46ce-b80d-e96885d349ec"><a href="https://www.chatsimple.ai/?utm_source=widget&utm_medium=referral">[chatbot]</a></chat-bot><script src="https://chatsimple-widget.s3.us-east-2.amazonaws.com/chat-bot-loader.js" defer></script>
+        <section class="cta-two-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 cta-left">
+                        <h1>Not Yet Satisfied?</h1>
+                    </div>
+                    <div class="col-lg-4 cta-right">
+                        <a class="primary-btn wh" href="https://gmail.com">Contact us at Virtual@deciphersacad.online  </a>
+                    </div>
+                </div>
+            </div>	
+        </section>
+        <!-- End cta-two Area -->
+                    
+        <!-- start footer Area -->		
+        <footer class="footer-area section-gap">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-2 col-md-6 col-sm-6">
+                        <div class="single-footer-widget">
+                            <h4>Our Services</h4>
+                            <ul>
+                                <li><a href="#">Online Classes</a></li>
+                                <li><a href="#">Private Tuition</a></li>
+                                <li><a href="#">Revision Courses</a></li>
+                                <li><a href="#">STEM Programs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6">
+                        <div class="single-footer-widget">
+                            <h4>Quick Links</h4>
+                            <ul>
+                                <li><a href="#">Jobs</a></li>
+                                <li><a href="#">Brand Assets</a></li>
+                                <li><a href="#">Investor Relations</a></li>
+                                <li><a href="#">Terms of Service</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6">
+                        <div class="single-footer-widget">
+                            <h4>Features</h4>
+                            <ul>
+                                <li><a href="#">Revision Resources</a></li>
+                                <li><a href="#">Predicted Papers</a></li>
+                                <li><a href="#">Teacher Resources</a></li>
+                                <li><a href="#">Quiz Creator</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6">
+                        <div class="single-footer-widget">
+                            <h4>Resources</h4>
+                            <ul>
+                                <li><a href="#">Guides</a></li>
+                                <li><a href="#">Research</a></li>
+                                <li><a href="#">Experts</a></li>
+                                <li><a href="#">Blog</a></li>
+                            </ul>
+                        </div>
+                    </div>																		
+                    <div class="col-lg-4  col-md-6 col-sm-6">
+                        <div class="single-footer-widget">
+                            <h4>Newsletter</h4>
+                            <p>Stay update with our latest</p>
+                            <div class="" id="mc_embed_signup">
+                                 <form target="_blank" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01" method="get">
+                                  <div class="input-group">
+                                    <input type="text" class="form-control" name="EMAIL" placeholder="Enter Email Address" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter Email Address '" required="" type="email">
+                                    <div class="input-group-btn">
+                                      <button class="btn btn-default" type="submit">
+                                        <span class="lnr lnr-arrow-right"></span>
+                                      </button>    
+                                    </div>
+                                        <div class="info"></div>  
+                                  </div>
+                                </form> 
+                            </div>
+                        </div>
+                    </div>											
+                </div>
+                <div class="footer-bottom row align-items-center justify-content-between">
+                    <p class="footer-text m-0 col-lg-6 col-md-12"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved Decipher-Academy| Made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a> &amp; distributed by <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+                    <div class="col-lg-6 col-sm-12 footer-social">
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                        <a href="#"><i class="fa fa-dribbble"></i></a>
+                        <a href="#"><i class="fa fa-behance"></i></a>
+                    </div>
+                </div>						
+            </div>
+        </footer>	
+        <!-- End footer Area -->	
+
+
+        <script src="js/vendor/jquery-2.2.4.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="js/vendor/bootstrap.min.js"></script>			
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhOdIF3Y9382fqJYt5I_sswSrEw5eihAA"></script>
+          <script src="js/easing.min.js"></script>			
+        <script src="js/hoverIntent.js"></script>
+        <script src="js/superfish.min.js"></script>	
+        <script src="js/jquery.ajaxchimp.min.js"></script>
+        <script src="js/jquery.magnific-popup.min.js"></script>	
+        <script src="js/jquery.tabs.min.js"></script>						
+        <script src="js/jquery.nice-select.min.js"></script>	
+        <script src="js/owl.carousel.min.js"></script>									
+        <script src="js/mail-script.js"></script>	
+        <script src="js/main.js"></script>	
+    </body>
+    <script>
+        // quote.js - Smooth sliding transition for quotes
+document.addEventListener('DOMContentLoaded', function() {
+  // Get all quote slides
+  const slides = document.querySelectorAll('.quote-slide');
+  let currentSlide = 0;
+  
+  // Add CSS for transitions
+  const style = document.createElement('style');
+  style.innerHTML = `
+    .slideshow-container {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      margin: 20px 0;
+      height: 60px; /* Adjust based on your quote height */
+    }
+    
+    .quote-slide {
+      position: absolute;
+      width: 100%;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: transform 1s ease, opacity 0.5s ease;
+    }
+    
+    .quote-slide.active {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    
+    .quote-slide.exit {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    
+    blockquote {
+      margin: 0;
+      padding: 0;
+      font-style: italic;
+      font-size: 1.2em;
+      color: #fff;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Hide all slides initially
+  slides.forEach(slide => {
+    slide.style.opacity = '0';
+    slide.style.transform = 'translateX(100%)';
+  });
+  
+  // Show the first slide
+  if (slides.length > 0) {
+    slides[0].classList.add('active');
+  }
+  
+  // Function to transition to the next slide
+  function nextSlide() {
+    // Exit current slide
+    slides[currentSlide].classList.remove('active');
+    slides[currentSlide].classList.add('exit');
+    
+    // Set timeout to remove exit class after transition completes
+    setTimeout(() => {
+      slides[currentSlide].classList.remove('exit');
+    }, 1000);
+    
+    // Move to next slide
+    currentSlide = (currentSlide + 1) % slides.length;
+    
+    // Show next slide
+    slides[currentSlide].classList.add('active');
+  }
+  
+  // Start the slideshow with 2 second intervals
+  setInterval(nextSlide, 4000); // 2s display + ~2s for transition
+});
+
+// Hamburger menu toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const hamburgerMenu = document.querySelector('.hamburger-menu');
+  const navLinks = document.querySelector('.nav-links');
+
+  if (hamburgerMenu && navLinks) {
+    hamburgerMenu.addEventListener('click', function() {
+      navLinks.classList.toggle('active');
+      hamburgerMenu.classList.toggle('active');
+    });
+
+    // Close menu when clicking on a link
+    const navItems = navLinks.querySelectorAll('a');
+    navItems.forEach(item => {
+      item.addEventListener('click', function() {
+        navLinks.classList.remove('active');
+        hamburgerMenu.classList.remove('active');
+      });
+    });
+  }
+});
+    </script>
+</html>
