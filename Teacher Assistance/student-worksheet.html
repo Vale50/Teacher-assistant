@@ -914,11 +914,11 @@
             justify-content: center;
             align-items: center;
             z-index: 10001;
-            animation: fadeInOverlay 0.3s ease;
         }
 
         .login-prompt-overlay.show {
             display: flex;
+            animation: fadeInOverlay 0.3s ease forwards;
         }
 
         .login-prompt-card {
@@ -929,6 +929,9 @@
             width: 90%;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-prompt-overlay.show .login-prompt-card {
             animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
@@ -2361,49 +2364,61 @@
 
         // =============================================
         // LOGIN PROMPT POPUP (for non-logged-in users)
+        // Shows after 2.5 seconds if user has no auth token
         // =============================================
-        (function() {
+        (function initLoginPrompt() {
             function isUserLoggedIn() {
-                return !!(localStorage.getItem('token') || sessionStorage.getItem('token'));
+                var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                return !!token;
             }
 
-            if (!isUserLoggedIn()) {
-                setTimeout(function() {
-                    // Double-check in case they logged in during the delay
-                    if (isUserLoggedIn()) return;
+            function setupLoginPrompt() {
+                var overlay = document.getElementById('loginPromptOverlay');
+                var cancelBtn = document.getElementById('loginPromptCancel');
+                var loginBtn = document.getElementById('loginPromptLogin');
 
-                    var overlay = document.getElementById('loginPromptOverlay');
-                    if (overlay) overlay.classList.add('show');
-                }, 2500);
-            }
+                if (!overlay) {
+                    console.warn('Login prompt overlay not found in DOM');
+                    return;
+                }
 
-            // Cancel button - close popup
-            var cancelBtn = document.getElementById('loginPromptCancel');
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', function() {
-                    var overlay = document.getElementById('loginPromptOverlay');
-                    if (overlay) overlay.classList.remove('show');
-                });
-            }
+                // Cancel button - close popup
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', function() {
+                        overlay.classList.remove('show');
+                    });
+                }
 
-            // Login button - redirect to index page
-            var loginBtn = document.getElementById('loginPromptLogin');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', function() {
-                    // Save current page so user can return after login
-                    sessionStorage.setItem('redirectAfterLogin', window.location.href);
-                    window.location.href = '/index.html';
-                });
-            }
+                // Login button - redirect to index page
+                if (loginBtn) {
+                    loginBtn.addEventListener('click', function() {
+                        sessionStorage.setItem('redirectAfterLogin', window.location.href);
+                        window.location.href = '/index.html';
+                    });
+                }
 
-            // Close on overlay click (outside the card)
-            var overlay = document.getElementById('loginPromptOverlay');
-            if (overlay) {
+                // Close on overlay click (outside the card)
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) {
                         overlay.classList.remove('show');
                     }
                 });
+
+                // Show popup after 2.5 seconds if not logged in
+                if (!isUserLoggedIn()) {
+                    setTimeout(function() {
+                        // Double-check in case they logged in during the delay
+                        if (isUserLoggedIn()) return;
+                        overlay.classList.add('show');
+                    }, 2500);
+                }
+            }
+
+            // Ensure DOM is ready before querying elements
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupLoginPrompt);
+            } else {
+                setupLoginPrompt();
             }
         })();
 
