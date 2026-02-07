@@ -902,6 +902,118 @@
             max-width: 400px;
         }
 
+        /* Login Prompt Popup */
+        .login-prompt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            backdrop-filter: blur(4px);
+        }
+
+        .login-prompt-overlay.show {
+            display: flex;
+            animation: fadeInOverlay 0.3s ease;
+        }
+
+        .login-prompt-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-align: center;
+        }
+
+        .login-prompt-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-prompt-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+        }
+
+        .login-prompt-text {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .login-prompt-features {
+            text-align: left;
+            background: linear-gradient(135deg, #f0f9ff, #ede9fe);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-prompt-features .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 0;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .login-prompt-features .feature-item i {
+            color: #667eea;
+            width: 20px;
+            text-align: center;
+        }
+
+        .login-prompt-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .login-prompt-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .login-prompt-btn.btn-login {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-prompt-btn.btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        }
+
+        .login-prompt-btn.btn-cancel {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .login-prompt-btn.btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .worksheet-content {
@@ -947,6 +1059,45 @@
     </style>
 </head>
 <body>
+    <!-- Login Prompt Popup -->
+    <div class="login-prompt-overlay" id="loginPromptOverlay">
+        <div class="login-prompt-card">
+            <div class="login-prompt-icon">
+                <i class="fas fa-user-lock" style="color: #667eea;"></i>
+            </div>
+            <h2 class="login-prompt-title">Sign In for Full Access</h2>
+            <p class="login-prompt-text">
+                Log in to unlock powerful tutor tools and track student progress.
+            </p>
+            <div class="login-prompt-features">
+                <div class="feature-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>View student worksheet scores &amp; performance reports</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Lesson Plan Creator</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-shapes"></i>
+                    <span>Generate geometry shapes &amp; graphs</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-clone"></i>
+                    <span>Flashcard Creator</span>
+                </div>
+            </div>
+            <div class="login-prompt-actions">
+                <button class="login-prompt-btn btn-cancel" onclick="dismissLoginPrompt()">
+                    Cancel
+                </button>
+                <button class="login-prompt-btn btn-login" onclick="goToLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Submission Loading Overlay -->
     <div class="submit-overlay" id="submitOverlay">
         <div class="submit-overlay-content">
@@ -2215,6 +2366,41 @@
             div.textContent = str;
             return div.innerHTML;
         }
+
+        // =============================================
+        // LOGIN PROMPT POPUP (2.5s delay for unauthenticated users)
+        // =============================================
+        function isUserLoggedIn() {
+            return !!(localStorage.getItem('token') || sessionStorage.getItem('token') ||
+                      localStorage.getItem('tutor_token') || sessionStorage.getItem('tutor_token'));
+        }
+
+        function showLoginPrompt() {
+            const overlay = document.getElementById('loginPromptOverlay');
+            if (overlay) {
+                overlay.classList.add('show');
+            }
+        }
+
+        function dismissLoginPrompt() {
+            const overlay = document.getElementById('loginPromptOverlay');
+            if (overlay) {
+                overlay.classList.remove('show');
+            }
+            // Remember dismissal for this session so we don't re-show
+            sessionStorage.setItem('loginPromptDismissed', 'true');
+        }
+
+        function goToLogin() {
+            window.location.href = 'index.html';
+        }
+
+        // Show login prompt after 2.5 seconds if user is not logged in
+        setTimeout(function() {
+            if (!isUserLoggedIn() && !sessionStorage.getItem('loginPromptDismissed')) {
+                showLoginPrompt();
+            }
+        }, 2500);
     </script>
 
     <!-- Worksheet Task Tracker - sends completion data to dashboard -->

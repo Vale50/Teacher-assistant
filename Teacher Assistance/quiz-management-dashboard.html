@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet Dashboard - Deciph.AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #10B981;
+            --accent: #764ba2;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --border: #e5e7eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            padding: 1.5rem;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-brand i { color: var(--primary); }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .sidebar-nav a.active { background: rgba(102, 126, 234, 0.3); }
+        .sidebar-nav a i { width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover { transform: translateY(-2px); }
+
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+        .stat-card .stat-icon.green { background: #d1fae5; color: #059669; }
+        .stat-card .stat-icon.purple { background: #ede9fe; color: #7c3aed; }
+        .stat-card .stat-icon.orange { background: #ffedd5; color: #ea580c; }
+
+        .stat-card .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-card .stat-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Worksheet Table */
+        .table-card {
+            background: var(--card);
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            width: 250px;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #f9fafb;
+            padding: 0.75rem 1.25rem;
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 0.875rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .data-table tr:hover { background: #f9fafb; }
+        .data-table tr:last-child td { border-bottom: none; }
+
+        .badge-subject {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .badge-math { background: #dbeafe; color: #1d4ed8; }
+        .badge-science { background: #d1fae5; color: #047857; }
+        .badge-english { background: #fef3c7; color: #b45309; }
+        .badge-general { background: #e5e7eb; color: #4b5563; }
+
+        .score-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .score-bar-track {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            min-width: 60px;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .score-bar-fill.excellent { background: linear-gradient(90deg, #10b981, #059669); }
+        .score-bar-fill.good { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .score-bar-fill.poor { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+        .btn-view {
+            padding: 0.35rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .btn-view:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Scores Modal */
+        .scores-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            backdrop-filter: blur(3px);
+        }
+
+        .scores-modal-overlay.show { display: flex; }
+
+        .scores-modal {
+            background: white;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .scores-modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .scores-modal-header h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 0.25rem;
+        }
+
+        .scores-modal-body { padding: 1.5rem; }
+
+        .student-score-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: #f9fafb;
+            border: 1px solid var(--border);
+        }
+
+        .student-score-row .student-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .student-score-row .student-meta {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .student-score-row .score-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .score-value.excellent { color: #059669; }
+        .score-value.good { color: #d97706; }
+        .score-value.poor { color: #dc2626; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        /* Loading */
+        .spinner-container {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .search-input { width: 100%; }
+            .data-table { font-size: 0.8rem; }
+            .data-table th, .data-table td { padding: 0.5rem 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-graduation-cap"></i>
+            DECIPH.AI
+        </div>
+        <nav class="sidebar-nav">
+            <a href="stem-plan.html"><i class="fas fa-chalkboard-teacher"></i> Lesson Plans</a>
+            <a href="create-worksheet.html"><i class="fas fa-file-alt"></i> Create Worksheet</a>
+            <a href="existing-worksheets.html"><i class="fas fa-folder-open"></i> My Worksheets</a>
+            <a href="quiz-management-dashboard.html" class="active"><i class="fas fa-chart-pie"></i> Quiz Dashboard</a>
+            <a href="performance.html"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="indexpage.html"><i class="fas fa-home"></i> Home</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title"><i class="fas fa-chart-pie" style="color: var(--primary);"></i> Quiz Management Dashboard</h1>
+                <p class="page-subtitle">Track student worksheet scores and submissions</p>
+            </div>
+            <div>
+                <a href="create-worksheet.html" class="btn-view" style="padding: 0.6rem 1.25rem; font-size: 0.9rem;">
+                    <i class="fas fa-plus"></i> Create Worksheet
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-file-alt"></i></div>
+                <div class="stat-value" id="totalWorksheets">--</div>
+                <div class="stat-label">Total Worksheets</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-paper-plane"></i></div>
+                <div class="stat-value" id="totalSubmissions">--</div>
+                <div class="stat-label">Total Submissions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+                <div class="stat-value" id="totalStudents">--</div>
+                <div class="stat-label">Unique Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="fas fa-trophy"></i></div>
+                <div class="stat-value" id="averageScore">--</div>
+                <div class="stat-label">Average Score</div>
+            </div>
+        </div>
+
+        <!-- Worksheets Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3><i class="fas fa-list"></i> Worksheets &amp; Submissions</h3>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search worksheets..." oninput="filterWorksheets()">
+            </div>
+            <div id="worksheetTableBody">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                    <p style="color: var(--text-light);">Loading worksheets...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scores Detail Modal -->
+    <div class="scores-modal-overlay" id="scoresModal">
+        <div class="scores-modal">
+            <div class="scores-modal-header">
+                <h3 id="scoresModalTitle">Student Scores</h3>
+                <button class="close-modal-btn" onclick="closeScoresModal()">&times;</button>
+            </div>
+            <div class="scores-modal-body" id="scoresModalBody">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                    <p>Loading scores...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // STATE
+        // =============================================
+        let allWorksheets = [];
+        let performanceData = null;
+
+        // =============================================
+        // AUTH
+        // =============================================
+        function getAuthToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token') ||
+                   localStorage.getItem('tutor_token') || sessionStorage.getItem('tutor_token');
+        }
+
+        function getHeaders() {
+            const token = getAuthToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            return headers;
+        }
+
+        // =============================================
+        // INITIALIZATION
+        // =============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            await Promise.all([
+                loadWorksheets(),
+                loadPerformance()
+            ]);
+        }
+
+        // =============================================
+        // LOAD WORKSHEETS
+        // =============================================
+        async function loadWorksheets() {
+            try {
+                const response = await fetch('/api/worksheet-submissions', {
+                    headers: getHeaders()
+                });
+
+                if (!response.ok) throw new Error('Failed to load worksheets');
+
+                const data = await response.json();
+                allWorksheets = data.worksheets || [];
+                renderWorksheetTable(allWorksheets);
+
+            } catch (error) {
+                console.error('Error loading worksheets:', error);
+                document.getElementById('worksheetTableBody').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Could not load worksheets</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // =============================================
+        // LOAD PERFORMANCE STATS
+        // =============================================
+        async function loadPerformance() {
+            try {
+                const response = await fetch('/api/worksheet-performance?period=month', {
+                    headers: getHeaders()
+                });
+
+                if (!response.ok) throw new Error('Failed to load performance');
+
+                performanceData = await response.json();
+                updateStatsCards(performanceData);
+
+            } catch (error) {
+                console.error('Error loading performance:', error);
+            }
+        }
+
+        // =============================================
+        // UPDATE STATS CARDS
+        // =============================================
+        function updateStatsCards(data) {
+            document.getElementById('totalWorksheets').textContent = data.total_worksheets || 0;
+            document.getElementById('totalSubmissions').textContent = data.total_submissions || 0;
+            document.getElementById('totalStudents').textContent = data.total_students || 0;
+            document.getElementById('averageScore').textContent = (data.average_score || 0) + '%';
+        }
+
+        // =============================================
+        // RENDER WORKSHEET TABLE
+        // =============================================
+        function renderWorksheetTable(worksheets) {
+            const container = document.getElementById('worksheetTableBody');
+
+            if (!worksheets || worksheets.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h4>No worksheets yet</h4>
+                        <p>Create your first worksheet to see submissions here.</p>
+                        <a href="create-worksheet.html" class="btn-view" style="margin-top: 1rem; padding: 0.6rem 1.25rem;">
+                            <i class="fas fa-plus"></i> Create Worksheet
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Worksheet</th>
+                            <th>Subject</th>
+                            <th>Submissions</th>
+                            <th>Avg Score</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            worksheets.forEach(ws => {
+                const subjectClass = getSubjectBadgeClass(ws.subject);
+                const scoreClass = ws.average_score >= 80 ? 'excellent' : ws.average_score >= 60 ? 'good' : 'poor';
+                const createdDate = ws.created_at ? new Date(ws.created_at).toLocaleDateString() : 'N/A';
+
+                html += `
+                    <tr>
+                        <td>
+                            <strong>${escapeHtml(ws.title || 'Untitled')}</strong>
+                            <br><small style="color: var(--text-light);">ID: ${ws.id}</small>
+                        </td>
+                        <td><span class="badge-subject ${subjectClass}">${escapeHtml(ws.subject || 'General')}</span></td>
+                        <td><strong>${ws.submission_count || 0}</strong></td>
+                        <td>
+                            <div class="score-bar">
+                                <span>${ws.average_score || 0}%</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill ${scoreClass}" style="width: ${ws.average_score || 0}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <button class="btn-view" onclick="viewScores('${ws.id}', '${escapeHtml(ws.title || 'Worksheet')}')">
+                                <i class="fas fa-eye"></i> View Scores
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // =============================================
+        // VIEW INDIVIDUAL WORKSHEET SCORES
+        // =============================================
+        async function viewScores(worksheetId, worksheetTitle) {
+            const modal = document.getElementById('scoresModal');
+            const body = document.getElementById('scoresModalBody');
+            const title = document.getElementById('scoresModalTitle');
+
+            title.textContent = worksheetTitle + ' - Student Scores';
+            body.innerHTML = '<div class="spinner-container"><div class="spinner"></div><p>Loading scores...</p></div>';
+            modal.classList.add('show');
+
+            try {
+                const response = await fetch(`/api/worksheet-scores/${worksheetId}`, {
+                    headers: getHeaders()
+                });
+
+                if (!response.ok) throw new Error('Failed to load scores');
+
+                const data = await response.json();
+                renderScoresModal(data);
+
+            } catch (error) {
+                console.error('Error loading scores:', error);
+                body.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Could not load scores</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderScoresModal(data) {
+            const body = document.getElementById('scoresModalBody');
+            const submissions = data.submissions || [];
+
+            if (submissions.length === 0) {
+                body.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h4>No submissions yet</h4>
+                        <p>No students have completed this worksheet yet.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div style="margin-bottom: 1rem; padding: 0.75rem; background: #f0f9ff; border-radius: 0.5rem; font-size: 0.9rem; color: #1e40af;">
+                    <strong>${data.total_submissions}</strong> submission${data.total_submissions !== 1 ? 's' : ''} total
+                </div>
+            `;
+
+            submissions.forEach(sub => {
+                const pct = sub.percentage || 0;
+                const scoreClass = pct >= 80 ? 'excellent' : pct >= 60 ? 'good' : 'poor';
+                const submittedAt = sub.submitted_at ? new Date(sub.submitted_at).toLocaleString() : 'N/A';
+
+                html += `
+                    <div class="student-score-row">
+                        <div>
+                            <div class="student-name"><i class="fas fa-user" style="margin-right: 0.4rem; color: var(--primary);"></i>${escapeHtml(sub.student_name)}</div>
+                            <div class="student-meta">
+                                ${submittedAt} | Time: ${sub.time_spent || 'N/A'}
+                                ${sub.extra_time_used ? ' | <span style="color: var(--warning);">Extra time used</span>' : ''}
+                                ${sub.auto_submitted ? ' | <span style="color: var(--danger);">Auto-submitted</span>' : ''}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="score-value ${scoreClass}">${sub.score}/${sub.max_score}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-light); text-align: right;">${pct}%</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            body.innerHTML = html;
+        }
+
+        function closeScoresModal() {
+            document.getElementById('scoresModal').classList.remove('show');
+        }
+
+        // Close modal on outside click
+        document.getElementById('scoresModal').addEventListener('click', function(e) {
+            if (e.target === this) closeScoresModal();
+        });
+
+        // =============================================
+        // SEARCH / FILTER
+        // =============================================
+        function filterWorksheets() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!query) {
+                renderWorksheetTable(allWorksheets);
+                return;
+            }
+            const filtered = allWorksheets.filter(ws =>
+                (ws.title || '').toLowerCase().includes(query) ||
+                (ws.subject || '').toLowerCase().includes(query) ||
+                (ws.id || '').toLowerCase().includes(query)
+            );
+            renderWorksheetTable(filtered);
+        }
+
+        // =============================================
+        // HELPERS
+        // =============================================
+        function getSubjectBadgeClass(subject) {
+            if (!subject) return 'badge-general';
+            const s = subject.toLowerCase();
+            if (s.includes('math')) return 'badge-math';
+            if (s.includes('science') || s.includes('bio') || s.includes('chem') || s.includes('phys')) return 'badge-science';
+            if (s.includes('english') || s.includes('lang')) return 'badge-english';
+            return 'badge-general';
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

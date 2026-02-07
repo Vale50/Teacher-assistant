@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Reports - Deciph.AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #10B981;
+            --accent: #764ba2;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --border: #e5e7eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            padding: 1.5rem;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-brand i { color: var(--primary); }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .sidebar-nav a.active { background: rgba(102, 126, 234, 0.3); }
+        .sidebar-nav a i { width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .period-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background: white;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .period-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .period-btn:hover:not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+        .stat-card .stat-icon.green { background: #d1fae5; color: #059669; }
+        .stat-card .stat-icon.purple { background: #ede9fe; color: #7c3aed; }
+        .stat-card .stat-icon.orange { background: #ffedd5; color: #ea580c; }
+        .stat-card .stat-icon.red { background: #fee2e2; color: #dc2626; }
+
+        .stat-card .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .stat-card .stat-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        .chart-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-card h3 i { color: var(--primary); }
+
+        /* Score Distribution (CSS-only bar chart) */
+        .distribution-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.75rem;
+            height: 200px;
+            padding-top: 1rem;
+        }
+
+        .dist-bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .dist-bar-value {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.35rem;
+        }
+
+        .dist-bar {
+            width: 100%;
+            max-width: 60px;
+            border-radius: 0.5rem 0.5rem 0 0;
+            transition: height 0.8s ease;
+            min-height: 4px;
+        }
+
+        .dist-bar.red { background: linear-gradient(180deg, #fca5a5, #ef4444); }
+        .dist-bar.orange { background: linear-gradient(180deg, #fdba74, #f97316); }
+        .dist-bar.yellow { background: linear-gradient(180deg, #fde68a, #f59e0b); }
+        .dist-bar.blue { background: linear-gradient(180deg, #93c5fd, #3b82f6); }
+        .dist-bar.green { background: linear-gradient(180deg, #6ee7b7, #10b981); }
+
+        .dist-bar-label {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        /* Activity Timeline (CSS-only) */
+        .activity-timeline {
+            padding: 0.5rem 0;
+        }
+
+        .activity-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .activity-row:last-child { border-bottom: none; }
+
+        .activity-date {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            min-width: 80px;
+        }
+
+        .activity-bar-track {
+            flex: 1;
+            height: 12px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .activity-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 6px;
+            transition: width 0.8s ease;
+        }
+
+        .activity-count {
+            font-size: 0.8rem;
+            font-weight: 600;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        /* Score Breakdown */
+        .score-summary {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .score-summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: #f9fafb;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .score-summary-item .label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .score-summary-item .value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .score-summary-item .value.excellent { color: #059669; }
+        .score-summary-item .value.good { color: #d97706; }
+        .score-summary-item .value.poor { color: #dc2626; }
+
+        /* Average Score Gauge */
+        .gauge-container {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .gauge-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        .gauge-circle.excellent { background: linear-gradient(135deg, #10b981, #059669); }
+        .gauge-circle.good { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .gauge-circle.poor { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+        .gauge-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Loading */
+        .spinner-container {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .period-selector { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-graduation-cap"></i>
+            DECIPH.AI
+        </div>
+        <nav class="sidebar-nav">
+            <a href="stem-plan.html"><i class="fas fa-chalkboard-teacher"></i> Lesson Plans</a>
+            <a href="create-worksheet.html"><i class="fas fa-file-alt"></i> Create Worksheet</a>
+            <a href="existing-worksheets.html"><i class="fas fa-folder-open"></i> My Worksheets</a>
+            <a href="quiz-management-dashboard.html"><i class="fas fa-chart-pie"></i> Quiz Dashboard</a>
+            <a href="performance.html" class="active"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="indexpage.html"><i class="fas fa-home"></i> Home</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title"><i class="fas fa-chart-line" style="color: var(--primary);"></i> Performance Reports</h1>
+                <p class="page-subtitle">Student worksheet performance analytics</p>
+            </div>
+            <div class="period-selector">
+                <button class="period-btn" data-period="week" onclick="changePeriod('week', this)">Week</button>
+                <button class="period-btn active" data-period="month" onclick="changePeriod('month', this)">Month</button>
+                <button class="period-btn" data-period="year" onclick="changePeriod('year', this)">Year</button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+                <p style="color: var(--text-light);">Loading performance data...</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Content (hidden until loaded) -->
+        <div id="dashboardContent" style="display: none;">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-paper-plane"></i></div>
+                    <div class="stat-value" id="statSubmissions">0</div>
+                    <div class="stat-label">Total Submissions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-users"></i></div>
+                    <div class="stat-value" id="statStudents">0</div>
+                    <div class="stat-label">Unique Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-file-alt"></i></div>
+                    <div class="stat-value" id="statWorksheets">0</div>
+                    <div class="stat-label">Active Worksheets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange"><i class="fas fa-percentage"></i></div>
+                    <div class="stat-value" id="statAvgScore">0%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <!-- Score Distribution -->
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-bar"></i> Score Distribution</h3>
+                    <div class="distribution-chart" id="distributionChart"></div>
+                </div>
+
+                <!-- Average Score Gauge -->
+                <div class="chart-card">
+                    <h3><i class="fas fa-bullseye"></i> Overall Performance</h3>
+                    <div class="gauge-container" id="gaugeContainer"></div>
+                    <div class="score-summary" id="scoreSummary"></div>
+                </div>
+
+                <!-- Activity Over Time -->
+                <div class="chart-card" style="grid-column: 1 / -1;">
+                    <h3><i class="fas fa-calendar-alt"></i> Submission Activity</h3>
+                    <div class="activity-timeline" id="activityTimeline"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" style="display: none;">
+            <div class="empty-state">
+                <i class="fas fa-chart-area"></i>
+                <h4>No performance data yet</h4>
+                <p>Once students start submitting worksheets, their performance data will appear here.</p>
+                <a href="create-worksheet.html" style="display: inline-block; margin-top: 1rem; padding: 0.6rem 1.25rem; background: var(--primary); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-plus"></i> Create a Worksheet
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // STATE
+        // =============================================
+        let currentPeriod = 'month';
+
+        // =============================================
+        // AUTH
+        // =============================================
+        function getAuthToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token') ||
+                   localStorage.getItem('tutor_token') || sessionStorage.getItem('tutor_token');
+        }
+
+        function getHeaders() {
+            const token = getAuthToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            return headers;
+        }
+
+        // =============================================
+        // INITIALIZATION
+        // =============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPerformanceData(currentPeriod);
+        });
+
+        // =============================================
+        // PERIOD CHANGE
+        // =============================================
+        function changePeriod(period, btn) {
+            currentPeriod = period;
+            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+
+            loadPerformanceData(period);
+        }
+
+        // =============================================
+        // LOAD PERFORMANCE DATA
+        // =============================================
+        async function loadPerformanceData(period) {
+            try {
+                const response = await fetch(`/api/worksheet-performance?period=${period}`, {
+                    headers: getHeaders()
+                });
+
+                if (!response.ok) throw new Error('Failed to load performance data');
+
+                const data = await response.json();
+
+                document.getElementById('loadingState').style.display = 'none';
+
+                if (data.total_submissions === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('dashboardContent').style.display = 'none';
+                    return;
+                }
+
+                document.getElementById('dashboardContent').style.display = 'block';
+                document.getElementById('emptyState').style.display = 'none';
+
+                renderDashboard(data);
+
+            } catch (error) {
+                console.error('Error loading performance:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Could not load performance data</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // =============================================
+        // RENDER DASHBOARD
+        // =============================================
+        function renderDashboard(data) {
+            // Update stat cards
+            document.getElementById('statSubmissions').textContent = data.total_submissions || 0;
+            document.getElementById('statStudents').textContent = data.total_students || 0;
+            document.getElementById('statWorksheets').textContent = data.total_worksheets || 0;
+            document.getElementById('statAvgScore').textContent = (data.average_score || 0).toFixed(1) + '%';
+
+            // Render score distribution
+            renderDistribution(data.score_distribution || {});
+
+            // Render gauge
+            renderGauge(data.average_score || 0, data);
+
+            // Render activity
+            renderActivity(data.activity_data || []);
+        }
+
+        // =============================================
+        // SCORE DISTRIBUTION
+        // =============================================
+        function renderDistribution(dist) {
+            const container = document.getElementById('distributionChart');
+            const ranges = [
+                { key: '0-59', label: '0-59%', color: 'red' },
+                { key: '60-69', label: '60-69%', color: 'orange' },
+                { key: '70-79', label: '70-79%', color: 'yellow' },
+                { key: '80-89', label: '80-89%', color: 'blue' },
+                { key: '90-100', label: '90-100%', color: 'green' }
+            ];
+
+            const maxCount = Math.max(...ranges.map(r => dist[r.key] || 0), 1);
+
+            let html = '';
+            ranges.forEach(r => {
+                const count = dist[r.key] || 0;
+                const height = Math.max((count / maxCount) * 160, 4);
+
+                html += `
+                    <div class="dist-bar-group">
+                        <div class="dist-bar-value">${count}</div>
+                        <div class="dist-bar ${r.color}" style="height: ${height}px;"></div>
+                        <div class="dist-bar-label">${r.label}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // =============================================
+        // PERFORMANCE GAUGE
+        // =============================================
+        function renderGauge(avgScore, data) {
+            const gaugeContainer = document.getElementById('gaugeContainer');
+            const summaryContainer = document.getElementById('scoreSummary');
+
+            const gaugeClass = avgScore >= 80 ? 'excellent' : avgScore >= 60 ? 'good' : 'poor';
+            const message = avgScore >= 80 ? 'Excellent' : avgScore >= 60 ? 'Good Progress' : 'Needs Attention';
+
+            gaugeContainer.innerHTML = `
+                <div class="gauge-circle ${gaugeClass}">${avgScore.toFixed(1)}%</div>
+                <div class="gauge-label">${message}</div>
+            `;
+
+            const dist = data.score_distribution || {};
+            const total = data.total_submissions || 1;
+            const excellentCount = (dist['90-100'] || 0) + (dist['80-89'] || 0);
+            const passingCount = excellentCount + (dist['70-79'] || 0) + (dist['60-69'] || 0);
+            const failingCount = dist['0-59'] || 0;
+
+            summaryContainer.innerHTML = `
+                <div class="score-summary-item">
+                    <span class="label">Scoring 80%+</span>
+                    <span class="value excellent">${excellentCount} (${((excellentCount/total)*100).toFixed(0)}%)</span>
+                </div>
+                <div class="score-summary-item">
+                    <span class="label">Passing (60%+)</span>
+                    <span class="value good">${passingCount} (${((passingCount/total)*100).toFixed(0)}%)</span>
+                </div>
+                <div class="score-summary-item">
+                    <span class="label">Below 60%</span>
+                    <span class="value poor">${failingCount} (${((failingCount/total)*100).toFixed(0)}%)</span>
+                </div>
+            `;
+        }
+
+        // =============================================
+        // ACTIVITY TIMELINE
+        // =============================================
+        function renderActivity(activityData) {
+            const container = document.getElementById('activityTimeline');
+
+            if (!activityData || activityData.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 1rem;">No activity data available for this period.</p>';
+                return;
+            }
+
+            // Show last 14 entries max
+            const data = activityData.slice(-14);
+            const maxCount = Math.max(...data.map(d => d.count), 1);
+
+            let html = '';
+            data.forEach(d => {
+                const pct = (d.count / maxCount) * 100;
+                const dateStr = new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                html += `
+                    <div class="activity-row">
+                        <span class="activity-date">${dateStr}</span>
+                        <div class="activity-bar-track">
+                            <div class="activity-bar-fill" style="width: ${pct}%"></div>
+                        </div>
+                        <span class="activity-count">${d.count}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
