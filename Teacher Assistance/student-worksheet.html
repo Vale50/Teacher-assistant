@@ -902,6 +902,121 @@
             max-width: 400px;
         }
 
+        /* Login Prompt Popup */
+        .login-prompt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            animation: fadeInOverlay 0.3s ease;
+        }
+
+        .login-prompt-overlay.show {
+            display: flex;
+        }
+
+        .login-prompt-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .login-prompt-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-prompt-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+        }
+
+        .login-prompt-text {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .login-prompt-features {
+            text-align: left;
+            background: linear-gradient(135deg, #f0f9ff, #ede9fe);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-prompt-features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .login-prompt-features li {
+            padding: 0.35rem 0;
+            color: #374151;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .login-prompt-features li i {
+            color: #667eea;
+            font-size: 0.85rem;
+            width: 18px;
+            text-align: center;
+        }
+
+        .login-prompt-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .login-prompt-btn {
+            padding: 0.75rem 1.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-prompt-btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-prompt-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        }
+
+        .login-prompt-btn-cancel {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .login-prompt-btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .worksheet-content {
@@ -990,6 +1105,31 @@
 
     <!-- Confetti Canvas -->
     <canvas id="confettiCanvas"></canvas>
+
+    <!-- Login Prompt Popup for non-logged-in users -->
+    <div class="login-prompt-overlay" id="loginPromptOverlay">
+        <div class="login-prompt-card">
+            <div class="login-prompt-icon"><i class="fas fa-user-lock" style="color: #667eea;"></i></div>
+            <div class="login-prompt-title">Sign in to unlock full access</div>
+            <div class="login-prompt-text">
+                Log in to access powerful tutor tools and track your students' progress.
+            </div>
+            <div class="login-prompt-features">
+                <ul>
+                    <li><i class="fas fa-chart-bar"></i> View student worksheet scores & performance reports</li>
+                    <li><i class="fas fa-chalkboard-teacher"></i> Lesson Plan Creator</li>
+                    <li><i class="fas fa-shapes"></i> Generate Geometry Shapes & Graphs</li>
+                    <li><i class="fas fa-clone"></i> Flashcard Creator</li>
+                </ul>
+            </div>
+            <div class="login-prompt-actions">
+                <button class="login-prompt-btn login-prompt-btn-cancel" id="loginPromptCancel">Cancel</button>
+                <button class="login-prompt-btn login-prompt-btn-primary" id="loginPromptLogin">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Task ID Setup for Worksheet Task Tracker (MUST be before tracker script) -->
     <script>
@@ -1738,6 +1878,9 @@
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submitted';
             }
+
+            // Send scores to quiz-scores endpoint for dashboard/performance tracking
+            sendWorksheetScoreToDashboard(result);
         }
 
         // =============================================
@@ -2214,6 +2357,126 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        // =============================================
+        // LOGIN PROMPT POPUP (for non-logged-in users)
+        // =============================================
+        (function() {
+            function isUserLoggedIn() {
+                return !!(localStorage.getItem('token') || sessionStorage.getItem('token'));
+            }
+
+            if (!isUserLoggedIn()) {
+                setTimeout(function() {
+                    // Double-check in case they logged in during the delay
+                    if (isUserLoggedIn()) return;
+
+                    var overlay = document.getElementById('loginPromptOverlay');
+                    if (overlay) overlay.classList.add('show');
+                }, 2500);
+            }
+
+            // Cancel button - close popup
+            var cancelBtn = document.getElementById('loginPromptCancel');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    var overlay = document.getElementById('loginPromptOverlay');
+                    if (overlay) overlay.classList.remove('show');
+                });
+            }
+
+            // Login button - redirect to index page
+            var loginBtn = document.getElementById('loginPromptLogin');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function() {
+                    // Save current page so user can return after login
+                    sessionStorage.setItem('redirectAfterLogin', window.location.href);
+                    window.location.href = '/index.html';
+                });
+            }
+
+            // Close on overlay click (outside the card)
+            var overlay = document.getElementById('loginPromptOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('show');
+                    }
+                });
+            }
+        })();
+
+        // =============================================
+        // SEND WORKSHEET SCORES TO QUIZ-SCORES ENDPOINT
+        // (mirrors how quiz.html sends data for dashboard/performance)
+        // =============================================
+        function sendWorksheetScoreToDashboard(result) {
+            try {
+                var urlParams = new URLSearchParams(window.location.search);
+                var worksheetId = urlParams.get('id');
+                var studentNameInput = document.getElementById('studentNameInput');
+                var studentName = studentNameInput ? studentNameInput.value.trim() : '';
+
+                var totalQuestions = worksheetData ? worksheetData.questions.length : 0;
+                var percentage = result.totalPossible > 0
+                    ? Math.round((result.totalScore / result.totalPossible) * 100 * 10) / 10
+                    : 0;
+
+                var scoreData = {
+                    quiz_id: worksheetId,
+                    flashcard_set_id: null,
+                    student_name: studentName || 'Anonymous Student',
+                    score: result.totalScore,
+                    total: totalQuestions,
+                    max_score: result.totalPossible,
+                    percentage: percentage,
+                    mode: 'worksheet',
+                    quiz_title: worksheetData ? worksheetData.title : 'Worksheet',
+                    quiz_type: 'worksheet',
+                    subject: worksheetData ? worksheetData.subject : 'General'
+                };
+
+                // Add taskId/studentId if available
+                var taskId = urlParams.get('taskId');
+                var studentId = urlParams.get('studentId');
+                if (taskId) scoreData.task_id = parseInt(taskId);
+                if (studentId) scoreData.student_id = parseInt(studentId);
+
+                console.log('Sending worksheet score to dashboard:', scoreData);
+
+                // Submit to the same /api/quiz-scores endpoint used by quiz.html
+                fetch('/api/quiz-scores', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(scoreData)
+                }).then(function(resp) {
+                    if (resp.ok) {
+                        console.log('Worksheet score sent to quiz-scores dashboard successfully');
+                    } else {
+                        console.warn('Failed to send worksheet score to dashboard:', resp.status);
+                    }
+                }).catch(function(err) {
+                    console.warn('Error sending worksheet score to dashboard:', err);
+                });
+
+                // Also submit to external API for the performance page
+                fetch('https://seashell-app-onfk3.ondigitalocean.app/api/quiz-scores', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(scoreData)
+                }).then(function(resp) {
+                    if (resp.ok) {
+                        console.log('Worksheet score sent to external API successfully');
+                    } else {
+                        console.warn('Failed to send worksheet score to external API:', resp.status);
+                    }
+                }).catch(function(err) {
+                    console.warn('Error sending worksheet score to external API:', err);
+                });
+            } catch (e) {
+                console.warn('Error in sendWorksheetScoreToDashboard:', e);
+            }
         }
     </script>
 
