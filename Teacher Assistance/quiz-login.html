@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deciph.AI Teacher Assistant</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" type="image/svg+xml">
+    <!-- Google Sign-In API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root {
+            --primary-color: #00bfff;
+            --primary-dark: #0096c7;
+            --primary-gradient: linear-gradient(135deg, #00bfff, #0077b6);
+            --secondary-color: #10B981;
+            --accent-color: #F59E0B;
+            --text-color: #1F2937;
+            --light-bg: #F3F4F6;
+            --white: #FFFFFF;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --error-color: #EF4444;
+            --success-color: #10B981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f0f4f8;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 1rem;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+            margin-right: 0.5rem;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .image-section {
+            flex: 0.38;
+            background: var(--primary-gradient);
+            padding: 1.5rem 1.2rem;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
+            overflow: visible;
+            min-width: 240px;
+        }
+        
+        .image-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7-7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'/%3E%3C/svg%3E");
+            opacity: 0.2;
+        }
+
+        /* Section divider */
+        .section-divider {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .section-divider::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+        }
+
+        /* Slideshow styles */
+        .slideshow {
+            height: auto;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .slideshow-wrapper {
+            position: relative;
+            height: 4rem;
+            width: 100%;
+            overflow: visible;
+            padding-right: 10px;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide h2 {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+
+        .welcome-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: visible;
+        }
+
+        /* Features slideshow */
+        .features-slideshow {
+            height: 200px;
+            margin-top: 1rem;
+            overflow: visible;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            max-width: 100%;
+            overflow: visible;
+        }
+
+        .feature.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .feature-icon {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+            word-break: keep-all;
+            white-space: nowrap;
+        }
+
+        .wink-emoji {
+            display: inline-block;
+            animation: wink 2s ease-in-out 1s;
+            margin-left: 4px;
+            position: relative;
+            z-index: 5;
+        }
+
+        @keyframes wink {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
+        .form-section {
+            flex: 1;
+            background: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .form-title {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .form-tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .form-tab.active {
+            color: var(--primary-color);
+        }
+        
+        .form-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .form-content {
+            position: relative;
+            min-height: 420px;
+            overflow: visible;
+        }
+        
+        .form {
+            position: absolute;
+            width: 100%;
+            transition: var(--transition);
+            opacity: 0;
+            transform: translateX(50px);
+            visibility: hidden;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+        
+        /* Custom scrollbar for form */
+        .form::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .form::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .form::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        .form::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        .form.active {
+            opacity: 1;
+            transform: translateX(0);
+            visibility: visible;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+        
+        .forgot-password a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0, 191, 255, 0.1), 0 2px 4px -1px rgba(0, 191, 255, 0.06);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 191, 255, 0.1), 0 4px 6px -2px rgba(0, 191, 255, 0.05);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .social-login {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .social-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .social-text::before,
+        .social-text::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background-color: #e5e7eb;
+        }
+        
+        .social-text::before {
+            left: 0;
+        }
+        
+        .social-text::after {
+            right: 0;
+        }
+        
+        .social-login-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 14px;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            display: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e5e7eb;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 900px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+            
+            .image-section {
+                padding: 2rem 1.5rem;
+            }
+            
+            .form-section {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .login-container {
+                margin: 0;
+                border-radius: 10px;
+                min-height: auto;
+            }
+            
+            .image-section, .form-section {
+                padding: 1.5rem;
+            }
+            
+            .welcome-title {
+                font-size: 1.2rem;
+            }
+
+            .slideshow-wrapper {
+                height: 3.5rem;
+            }
+            
+            .features-slideshow {
+                height: 160px;
+                margin-bottom: 20px;
+            }
+            
+            .form-content {
+                min-height: 470px;
+            }
+
+            .form-tabs {
+                margin-bottom: 1.5rem;
+            }
+
+            .form-tab {
+                padding: 0.75rem 0.5rem;
+            }
+            
+            .logo-container {
+                margin-bottom: 0.5rem;
+            }
+            
+            .feature-text {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="image-section">
+            <div class="logo-container">
+                <span class="logo-icon">📚</span>
+                <span class="logo-text">Deciph.AI</span>
+            </div>
+            
+            <!-- Welcome slideshow -->
+            <div class="slideshow welcome-slideshow">
+                <div class="slideshow-wrapper">
+                    <div class="slide active">
+                        <h2 class="welcome-title">Welcome to Deciph.AI</h2>
+                    </div>
+                    <div class="slide">
+                        <h2 class="welcome-title">Your go-easy mode <span class="wink-emoji">😉</span></h2>
+                    </div>
+                    <div class="slide">
+                        <h2 class="welcome-title">Smart tool for teaching</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section divider -->
+            <div class="section-divider"></div>
+            
+            <!-- Features slideshow -->
+            <div class="features-slideshow">
+                <div class="feature" id="feature-1">
+                    <span class="feature-icon">📝</span>
+                    <span class="feature-text">Interactive Quiz Creator</span>
+                </div>
+                <div class="feature" id="feature-2">
+                    <span class="feature-icon">📊</span>
+                    <span class="feature-text">Performance Analytics</span>
+                </div>
+                <div class="feature" id="feature-3">
+                    <span class="feature-icon">📋</span>
+                    <span class="feature-text">Lesson Planner</span>
+                </div>
+                <div class="feature" id="feature-4">
+                    <span class="feature-icon">📱</span>
+                    <span class="feature-text">Access Anywhere</span>
+                </div>
+                <div class="feature" id="feature-5">
+                    <span class="feature-icon">⏱️</span>
+                    <span class="feature-text">Save Planning Time</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-tabs">
+                <div class="form-tab active" data-tab="login">Login</div>
+                <div class="form-tab" data-tab="register">Register</div>
+            </div>
+            
+            <div class="form-content">
+                <form class="form login-form active" id="loginForm">
+                    <h2 class="form-title">Welcome Back</h2>
+                    
+                    <div class="form-group">
+                        <label for="loginEmail" class="form-label">Email</label>
+                        <input type="email" id="loginEmail" class="form-input" placeholder="Enter your email" autocomplete="email" required>
+                        <div class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword" class="form-label">Password</label>
+                        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" autocomplete="current-password" required>
+                        <div class="error-message"></div>
+                    </div>
+                    
+                    <div class="forgot-password">
+                        <a href="#" id="forgotPasswordLink">Forgot password?</a>
+                    </div>
+                    
+                    <div class="success-message" id="loginSuccessMessage"></div>
+                    <button type="submit" class="submit-btn">Login</button>
+                    
+                    <div class="social-login">
+                        <p class="social-text">Or login with</p>
+                        <div class="social-login-buttons">
+                            <div id="g_id_onload"
+                                 data-client_id="587123593268-765h8r0680mgtqvc3coko7dg66gqf7n2.apps.googleusercontent.com"
+                                 data-context="signin"
+                                 data-callback="handleGoogleSignIn"
+                                 data-auto_prompt="false">
+                            </div>
+                            <div class="g_id_signin"
+                                 data-type="standard"
+                                 data-size="large"
+                                 data-theme="outline"
+                                 data-text="signin_with"
+                                 data-shape="rectangular"
+                                 data-logo_alignment="center">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <form class="form register-form" id="registerForm">
+                    <h2 class="form-title">Create Account</h2>
+                    
+                    <div class="form-group">
+                        <label for="registerName" class="form-label">Full Name</label>
+                        <input type="text" id="registerName" class="form-input" placeholder="Enter your full name" autocomplete="name" required>
+                        <div class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerEmail" class="form-label">Email</label>
+                        <input type="email" id="registerEmail" class="form-input" placeholder="Enter your email" autocomplete="email" required>
+                        <div class="error-message" id="registerEmailError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPassword" class="form-label">Password</label>
+                        <input type="password" id="registerPassword" class="form-input" placeholder="Create a password" autocomplete="new-password" required>
+                        <div class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your password" required>
+                        <div class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerCountry" class="form-label">Country</label>
+                        <select id="registerCountry" class="form-input" required>
+                            <option value="" disabled selected>Select your country</option>
+                        </select>
+                        <div class="error-message"></div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Create Account</button>
+                    
+                    <div class="social-login">
+                        <p class="social-text">Or register with</p>
+                        <div class="social-login-buttons">
+                            <div id="g_id_onload_register"
+                                 data-client_id="587123593268-765h8r0680mgtqvc3coko7dg66gqf7n2.apps.googleusercontent.com"
+                                 data-context="signup"
+                                 data-callback="handleGoogleSignUp"
+                                 data-auto_prompt="false">
+                            </div>
+                            <div class="g_id_signin"
+                                 data-type="standard"
+                                 data-size="large"
+                                 data-theme="outline"
+                                 data-text="signup_with"
+                                 data-shape="rectangular"
+                                 data-logo_alignment="center">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Country data for dropdown
+        const countries = [
+            "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
+            "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
+            "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde",
+            "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros",
+            "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica",
+            "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini",
+            "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada",
+            "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
+            "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati",
+            "Korea, North", "Korea, South", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia",
+            "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
+            "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro",
+            "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger",
+            "Nigeria", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea",
+            "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis",
+            "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia",
+            "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia",
+            "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan",
+            "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey",
+            "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay",
+            "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate country dropdown
+            const countrySelect = document.getElementById('registerCountry');
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.textContent = country;
+                option.value = country;
+                countrySelect.appendChild(option);
+            });
+            
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.form-tab');
+            const forms = document.querySelectorAll('.form');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update active form with animation
+                    forms.forEach(form => {
+                        form.classList.remove('active');
+                        if (form.classList.contains(`${target}-form`)) {
+                            setTimeout(() => {
+                                form.classList.add('active');
+                            }, 50);
+                        }
+                    });
+                    
+                    // Clear any error messages
+                    document.querySelectorAll('.error-message').forEach(err => {
+                        err.style.display = 'none';
+                    });
+                });
+            });
+            
+            // Welcome text slideshow
+            function animateWelcomeSlides() {
+                const slides = document.querySelectorAll('.welcome-slideshow .slide');
+                let currentSlide = 0;
+                
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, 3000);
+            }
+            
+            // Features animation - one by one
+            function animateFeatures() {
+                const features = document.querySelectorAll('.feature');
+                let currentFeature = 0;
+                
+                // First feature starts active
+                features[0].classList.add('active');
+                // Continuing from where we left off with the features animation
+                
+setInterval(() => {
+    features[currentFeature].classList.remove('active');
+    currentFeature = (currentFeature + 1) % features.length;
+    features[currentFeature].classList.add('active');
+}, 2500);
+}
+
+// Start animations
+animateWelcomeSlides();
+animateFeatures();
+
+// Check if user is already logged in
+checkExistingToken();
+
+// Login form submission
+const loginForm = document.getElementById('loginForm');
+loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Get the submit button
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Logging in...';
+
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+        const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server response was not JSON');
+        }
+
+        const data = await response.json();
+        console.log("Login response:", data);
+
+        if (response.ok) {
+            // Call our handleLoginSuccess function with the data
+            handleLoginSuccess(data);
+        } else {
+            showError('loginEmail', data.error || 'Login failed');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showError('loginEmail', 'An error occurred. Please try again.');
+    } finally {
+        // Re-enable the button
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Login';
+    }
+});
+
+// Register form submission
+const registerForm = document.getElementById('registerForm');
+registerForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Get the submit button
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Registering...';
+
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const country = document.getElementById('registerCountry').value;
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+        showError('confirmPassword', 'Passwords do not match');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Register';
+        return;
+    }
+
+    // Validate email format
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.valid) {
+        showError('registerEmail', emailValidation.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Register';
+        return;
+    }
+
+    try {
+        // First, check if email exists
+        const emailCheckResponse = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/check-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        });
+        
+        const emailCheckData = await emailCheckResponse.json();
+        
+        if (!emailCheckResponse.ok) {
+            if (emailCheckData.error === 'Email already exists') {
+                showError('registerEmail', 'This email is already registered. Please log in instead.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Register';
+                return;
+            } else if (emailCheckData.error === 'Invalid email') {
+                showError('registerEmail', 'Please enter a valid email address that can receive messages.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Register';
+                return;
+            }
+        }
+
+        // If email check passes, proceed with registration
+        const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ 
+                name, 
+                email, 
+                password, 
+                country 
+            })
+        });
+
+        // Check if the response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server response was not JSON');
+        }
+
+        const data = await response.json();
+
+        if (response.ok) {
+            sessionStorage.removeItem('redirectAfterLogin');
+            sessionStorage.removeItem('sessionExpired');
+            // Show success message
+            document.querySelector('.login-container').innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <h2 style="color: #4CAF50;">Registration Successful!</h2>
+                    <p>A verification email has been sent to ${email}.</p>
+                    <p>Please check your email and click the verification link to activate your account.</p>
+                    <p style="margin-top: 20px; font-size: 0.9em; color: #666;">
+                        Didn't receive the email? Check your spam folder or click below to resend.
+                    </p>
+                    <p id="resendMessage" style="margin: 10px 0; font-size: 0.9em;"></p>
+                    <button id="resendBtn" 
+                            onclick="resendVerificationEmail('${email}')" 
+                            class="submit-btn" 
+                            style="margin-top: 10px;">
+                        Resend Verification Email
+                    </button>
+                    <button onclick="location.reload()" 
+                            class="submit-btn" 
+                            style="margin-top: 10px; background: #6B7280;">
+                        Return to Login
+                    </button>
+                </div>
+            `;
+        } else {
+            showError('registerEmail', data.error || 'Registration failed');
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        showError('registerEmail', 'An error occurred. Please try again.');
+    } finally {
+        // Always re-enable the button
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Register';
+    }
+});
+});
+
+// Helper function to show error messages
+function showError(fieldId, message) {
+    const errorDiv = document.getElementById(fieldId)
+        .parentElement
+        .querySelector('.error-message');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    
+    // Optionally hide the error after 5 seconds
+    setTimeout(() => {
+        errorDiv.style.display = 'none';
+    }, 5000);
+}
+
+// Helper function for multi-storage token handling
+function storeToken(token) {
+    // Store in multiple locations for better mobile browser compatibility
+    try {
+        localStorage.setItem('token', token);
+        console.log("Token stored in localStorage");
+    } catch (e) {
+        console.warn('Could not store in localStorage:', e);
+    }
+    
+    try {
+        sessionStorage.setItem('token', token);
+        console.log("Token stored in sessionStorage");
+    } catch (e) {
+        console.warn('Could not store in sessionStorage:', e);
+    }
+    
+    try {
+        // Set a cookie as well (some mobile browsers prefer cookies)
+        const date = new Date();
+        date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day expiry
+        document.cookie = `token=${token}; expires=${date.toUTCString()}; path=/`;
+        console.log("Token stored in cookie");
+    } catch (e) {
+        console.warn('Could not set cookie:', e);
+    }
+}
+
+// Function to check if user is already logged in
+function checkExistingToken() {
+    // Check if we're coming from a logout
+    const justLoggedOut = sessionStorage.getItem('just_logged_out');
+    if (justLoggedOut) {
+        // Clear the flag and don't check for tokens
+        sessionStorage.removeItem('just_logged_out');
+        return; // Skip automatic login check
+    }
+    
+    const token = localStorage.getItem('token') || 
+                sessionStorage.getItem('token') || 
+                getCookie('token');
+                    
+    if (token) {
+        // Rest of your token validation code
+        fetch('https://seashell-app-onfk3.ondigitalocean.app/user/profile', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/quiz-creator';
+            } else {
+                // Token is invalid, clear it
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+                document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            }
+        })
+        .catch(error => {
+            console.error('Error validating token:', error);
+        });
+    }
+}
+
+// Helper function to get cookies
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+// Email validation function - checks for real email format
+function validateEmail(email) {
+    // Basic format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return { valid: false, message: 'Please enter a valid email address' };
+    }
+    
+    // Check for common disposable email domains
+    const disposableDomains = ['mailinator.com', 'tempmail.com', 'fakeinbox.com', 'guerrillamail.com', 'yopmail.com'];
+    const domain = email.split('@')[1];
+    
+    if (disposableDomains.includes(domain)) {
+        return { valid: false, message: 'Disposable email addresses are not allowed' };
+    }
+    
+    return { valid: true };
+}
+
+// Function to handle Google Sign-in
+function handleGoogleSignIn(response) {
+    console.log("Google sign-in response received:", response);
+    
+    // Extract the token
+    const credential = response.credential;
+    
+    // Decode the JWT token to get user info
+    const payload = JSON.parse(atob(credential.split('.')[1]));
+    console.log("User details:", payload);
+    
+    // Send the token to your backend for verification and login
+    fetch('https://seashell-app-onfk3.ondigitalocean.app/api/google-login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 
+            token: credential,
+            email: payload.email,
+            name: payload.name
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.token) {
+            // Handle successful login
+            handleLoginSuccess(data);
+        } else {
+            showError('loginEmail', data.error || 'Google login failed');
+        }
+    })
+    .catch(error => {
+        console.error('Google login error:', error);
+        showError('loginEmail', 'An error occurred during Google login. Please try again.');
+    });
+}
+
+// Function to handle Google Sign-up
+function handleGoogleSignUp(response) {
+    console.log("Google sign-up response received:", response);
+    
+    // Extract the token
+    const credential = response.credential;
+    
+    // Decode the JWT token to get user info
+    const payload = JSON.parse(atob(credential.split('.')[1]));
+    console.log("User details:", payload);
+    
+    // Send the token to your backend for verification and registration
+    fetch('https://seashell-app-onfk3.ondigitalocean.app/api/google-register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 
+            token: credential,
+            email: payload.email,
+            name: payload.name,
+            // Default values for required fields
+            country: 'Unknown' // You might want to prompt for this
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show registration success message
+            document.querySelector('.login-container').innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <h2 style="color: #4CAF50;">Registration Successful!</h2>
+                    <p>Your account has been created with Google.</p>
+                    <p>You can now log in with your Google account.</p>
+                    <button onclick="location.reload()" 
+                            class="submit-btn" 
+                            style="margin-top: 10px; background: #6B7280;">
+                        Return to Login
+                    </button>
+                </div>
+            `;
+        } else {
+            showError('registerEmail', data.error || 'Google registration failed');
+        }
+    })
+    .catch(error => {
+        console.error('Google registration error:', error);
+        showError('registerEmail', 'An error occurred during Google registration. Please try again.');
+    });
+}
+
+// Resend verification email
+function resendVerificationEmail(email) {
+    const resendBtn = document.getElementById('resendBtn');
+    resendBtn.disabled = true;
+    resendBtn.textContent = 'Sending...';
+    
+    fetch('https://seashell-app-onfk3.ondigitalocean.app/api/resend-verification', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const message = document.getElementById('resendMessage');
+        if (data.success) {
+            message.textContent = 'Verification email sent! Please check your inbox.';
+            message.style.color = '#4CAF50';
+        } else {
+            message.textContent = data.error || 'Failed to resend verification email';
+            message.style.color = '#EF4444';
+        }
+    })
+    .catch(error => {
+        console.error('Error resending verification:', error);
+        const message = document.getElementById('resendMessage');
+        message.textContent = 'An error occurred. Please try again.';
+        message.style.color = '#EF4444';
+    })
+    .finally(() => {
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Resend Verification Email';
+        
+        // Enable the button again after 60 seconds to prevent spam
+        setTimeout(() => {
+            resendBtn.disabled = false;
+        }, 60000);
+    });
+}
+
+function handleLoginSuccess(data) {
+    console.log("Login successful, handling token storage...");
+    
+    if (data.token) {
+        storeToken(data.token);
+        
+        if (data.user) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        
+        const successMsg = document.getElementById('loginSuccessMessage');
+        if (successMsg) {
+            successMsg.textContent = 'Login successful! Redirecting...';
+            successMsg.style.display = 'block';
+        }
+        
+        // ⭐ NEW: Check if there's a redirect URL
+        const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+        const wasExpired = sessionStorage.getItem('sessionExpired');
+        
+        // ⭐ IMPORTANT: Only redirect back if this was a returning user (session expired)
+        // Don't redirect new users who just registered
+        if (redirectUrl && wasExpired === 'true') {
+            // Clear the stored redirect
+            sessionStorage.removeItem('redirectAfterLogin');
+            sessionStorage.removeItem('sessionExpired');
+            
+            console.log('🔄 Returning user, redirecting back to:', redirectUrl);
+            
+            // Show appropriate message
+            if (successMsg) {
+                successMsg.textContent = 'Session restored! Redirecting back...';
+            }
+            
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 1000);
+        } else {
+            // Normal login flow - new login or registration
+            console.log('📍 New login, going to welcome page');
+            
+            // Clear any stale redirect data
+            sessionStorage.removeItem('redirectAfterLogin');
+            sessionStorage.removeItem('sessionExpired');
+            
+            sessionStorage.setItem('newLogin', 'true');
+            setTimeout(() => {
+                window.location.href = '/quiz-creator';
+            }, 1000);
+        }
+    } else {
+        showError('loginEmail', 'Authentication failed. Please try again.');
+    }
+}
+// Check if redirected due to expired session
+const sessionExpired = sessionStorage.getItem('sessionExpired');
+if (sessionExpired) {
+    const message = document.createElement('div');
+    message.style.cssText = 'background: #FEF3C7; color: #92400E; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center;';
+    message.textContent = 'Your session has expired. Please log in again.';
+    
+    const loginForm = document.getElementById('loginForm');
+    loginForm.insertBefore(message, loginForm.firstChild);
+    
+    sessionStorage.removeItem('sessionExpired');
+}
+
+/**
+ * auth-redirect-handler.js
+ * Handles storing and restoring page context when users need to re-authenticate
+ */
+
+(function() {
+    'use strict';
+
+    // Store the current page URL when authentication fails
+    function storeCurrentPageForRedirect() {
+        const currentUrl = window.location.href;
+        sessionStorage.setItem('redirectAfterLogin', currentUrl);
+        console.log('Stored redirect URL:', currentUrl);
+    }
+
+    // Check if user needs authentication and redirect to login
+    function checkAuthAndRedirect() {
+        const token = localStorage.getItem('token') || 
+                     sessionStorage.getItem('token') || 
+                     getCookie('token');
+        
+        // If no token and not already on login page
+        if (!token && !window.location.pathname.includes('index.html')) {
+            console.log('No authentication token found, redirecting to login');
+            storeCurrentPageForRedirect();
+            sessionStorage.setItem('sessionExpired', 'true');
+            window.location.href = '/index.html';
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Intercept all fetch requests to handle 401 errors
+    function setupFetchInterceptor() {
+        const originalFetch = window.fetch;
+        
+        window.fetch = function(...args) {
+            return originalFetch.apply(this, args)
+                .then(response => {
+                    // If we get a 401, store current page and redirect
+                    if (response.status === 401) {
+                        console.log('Received 401 response, redirecting to login');
+                        storeCurrentPageForRedirect();
+                        sessionStorage.setItem('sessionExpired', 'true');
+                        
+                        // Small delay to allow any pending operations
+                        setTimeout(() => {
+                            window.location.href = '/index.html';
+                        }, 100);
+                    }
+                    return response;
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    throw error;
+                });
+        };
+    }
+
+    // Helper function to get cookie
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
+    // Override the existing showLoginOption to use redirect system
+    window.showLoginOptionWithRedirect = function() {
+        storeCurrentPageForRedirect();
+        
+        // Show a user-friendly message
+        const container = document.querySelector('.container') || document.body;
+        if (!container || document.getElementById('login-option')) return;
+        
+        const loginOption = document.createElement('div');
+        loginOption.id = 'login-option';
+        loginOption.className = 'form-group';
+        loginOption.style.cssText = `
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            border-radius: 12px;
+            border: 2px solid #F59E0B;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        `;
+        
+        loginOption.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                <span style="font-size: 48px;">🔐</span>
+                <div style="text-align: left;">
+                    <h3 style="margin: 0 0 5px 0; color: #92400E; font-size: 24px;">Authentication Required</h3>
+                    <p style="margin: 0; color: #78350F; font-size: 14px;">Your session has expired. Please log in to continue.</p>
+                </div>
+            </div>
+            <button onclick="window.location.href='/index.html'" 
+                    style="
+                        background: linear-gradient(135deg, #4F46E5, #7C3AED);
+                        color: white;
+                        border: none;
+                        padding: 12px 32px;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+                        transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(79, 70, 229, 0.4)'"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(79, 70, 229, 0.3)'">
+                🚀 Return to Login
+            </button>
+            <p style="margin-top: 15px; font-size: 12px; color: #78350F;">
+                You'll be redirected back to this page after logging in.
+            </p>
+        `;
+        
+        container.insertBefore(loginOption, container.firstChild);
+        
+        // Hide the rest of the page content
+        const formGroups = document.querySelectorAll('.form-group:not(#login-option)');
+        formGroups.forEach(group => group.style.display = 'none');
+        
+        const generateBtn = document.getElementById('generate-btn');
+        if (generateBtn) generateBtn.style.display = 'none';
+    };
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Auth redirect handler initialized');
+        
+        // Set up fetch interceptor
+        setupFetchInterceptor();
+        
+        // Check authentication status
+        checkAuthAndRedirect();
+    });
+
+    // Export functions for global use
+    window.authRedirectHandler = {
+        storeCurrentPageForRedirect,
+        checkAuthAndRedirect
+    };
+
+})();
+</script>
+<script>
+    // Add this to your JavaScript file, or as a new <script> tag
+// Add this to your JavaScript file, or as a new <script> tag
+
+// First, create a modal for the forgot password form
+document.addEventListener('DOMContentLoaded', function() {
+    // Create the modal HTML
+    const forgotPasswordModal = document.createElement('div');
+    forgotPasswordModal.id = 'forgotPasswordModal';
+    forgotPasswordModal.className = 'modal';
+    forgotPasswordModal.style.display = 'none';
+    forgotPasswordModal.style.position = 'fixed';
+    forgotPasswordModal.style.zIndex = '1000';
+    forgotPasswordModal.style.left = '0';
+    forgotPasswordModal.style.top = '0';
+    forgotPasswordModal.style.width = '100%';
+    forgotPasswordModal.style.height = '100%';
+    forgotPasswordModal.style.overflow = 'auto';
+    forgotPasswordModal.style.backgroundColor = 'rgba(0,0,0,0.4)';
+    
+    forgotPasswordModal.innerHTML = `
+        <div class="modal-content" style="background-color: white; margin: 15% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <span class="close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 20px;">Reset Password</h2>
+            <p>Enter your email address below and we'll send you a link to reset your password.</p>
+            
+            <form id="passwordResetForm">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="resetEmail" class="form-label">Email</label>
+                    <input type="email" id="resetEmail" class="form-input" placeholder="Enter your email" required>
+                    <div class="error-message" id="resetEmailError" style="color: var(--error-color); font-size: 14px; margin-top: 4px; display: none;"></div>
+                </div>
+                
+                <div class="success-message" id="resetSuccessMessage" style="color: var(--success-color); font-size: 14px; margin-bottom: 10px; display: none;"></div>
+                
+                <button type="submit" id="resetSubmitBtn" class="submit-btn" style="width: 100%; padding: 0.75rem; background: var(--primary-gradient); color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer;">Send Reset Link</button>
+                
+                <div id="resetLoading" class="loading" style="display: none; text-align: center; margin-top: 10px;"></div>
+            </form>
+        </div>
+    `;
+    
+    // Append the modal to the body
+    document.body.appendChild(forgotPasswordModal);
+    
+    // Get the modal elements
+    const modal = document.getElementById('forgotPasswordModal');
+    const closeBtn = modal.querySelector('.close');
+    const resetForm = modal.querySelector('.modal-content');
+    const resetEmail = document.getElementById('resetEmail');
+    const resetEmailError = document.getElementById('resetEmailError');
+    const resetSuccessMessage = document.getElementById('resetSuccessMessage');
+    const resetSubmitBtn = document.getElementById('resetSubmitBtn');
+    const resetLoading = document.getElementById('resetLoading');
+    
+    // Add event listener to the forgot password link
+    const forgotPasswordLink = document.querySelector('.forgot-password a');
+    forgotPasswordLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Reset form state
+        resetEmail.value = '';
+        resetEmailError.style.display = 'none';
+        resetSuccessMessage.style.display = 'none';
+        resetSubmitBtn.disabled = false;
+        resetLoading.style.display = 'none';
+        
+        // Show the modal
+        modal.style.display = 'block';
+    });
+    
+    // Close the modal when clicking the close button
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+    // Close the modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+    
+    // Handle form submission
+    const passwordResetForm = document.getElementById('passwordResetForm');
+    passwordResetForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get the email
+        const email = resetEmail.value;
+        
+        // Basic validation
+        if (!email) {
+            resetEmailError.textContent = 'Email is required';
+            resetEmailError.style.display = 'block';
+            return;
+        }
+        
+        // Disable button and show loading
+        resetSubmitBtn.disabled = true;
+        resetSubmitBtn.textContent = 'Sending...';
+        resetLoading.style.display = 'block';
+        
+        // Make API request
+        fetch('https://seashell-app-onfk3.ondigitalocean.app/api/forgot-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Show success message (regardless of whether email  exists)
+            resetSuccessMessage.textContent = data.message || 'If your email is registered, you will receive a password reset link';
+            resetSuccessMessage.style.display = 'block';
+            
+            // Hide the form fields
+            resetEmail.style.display = 'none';
+            document.querySelector('label[for="resetEmail"]').style.display = 'none';
+            resetSubmitBtn.style.display = 'none';
+            
+            // Change the success message to indicate next steps
+            resetSuccessMessage.innerHTML = `
+                <p>If your email is registered, you will receive a password reset link shortly.</p>
+                <p>Please check your inbox and follow the instructions in the email.</p>
+            `;
+        })
+        .catch(error => {
+            resetEmailError.textContent = 'An error occurred. Please try again.';
+            resetEmailError.style.display = 'block';
+        })
+        .finally(() => {
+            // Hide loading
+            resetLoading.style.display = 'none';
+            resetSubmitBtn.textContent = 'Send Reset Link';
+        });
+    });
+});
+
+</script>
+<script>
+  // Add this script to your page to remove the fallback error message
+document.addEventListener('DOMContentLoaded', function() {
+    // Find and remove any existing error message elements
+    const removeGoogleErrorMessages = function() {
+        const errorElements = document.querySelectorAll('.google-signin-error');
+        errorElements.forEach(element => {
+            element.remove();
+        });
+        
+        // Make sure Google sign-in buttons are visible
+        const googleButtons = document.querySelectorAll('.g_id_signin');
+        googleButtons.forEach(button => {
+            button.style.display = 'block';
+        });
+    };
+    
+    // Call immediately
+    removeGoogleErrorMessages();
+    
+    // Also call after a short delay to handle any that might be added dynamically
+    setTimeout(removeGoogleErrorMessages, 1000);
+    
+    // Remove the error monitoring function if it exists
+    if (window.checkGoogleButtonsLoaded) {
+        window.checkGoogleButtonsLoaded = function() {
+            // Do nothing - effectively disabling the check
+            return;
+        };
+    }
+    
+    // Override the console.error function to prevent it from triggering the fallback
+    const originalConsoleError = console.error;
+    console.error = function() {
+        // Check if the error is related to Google Sign-In
+        const errorMessage = arguments[0];
+        if (typeof errorMessage !== 'string' || 
+            !(errorMessage.includes('GSI_LOGGER') || 
+              errorMessage.includes('origin is not allowed'))) {
+            // Only log non-Google Sign-In errors
+            originalConsoleError.apply(console, arguments);
+        }
+    };
+});
+</script>
+
+<script>
+    // Google Sign-In handlers with improved error handling
+function handleGoogleSignIn(response) {
+    console.log("Google sign-in response received:", response);
+    
+    // Extract the credential token
+    const credential = response.credential;
+    
+    if (!credential) {
+        console.error("No credential found in Google response");
+        showError('loginEmail', 'Google authentication failed. Please try again.');
+        return;
+    }
+    
+    // Decode the JWT token to get user info (for logging only)
+    try {
+        const payload = JSON.parse(atob(credential.split('.')[1]));
+        console.log("User details:", payload);
+    } catch (e) {
+        console.warn("Could not decode token payload:", e);
+    }
+    
+    // Disable login button during request
+    const loginButton = document.querySelector('#loginForm .submit-btn');
+    if (loginButton) {
+        loginButton.disabled = true;
+        loginButton.textContent = 'Logging in...';
+    }
+    
+    // Show loading indicator if available
+    const loadingIndicator = document.querySelector('#loginForm .loading');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'block';
+    }
+    
+    // Send the token to your backend for verification and login
+    fetch('https://seashell-app-onfk3.ondigitalocean.app/api/google-login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 
+            credential: credential
+        })
+    })
+    .then(response => {
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server response was not JSON');
+        }
+        return response.json().then(data => ({ status: response.status, body: data }));
+    })
+    .then(({ status, body }) => {
+        if (status === 200) {
+            // Handle successful login
+            handleLoginSuccess(body);
+        } else if (status === 404) {
+            // User not found, should register
+            showError('loginEmail', body.error || 'Account not found. Please register first.');
+        } else {
+            // Other errors
+            showError('loginEmail', body.error || 'Google login failed. Please try again or use email login.');
+        }
+    })
+    .catch(error => {
+        console.error('Google login error:', error);
+        showError('loginEmail', 'An error occurred during Google login. Please try again or use email login.');
+    })
+    .finally(() => {
+        // Re-enable login button
+        if (loginButton) {
+            loginButton.disabled = false;
+            loginButton.textContent = 'Login';
+        }
+        
+        // Hide loading indicator
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+    });
+}
+
+// Google Sign-up handler with improved error handling
+function handleGoogleSignUp(response) {
+    console.log("Google sign-up response received:", response);
+    
+    // Extract the credential token
+    const credential = response.credential;
+    
+    if (!credential) {
+        console.error("No credential found in Google response");
+        showError('registerEmail', 'Google authentication failed. Please try again.');
+        return;
+    }
+    
+    // Decode the JWT token to get user info (for logging only)
+    let userName = '';
+    let userEmail = '';
+    
+    try {
+        const payload = JSON.parse(atob(credential.split('.')[1]));
+        console.log("User details:", payload);
+        userName = payload.name || '';
+        userEmail = payload.email || '';
+    } catch (e) {
+        console.warn("Could not decode token payload:", e);
+    }
+    
+    // Get country from form if available
+    let country = 'Unknown';
+    const countrySelect = document.getElementById('registerCountry');
+    if (countrySelect && countrySelect.value) {
+        country = countrySelect.value;
+    }
+    
+    // Disable register button during request
+    const registerButton = document.querySelector('#registerForm .submit-btn');
+    if (registerButton) {
+        registerButton.disabled = true;
+        registerButton.textContent = 'Registering...';
+    }
+    
+    // Show loading indicator if available
+    const loadingIndicator = document.querySelector('#registerForm .loading');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'block';
+    }
+    
+    // Send the token to your backend for verification and registration
+    fetch('https://seashell-app-onfk3.ondigitalocean.app/api/google-register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 
+            credential: credential,
+            country: country
+        })
+    })
+    .then(response => {
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server response was not JSON');
+        }
+        return response.json().then(data => ({ status: response.status, body: data }));
+    })
+    .then(({ status, body }) => {
+        if (status === 201) {
+            // Registration successful
+            if (body.token) {
+                // Auto login
+                handleLoginSuccess(body);
+            } else {
+                // Show success message
+                document.querySelector('.login-container').innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <h2 style="color: #4CAF50;">Registration Successful!</h2>
+                        <p>Your account has been created with Google.</p>
+                        <p>You can now log in with your Google account.</p>
+                        <button onclick="location.reload()" 
+                                class="submit-btn" 
+                                style="margin-top: 10px; background: #6B7280;">
+                            Return to Login
+                        </button>
+                    </div>
+                `;
+            }
+        } else if (body.should_login) {
+            // User already exists, suggest login
+            showError('registerEmail', 'This Google account is already registered. Please login instead.');
+            
+            // Switch to login tab after a short delay
+            setTimeout(() => {
+                const loginTab = document.querySelector('.form-tab[data-tab="login"]');
+                if (loginTab) {
+                    loginTab.click();
+                }
+            }, 1500);
+        } else {
+            // Other errors
+            showError('registerEmail', body.error || 'Google registration failed. Please try again or use email registration.');
+        }
+    })
+    .catch(error => {
+        console.error('Google registration error:', error);
+        showError('registerEmail', 'An error occurred during Google registration. Please try again or use email registration.');
+    })
+    .finally(() => {
+        // Re-enable register button
+        if (registerButton) {
+            registerButton.disabled = false;
+            registerButton.textContent = 'Register';
+        }
+        
+        // Hide loading indicator
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+    });
+}
+</script>
+<script src="auth-redirect-handler.js"></script>
+</body>
+</html>

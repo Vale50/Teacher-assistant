@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Analytics Dashboard </title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" type="image/svg+xml">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary-color: #10B981;
+            --accent-color: #F59E0B;
+            --text-color: #1F2937;
+            --light-bg: #F3F4F6;
+            --white: #FFFFFF;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --red-500: #EF4444;
+            --green-500: #10B981;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: var(--transition);
+        }
+        
+        .user-info:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-name {
+            font-weight: 600;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 60px;
+            right: 2rem;
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            box-shadow: var(--card-shadow);
+            width: 200px;
+            z-index: 100;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .dropdown-menu.active {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .dropdown-item i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-title {
+            font-size: 1.75rem;
+            color: var(--text-color);
+        }
+        
+        .dashboard-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #0ea271;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background-color: var(--white);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 0.75rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .stat-increase {
+            color: var(--green-500);
+        }
+        
+        .stat-decrease {
+            color: var(--red-500);
+        }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 992px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .chart-card {
+            background-color: var(--white);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .chart-filters {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .chart-filter {
+            padding: 0.5rem 0.75rem;
+            background-color: var(--gray-100);
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .chart-filter:hover, .chart-filter.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .chart-container {
+            height: 300px;
+        }
+        
+        .recent-quizzes {
+            background-color: var(--white);
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .section-action {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+      
+        .section-action:hover {
+            text-decoration: underline;
+        }
+        
+        .quiz-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .quiz-table th, .quiz-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .quiz-table th {
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+        
+        .quiz-table tbody tr {
+            transition: var(--transition);
+        }
+        
+        .quiz-table tbody tr:hover {
+            background-color: var(--gray-100);
+        }
+        
+        .quiz-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .quiz-name {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .quiz-score {
+            font-weight: 600;
+        }
+        
+        .high-score {
+            color: var(--green-500);
+        }
+        
+        .medium-score {
+            color: var(--accent-color);
+        }
+        
+        .low-score {
+            color: var(--red-500);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .badge-secondary {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .badge-accent {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--accent-color);
+        }
+        
+        .badge-red {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--red-500);
+        }
+        
+        .action-icon {
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .action-icon:hover {
+            color: var(--primary-color);
+        }
+        
+        .insights-card {
+            background-color: var(--white);
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .insight-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+        
+        .insight-icon {
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .insight-icon-primary {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .insight-icon-secondary {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .insight-icon-accent {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--accent-color);
+        }
+        
+        .insight-content {
+            flex: 1;
+        }
+        
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .insight-description {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+        
+        .footer {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-link {
+            color: var(--white);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+        
+        .footer-link:hover {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .dashboard-actions {
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="/welcome.html" class="logo">
+                <span class="logo-icon">📚</span>
+                <span>Decipher Learning</span>
+            </a>
+            <nav class="nav-links">
+                <a href="/welcome.html" class="nav-link">Home</a>
+                <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                <a href="/quiz-management-dashboard.html" class="nav-link">My Quizzes</a>
+                <a href="https://deciph.ai.deciphersacad.online/profile.html" class="nav-link active">Profile</a>
+            </nav>
+            
+            <div class="user-menu">
+                <div class="user-info" id="userInfoDropdown">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span class="user-name" id="userName">Username</span>
+                </div>
+                
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="/profile.html" class="dropdown-item">
+                        <i>👤</i> My Profile
+                    </a>
+                    <a href="/performance.html" class="dropdown-item">
+                        <i>📊</i> Performance
+                    </a>
+                    <a href="#" class="dropdown-item" id="logoutBtn">
+                        <i>🚪</i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Dashboard</h1>
+            
+            <div class="dashboard-actions">
+                <a href="/quiz-creator" class="btn">Create Quiz</a>
+                <a href="/videoquiz-creator.html" class="btn btn-outline">Create Video Quiz</a>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Total Quizzes Created</div>
+                <div class="stat-value" id="totalQuizzes">24</div>
+                <div class="stat-change stat-increase">
+                    <span>↑</span>
+                    <span>12% from last month</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">Total Students</div>
+                <div class="stat-value" id="totalStudents">156</div>
+                <div class="stat-change stat-increase">
+                    <span>↑</span>
+                    <span>8% from last month</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">Average Score</div>
+                <div class="stat-value" id="averageScore">85%</div>
+                <div class="stat-change stat-increase">
+                    <span>↑</span>
+                    <span>3% from last month</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">Completion Rate</div>
+                <div class="stat-value" id="completionRate">92%</div>
+                <div class="stat-change stat-decrease">
+                    <span>↓</span>
+                    <span>2% from last month</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Quiz Activity</h2>
+                    
+                    <div class="chart-filters">
+                        <div class="chart-filter active" data-period="week">Week</div>
+                        <div class="chart-filter" data-period="month">Month</div>
+                        <div class="chart-filter" data-period="year">Year</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Subject Distribution</h2>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="subjectChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recent-quizzes">
+            <div class="section-header">
+                <h2 class="section-title">Recent Quizzes</h2>
+                <a href="/quizzes.html" class="section-action">View All</a>
+            </div>
+            
+            <table class="quiz-table">
+                <thead>
+                    <tr>
+                        <th>Quiz Name</th>
+                        <th>Date</th>
+                        <th>Students</th>
+                        <th>Avg. Score</th>
+                        <th>Grade Level</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recentQuizzesList">
+                    <tr>
+                        <td class="quiz-name">Mathematics: Basic Algebra</td>
+                        <td>Feb 20, 2025</td>
+                        <td>32</td>
+                        <td><span class="quiz-score high-score">85%</span></td>
+                        <td><span class="badge badge-primary">High School</span></td>
+                        <td>
+                            <span class="action-icon">📊</span>
+                            <span class="action-icon">✏️</span>
+                            <span class="action-icon">🔗</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="quiz-name">Science: Solar System</td>
+                        <td>Feb 18, 2025</td>
+                        <td>28</td>
+                        <td><span class="quiz-score medium-score">78%</span></td>
+                        <td><span class="badge badge-secondary">Middle School</span></td>
+                        <td>
+                            <span class="action-icon">📊</span>
+                            <span class="action-icon">✏️</span>
+                            <span class="action-icon">🔗</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="quiz-name">History: World War II</td>
+                        <td>Feb 15, 2025</td>
+                        <td>30</td>
+                        <td><span class="quiz-score high-score">92%</span></td>
+                        <td><span class="badge badge-primary">High School</span></td>
+                        <td>
+                            <span class="action-icon">📊</span>
+                            <span class="action-icon">✏️</span>
+                            <span class="action-icon">🔗</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="quiz-name">Biology: Human Body</td>
+                        <td>Feb 12, 2025</td>
+                        <td>25</td>
+                        <td><span class="quiz-score low-score">68%</span></td>
+                        <td><span class="badge badge-primary">High School</span></td>
+                        <td>
+                            <span class="action-icon">📊</span>
+                            <span class="action-icon">✏️</span>
+                            <span class="action-icon">🔗</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="quiz-name">English: Literary Elements</td>
+                        <td>Feb 10, 2025</td>
+                        <td>30</td>
+                        <td><span class="quiz-score high-score">88%</span></td>
+                        <td><span class="badge badge-accent">College</span></td>
+                        <td>
+                            <span class="action-icon">📊</span>
+                            <span class="action-icon">✏️</span>
+                            <span class="action-icon">🔗</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="insights-card">
+            <div class="section-header">
+                <h2 class="section-title">Learning Insights</h2>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon insight-icon-primary">📈</div>
+                <div class="insight-content">
+                    <div class="insight-title">Performance Improving in Mathematics</div>
+                    <div class="insight-description">Student scores in algebra quizzes have improved by 15% over the last month.</div>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon insight-icon-accent">⚠️</div>
+                <div class="insight-content">
+                    <div class="insight-title">Learning Gap Detected: Scientific Method</div>
+                    <div class="insight-description">Students are struggling with applying the scientific method in practical scenarios.</div>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon insight-icon-secondary">💡</div>
+                <div class="insight-content">
+                    <div class="insight-title">Suggested Action: Reading Comprehension</div>
+                    <div class="insight-description">Consider creating more exercises focused on extracting key information from complex texts.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2025 Decipher Learning Platform. All rights reserved.</p>
+            
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    if (!token) {
+        window.location.href = '/index.html';
+        return;
+    }
+    
+    // Display user name and avatar initial
+    const userName = document.getElementById('userName');
+    const userAvatar = document.getElementById('userAvatar');
+    
+    if (user.name) {
+        userName.textContent = user.name;
+        userAvatar.textContent = user.name.charAt(0).toUpperCase();
+    }
+    
+    // Toggle dropdown menu
+    const userInfoDropdown = document.getElementById('userInfoDropdown');
+    const userDropdown = document.getElementById('userDropdown');
+    
+    userInfoDropdown.addEventListener('click', function() {
+        userDropdown.classList.toggle('active');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!userInfoDropdown.contains(event.target) && !userDropdown.contains(event.target)) {
+            userDropdown.classList.remove('active');
+        }
+    });
+    
+    // Logout functionality
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        window.location.href = '/index.html';
+    });
+    
+    // Initialize charts and attach filter listeners
+    initCharts();
+    
+    // Load dashboard data (real data if API available, fallback to mock data)
+    loadDashboardData();
+});
+
+/**
+ * Initialize charts with default data
+ */
+function initCharts() {
+    // Activity Chart
+    const activityCtx = document.getElementById('activityChart').getContext('2d');
+    window.activityChart = new Chart(activityCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Quiz Completions',
+                data: [12, 15, 8, 10, 14, 3, 5],
+                borderColor: '#4F46E5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    // Subject Distribution Chart
+    const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+    window.subjectChart = new Chart(subjectCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Mathematics', 'Science', 'History', 'Languages', 'Arts', 'Other'],
+            datasets: [{
+                data: [35, 25, 15, 10, 10, 5],
+                backgroundColor: [
+                    '#4F46E5',
+                    '#10B981',
+                    '#F59E0B',
+                    '#EF4444',
+                    '#8B5CF6',
+                    '#6B7280'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            },
+            cutout: '70%'
+        }
+    });
+    
+    // Set up chart filters
+    setupChartFilterListeners();
+}
+
+/**
+ * Set up chart filter listeners
+ */
+function setupChartFilterListeners() {
+    const chartFilters = document.querySelectorAll('.chart-filter');
+    
+    chartFilters.forEach(filter => {
+        filter.addEventListener('click', function() {
+            // Remove active class from all filters
+            chartFilters.forEach(f => f.classList.remove('active'));
+            
+            // Add active class to clicked filter
+            this.classList.add('active');
+            
+            // Update chart data based on selected period
+            const period = this.getAttribute('data-period');
+            updateActivityChart(period);
+        });
+    });
+}
+
+/**
+ * Main function to load all dashboard data
+ */
+async function loadDashboardData() {
+    try {
+        // Get authentication token
+        const token = getAuthToken();
+
+        // Always load worksheet performance data (public, no auth required)
+        let worksheetPerf = null;
+        try {
+            const wsResp = await fetch('/api/worksheet-performance');
+            if (wsResp.ok) {
+                worksheetPerf = await wsResp.json();
+            }
+        } catch (wsErr) {
+            console.warn('Could not load worksheet performance:', wsErr);
+        }
+
+        // Load dashboard data from API if token is available
+        if (token) {
+            try {
+                // Load statistics data (merges quiz + worksheet data)
+                await loadDashboardStatistics(token, worksheetPerf);
+
+                // Load recent quizzes (merges quiz + worksheet data)
+                await loadRecentQuizzes(token);
+
+                // Load chart data
+                await loadDashboardCharts(token);
+
+                // Load learning insights
+                await loadLearningInsights(token);
+            } catch (apiError) {
+                console.error("API error, falling back to worksheet + mock data:", apiError);
+                if (worksheetPerf && worksheetPerf.total_submissions > 0) {
+                    loadWorksheetOnlyData(worksheetPerf);
+                } else {
+                    loadMockData();
+                }
+            }
+        } else if (worksheetPerf && worksheetPerf.total_submissions > 0) {
+            // No auth token but we have worksheet data - show it
+            loadWorksheetOnlyData(worksheetPerf);
+        } else {
+            // Fallback to mock data if no token and no worksheet data
+            loadMockData();
+        }
+    } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        // Ensure at least mock data is loaded on error
+        loadMockData();
+    }
+}
+
+/**
+ * Load dashboard with worksheet-only data when quiz API is unavailable
+ */
+async function loadWorksheetOnlyData(worksheetPerf) {
+    updateDashboardStats({
+        totalQuizzes: worksheetPerf.total_worksheets || 0,
+        totalStudents: worksheetPerf.total_students || 0,
+        averageScore: Math.round(worksheetPerf.average_score || 0),
+        completionRate: Math.round(worksheetPerf.completion_rate || 0)
+    });
+
+    // Load worksheet submissions as recent items
+    try {
+        const wsResp = await fetch('/api/worksheet-submissions');
+        if (wsResp.ok) {
+            const wsData = await wsResp.json();
+            const recentWorksheets = (wsData.worksheets || []).slice(0, 5).map(ws => ({
+                title: ws.title,
+                created_at: ws.created_at,
+                students: ws.submission_count || 0,
+                avgScore: ws.average_score || 0,
+                grade_level: 'worksheet'
+            }));
+            updateRecentQuizzesTable(recentWorksheets);
+        }
+    } catch (err) {
+        console.warn('Could not load worksheet submissions list:', err);
+    }
+
+    // Update charts with worksheet activity data
+    if (worksheetPerf.activity_data && worksheetPerf.activity_data.length > 0) {
+        updateActivityChart('week', worksheetPerf);
+    } else {
+        updateActivityChart('week');
+    }
+}
+
+/**
+ * Helper function to get authentication token
+ */
+function getAuthToken() {
+    return localStorage.getItem('token');
+}
+
+/**
+ * Load mock data when API is unavailable
+ */
+function loadMockData() {
+    // Update stats with mock data
+    updateDashboardStats({
+        totalQuizzes: 24,
+        totalStudents: 156,
+        averageScore: 85,
+        completionRate: 92
+    });
+    
+    // Load mock recent quizzes
+    const mockQuizzes = [
+        {
+            title: 'Mathematics: Basic Algebra',
+            created_at: '2025-02-20T00:00:00.000Z',
+            students: 32,
+            avgScore: 85,
+            grade_level: 'high'
+        },
+        {
+            title: 'Science: Solar System',
+            created_at: '2025-02-18T00:00:00.000Z',
+            students: 28,
+            avgScore: 78,
+            grade_level: 'middle'
+        },
+        {
+            title: 'History: World War II',
+            created_at: '2025-02-15T00:00:00.000Z',
+            students: 30,
+            avgScore: 92,
+            grade_level: 'high'
+        },
+        {
+            title: 'Biology: Human Body',
+            created_at: '2025-02-12T00:00:00.000Z',
+            students: 25,
+            avgScore: 68,
+            grade_level: 'high'
+        },
+        {
+            title: 'English: Literary Elements',
+            created_at: '2025-02-10T00:00:00.000Z',
+            students: 30,
+            avgScore: 88,
+            grade_level: 'college'
+        }
+    ];
+    updateRecentQuizzesTable(mockQuizzes);
+    
+    // Update charts with mock data
+    updateActivityChart('week');
+    
+    // Generate mock insights
+    const mockInsights = [
+        {
+            type: 'success',
+            title: 'Performance Improving in Mathematics',
+            description: 'Student scores in algebra quizzes have improved by 15% over the last month.',
+            icon: '📈'
+        },
+        {
+            type: 'warning',
+            title: 'Learning Gap Detected: Scientific Method',
+            description: 'Students are struggling with applying the scientific method in practical scenarios.',
+            icon: '⚠️'
+        },
+        {
+            type: 'suggestion',
+            title: 'Suggested Action: Reading Comprehension',
+            description: 'Consider creating more exercises focused on extracting key information from complex texts.',
+            icon: '💡'
+        }
+    ];
+    updateLearningInsightsUI(mockInsights);
+}
+
+/**
+ * Update dashboard stats with provided data
+ */
+function updateDashboardStats(stats) {
+    // Update the statistics elements with real data
+    const totalQuizzesElem = document.getElementById('totalQuizzes');
+    const totalStudentsElem = document.getElementById('totalStudents');
+    const averageScoreElem = document.getElementById('averageScore');
+    const completionRateElem = document.getElementById('completionRate');
+    
+    if (totalQuizzesElem) totalQuizzesElem.textContent = stats.totalQuizzes;
+    if (totalStudentsElem) totalStudentsElem.textContent = stats.totalStudents;
+    if (averageScoreElem) averageScoreElem.textContent = `${stats.averageScore}%`;
+    if (completionRateElem) completionRateElem.textContent = `${stats.completionRate}%`;
+}
+
+/**
+ * Update activity chart with data based on period
+ */
+function updateActivityChart(period, apiData = null) {
+    // Default labels and data for each period
+    let labels = [];
+    let data = [];
+    
+    if (apiData) {
+        // Parse real activity data from API
+        const activityData = apiData.activity_data || [];
+        
+        if (period === 'week') {
+            // Group by day of week
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            labels = days;
+            
+            // Initialize counts for each day
+            const dayCounts = Array(7).fill(0);
+            
+            // Count submissions for each day
+            activityData.forEach(item => {
+                const date = new Date(item.date);
+                const dayIndex = date.getDay();
+                dayCounts[dayIndex] += item.count || 0;
+            });
+            
+            data = dayCounts;
+        } else if (period === 'month') {
+            // Group by week
+            labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+            
+            // Initialize counts for each week
+            const weekCounts = Array(4).fill(0);
+            
+            // Count submissions for each week
+            activityData.forEach(item => {
+                const date = new Date(item.date);
+                const day = date.getDate();
+                let weekIndex = 0;
+                
+                if (day <= 7) weekIndex = 0;
+                else if (day <= 14) weekIndex = 1;
+                else if (day <= 21) weekIndex = 2;
+                else weekIndex = 3;
+                
+                weekCounts[weekIndex] += item.count || 0;
+            });
+            
+            data = weekCounts;
+        } else if (period === 'year') {
+            // Group by month
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            labels = months;
+            
+            // Initialize counts for each month
+            const monthCounts = Array(12).fill(0);
+            
+            // Count submissions for each month
+            activityData.forEach(item => {
+                const date = new Date(item.date);
+                const monthIndex = date.getMonth();
+                monthCounts[monthIndex] += item.count || 0;
+            });
+            
+            data = monthCounts;
+        }
+    } else {
+        // Use mock data if no API data available
+        switch(period) {
+            case 'week':
+                labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                data = [12, 15, 8, 10, 14, 3, 5];
+                break;
+            case 'month':
+                labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                data = [45, 52, 38, 65];
+                break;
+            case 'year':
+                labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                data = [120, 135, 142, 138, 145, 132, 110, 120, 130, 145, 150, 160];
+                break;
+        }
+    }
+    
+    // Update chart with new data
+    if (window.activityChart) {
+        window.activityChart.data.labels = labels;
+        window.activityChart.data.datasets[0].data = data;
+        window.activityChart.update();
+    }
+}
+
+/**
+ * Update subject distribution chart with real data
+ */
+function updateSubjectDistributionChart(data) {
+    if (!window.subjectChart) return;
+    
+    // Get subject distribution data
+    const subjectData = data?.subject_distribution || {
+        'Mathematics': 35,
+        'Science': 25,
+        'History': 15,
+        'Languages': 10,
+        'Arts': 10,
+        'Other': 5
+    };
+    
+    // Format data for the chart
+    const subjects = Object.keys(subjectData);
+    const values = Object.values(subjectData);
+    
+    // Default colors for subjects
+    const colors = [
+        '#4F46E5', // Primary
+        '#10B981', // Secondary
+        '#F59E0B', // Accent
+        '#EF4444', // Red
+        '#8B5CF6', // Purple
+        '#6B7280'  // Gray
+    ];
+    
+    // Update chart data
+    window.subjectChart.data.labels = subjects;
+    window.subjectChart.data.datasets[0].data = values;
+    window.subjectChart.data.datasets[0].backgroundColor = colors.slice(0, subjects.length);
+    window.subjectChart.update();
+}
+
+/**
+ * Load dashboard statistics from API
+ */
+async function loadDashboardStatistics(token, worksheetPerf) {
+    try {
+        // First get overall performance metrics from quiz API
+        const performanceResponse = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/quiz-performance', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!performanceResponse.ok) {
+            throw new Error(`Failed to load performance data: ${performanceResponse.status}`);
+        }
+
+        const performanceData = await performanceResponse.json();
+
+        // Then get user's quizzes count
+        const quizzesResponse = await fetch('https://seashell-app-onfk3.ondigitalocean.app/user/quizzes', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!quizzesResponse.ok) {
+            throw new Error(`Failed to load quizzes data: ${quizzesResponse.status}`);
+        }
+
+        const quizzesData = await quizzesResponse.json();
+
+        // Merge quiz + worksheet stats
+        let totalItems = (quizzesData.quizzes?.length || 0);
+        let totalStudents = performanceData.total_students || 0;
+        let avgScore = performanceData.average_score || 0;
+        let quizSubmissions = performanceData.total_submissions || 0;
+
+        if (worksheetPerf) {
+            totalItems += (worksheetPerf.total_worksheets || 0);
+            totalStudents += (worksheetPerf.total_students || 0);
+
+            // Weighted average of scores
+            const wsSubmissions = worksheetPerf.total_submissions || 0;
+            const wsAvg = worksheetPerf.average_score || 0;
+            const totalSubs = quizSubmissions + wsSubmissions;
+            if (totalSubs > 0) {
+                avgScore = ((avgScore * quizSubmissions) + (wsAvg * wsSubmissions)) / totalSubs;
+            }
+        }
+
+        // Update dashboard statistics
+        updateDashboardStats({
+            totalQuizzes: totalItems,
+            totalStudents: totalStudents,
+            averageScore: Math.round(avgScore),
+            completionRate: Math.round(performanceData.completion_rate || 0)
+        });
+
+        return performanceData;
+    } catch (error) {
+        console.error("Error loading dashboard statistics:", error);
+        throw error;
+    }
+}
+
+/**
+ * Load recent quizzes for dashboard from API
+ */
+async function loadRecentQuizzes(token) {
+    try {
+        const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/user/quizzes', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load quizzes: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const quizzes = data.quizzes || [];
+        
+        // Get additional data for each quiz (scores, student counts)
+        const enhancedQuizzes = await Promise.all(
+            quizzes.slice(0, 5).map(async (quiz) => {
+                try {
+                    const scoresResponse = await fetch(`https://seashell-app-onfk3.ondigitalocean.app/api/quiz-scores/${quiz.id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!scoresResponse.ok) {
+                        return {
+                            ...quiz,
+                            students: 0,
+                            avgScore: 0
+                        };
+                    }
+                    
+                    const scoresData = await scoresResponse.json();
+                    const submissions = scoresData.submissions || [];
+                    
+                    // Calculate average score
+                    let totalScore = 0;
+                    submissions.forEach(sub => {
+                        totalScore += (sub.score / sub.max_score) * 100;
+                    });
+                    
+                    const avgScore = submissions.length > 0 ? Math.round(totalScore / submissions.length) : 0;
+                    
+                    return {
+                        ...quiz,
+                        students: submissions.length,
+                        avgScore: avgScore
+                    };
+                } catch (error) {
+                    console.error(`Error fetching data for quiz ${quiz.id}:`, error);
+                    return {
+                        ...quiz,
+                        students: 0,
+                        avgScore: 0
+                    };
+                }
+            })
+        );
+        
+        // Also load recent worksheets and merge
+        try {
+            const wsResp = await fetch('/api/worksheet-submissions');
+            if (wsResp.ok) {
+                const wsData = await wsResp.json();
+                const recentWorksheets = (wsData.worksheets || []).slice(0, 5).map(ws => ({
+                    title: ws.title,
+                    created_at: ws.created_at,
+                    students: ws.submission_count || 0,
+                    avgScore: ws.average_score || 0,
+                    grade_level: 'worksheet'
+                }));
+
+                // Merge quizzes + worksheets, sort by date, take top 5
+                const combined = enhancedQuizzes.concat(recentWorksheets);
+                combined.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                updateRecentQuizzesTable(combined.slice(0, 5));
+            } else {
+                updateRecentQuizzesTable(enhancedQuizzes);
+            }
+        } catch (wsErr) {
+            console.warn('Could not load worksheets for recent table:', wsErr);
+            updateRecentQuizzesTable(enhancedQuizzes);
+        }
+
+        return enhancedQuizzes;
+    } catch (error) {
+        console.error("Error loading recent quizzes:", error);
+        throw error;
+    }
+}
+
+/**
+ * Update recent quizzes table with provided data
+ */
+function updateRecentQuizzesTable(quizzes) {
+    const quizzesList = document.getElementById('recentQuizzesList');
+    if (!quizzesList) return;
+    
+    // Clear existing content
+    quizzesList.innerHTML = '';
+    
+    // If no quizzes, show a message
+    if (quizzes.length === 0) {
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = `
+            <td colspan="6" style="text-align: center; padding: 20px;">
+                No quizzes created yet. <a href="/quiz-creator.html" style="color: var(--primary-color);">Create your first quiz</a>.
+            </td>
+        `;
+        quizzesList.appendChild(emptyRow);
+        return;
+    }
+    
+    // Add each quiz to the table
+    quizzes.forEach(quiz => {
+        // Format date
+        const quizDate = new Date(quiz.created_at);
+        const formattedDate = quizDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+        
+        // Determine score class
+        let scoreClass = 'low-score';
+        if (quiz.avgScore >= 85) {
+            scoreClass = 'high-score';
+        } else if (quiz.avgScore >= 70) {
+            scoreClass = 'medium-score';
+        }
+        
+        // Determine grade badge class
+        let badgeClass = 'badge-primary';
+        if (quiz.grade_level === 'middle') {
+            badgeClass = 'badge-secondary';
+        } else if (quiz.grade_level === 'college') {
+            badgeClass = 'badge-accent';
+        } else if (quiz.grade_level === 'elementary') {
+            badgeClass = 'badge-red';
+        }
+        
+        // Format grade level display
+        let gradeDisplay = 'Unknown';
+        if (quiz.grade_level === 'elementary') {
+            gradeDisplay = 'Elementary';
+        } else if (quiz.grade_level === 'middle') {
+            gradeDisplay = 'Middle School';
+        } else if (quiz.grade_level === 'high') {
+            gradeDisplay = 'High School';
+        } else if (quiz.grade_level === 'college') {
+            gradeDisplay = 'College';
+        }
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="quiz-name">${quiz.title || quiz.topic || 'Untitled Quiz'}</td>
+            <td>${formattedDate}</td>
+            <td>${quiz.students}</td>
+            <td><span class="quiz-score ${scoreClass}">${quiz.avgScore}%</span></td>
+            <td><span class="badge ${badgeClass}">${gradeDisplay}</span></td>
+            <td>
+                <a href="/scores.html?id=${quiz.id || ''}" class="action-icon" title="View Results">📊</a>
+                <a href="/quiz-creator.html?id=${quiz.id || ''}" class="action-icon" title="Edit Quiz">✏️</a>
+                <span class="action-icon" title="Share Link" onclick="shareQuiz('${quiz.id || ''}')">🔗</span>
+            </td>
+        `;
+        
+        quizzesList.appendChild(row);
+    });
+}
+
+/**
+ * Load dashboard charts with API data
+ */
+async function loadDashboardCharts(token) {
+    try {
+        // Get performance data for charts
+        const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/quiz-performance', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load chart data: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Update activity chart with current active period
+        const activePeriod = document.querySelector('.chart-filter.active')?.getAttribute('data-period') || 'week';
+        updateActivityChart(activePeriod, data);
+        
+        // Update subject distribution chart
+        updateSubjectDistributionChart(data);
+        
+        return data;
+    } catch (error) {
+        console.error("Error loading dashboard charts:", error);
+        throw error;
+    }
+}
+
+/**
+ * Load learning insights based on performance data
+ */
+async function loadLearningInsights(token) {
+    try {
+        // Get performance data for insights
+        const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/quiz-performance', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load data for insights: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Generate insights based on performance data
+        const insights = generateLearningInsights(data);
+        
+        // Update insights in the UI
+        updateLearningInsightsUI(insights);
+        
+        return insights;
+    } catch (error) {
+        console.error("Error loading learning insights:", error);
+        throw error;
+    }
+}
+
+/**
+ * Generate learning insights from performance data
+ */
+function generateLearningInsights(data) {
+    const insights = [];
+    
+    // Get subject performance data
+    const subjectData = data?.subject_distribution || {};
+    
+    // Find highest performing subject
+    let highestSubject = '';
+    let highestScore = 0;
+    
+    // Find lowest performing subject
+    let lowestSubject = '';
+    let lowestScore = 100;
+    
+    // Process subjects
+    Object.entries(subjectData).forEach(([subject, score]) => {
+        if (score > highestScore) {
+            highestScore = score;
+            highestSubject = subject;
+        }
+        
+        if (score < lowestScore) {
+            lowestScore = score;
+            lowestSubject = subject;
+        }
+    });
+    
+    // Add insights based on scores
+    
+    // Highest performing subject
+    if (highestSubject) {
+        insights.push({
+            type: 'success',
+            title: `Performance Excelling in ${highestSubject}`,
+            description: `Student scores in ${highestSubject} quizzes are ${highestScore.toFixed(1)}%, showing strong understanding.`,
+            icon: '📈'
+        });
+    }
+    
+    // Lowest performing subject (if below 75%)
+    if (lowestSubject && lowestScore < 75) {
+        insights.push({
+            type: 'warning',
+            title: `Learning Gap Detected: ${lowestSubject}`,
+            description: `Students are struggling with ${lowestSubject} concepts, with an average score of ${lowestScore.toFixed(1)}%.`,
+            icon: '⚠️'
+        });
+    }
+    
+    // Add suggestion based on lowest score
+    if (lowestSubject && lowestScore < 80) {
+        insights.push({
+            type: 'suggestion',
+            title: `Suggested Action: ${lowestSubject}`,
+            description: `Consider creating more ${lowestSubject} quizzes focusing on fundamental concepts to improve understanding.`,
+            icon: '💡'
+        });
+    }
+    
+    // Ensure we have at least one insight
+    if (insights.length === 0) {
+        insights.push({
+            type: 'suggestion',
+            title: 'Create More Diverse Quizzes',
+            description: 'Try creating quizzes across different subjects to gather more learning insights.',
+            icon: '💡'
+        });
+    }
+    
+    return insights;
+}
+
+/**
+ * Update learning insights UI with generated insights
+ */
+function updateLearningInsightsUI(insights) {
+    const insightsContainer = document.querySelector('.insights-card');
+    if (!insightsContainer) return;
+    
+    // Get section header
+    const sectionHeader = insightsContainer.querySelector('.section-header');
+    
+    // Clear existing insights, but keep the header
+    insightsContainer.innerHTML = '';
+    if (sectionHeader) {
+        insightsContainer.appendChild(sectionHeader);
+    } else {
+        // Create header if it doesn't exist
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        header.innerHTML = '<h2 class="section-title">Learning Insights</h2>';
+        insightsContainer.appendChild(header);
+    }
+    
+    // Add each insight
+    insights.forEach(insight => {
+        const insightElement = document.createElement('div');
+        insightElement.className = 'insight-item';
+        
+        // Determine icon class based on insight type
+        let iconClass = 'insight-icon-primary';
+        if (insight.type === 'warning') {
+            iconClass = 'insight-icon-accent';
+        } else if (insight.type === 'suggestion') {
+            iconClass = 'insight-icon-secondary';
+        }
+        
+        insightElement.innerHTML = `
+            <div class="insight-icon ${iconClass}">${insight.icon}</div>
+            <div class="insight-content">
+                <div class="insight-title">${insight.title}</div>
+                <div class="insight-description">${insight.description}</div>
+            </div>
+        `;
+        
+        insightsContainer.appendChild(insightElement);
+    });
+}
+
+/**
+ * Share quiz function for sharing quiz links
+ */
+window.shareQuiz = function(quizId) {
+    if (!quizId) {
+        console.error('Invalid quiz ID for sharing');
+        return;
+    }
+    
+    // Create share link with clipboard functionality
+    const quizUrl = `https://seashell-app-onfk3.ondigitalocean.app/quiz.html?id=${quizId}`;
+    
+    // Create modal for sharing
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1000';
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px;">
+            <h3 style="margin-bottom: 15px;">Share Quiz Link</h3>
+            <div style="display: flex; margin-bottom: 20px;">
+                <input type="text" value="${quizUrl}" readonly style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px 0 0 5px;">
+                <button id="copyLinkBtn" style="background: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 0 5px 5px 0; cursor: pointer;">Copy</button>
+            </div>
+            <button id="closeModalBtn" style="width: 100%; padding: 10px; background: #f1f1f1; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Add event listeners
+    document.getElementById('copyLinkBtn').addEventListener('click', function() {
+        const input = this.previousElementSibling;
+        input.select();
+        document.execCommand('copy');
+        this.textContent = 'Copied!';
+        setTimeout(() => {
+            this.textContent = 'Copy';
+        }, 2000);
+    });
+    
+    document.getElementById('closeModalBtn').addEventListener('click', function() {
+        document.body.removeChild(modal);
+    });
+};
+
+/**
+ * Function to inject scripts into the page (for modular loading)
+ */
+function injectScript(scriptSrc) {
+    const script = document.createElement('script');
+    script.src = scriptSrc;
+    document.head.appendChild(script);
+}
+
+/**
+ * Load enhanced quiz scripts based on current page
+ */
+function loadEnhancedQuizScripts() {
+    // Detect current page
+    const isQuizPage = window.location.pathname.includes('quiz.html');
+    const isQuizCreator = window.location.pathname.includes('quiz-creator.html');
+    const isScoresPage = window.location.pathname.includes('scores.html');
+    const isPerformancePage = window.location.pathname.includes('performance.html');
+    const isProfilePage = window.location.pathname.includes('profile.html');
+    const isDashboardPage = window.location.pathname.includes('dashboard.html');
+    
+    // Common functionality - login redirection for all pages
+    injectScript('login-redirect-handler.js');
+    
+    // Page-specific functionality
+    if (isQuizPage) {
+        // Quiz page needs mode handlers and submission enhancements
+        injectScript('quiz-mode-handler.js');
+        injectScript('quiz-submission-handler.js');
+    } 
+    else if (isScoresPage) {
+        // Scores page needs score display enhancements
+        injectScript('quiz-scores-integration.js');
+    }
+    else if (isQuizCreator) {
+        // Quiz creator needs better mode persisting
+        injectScript('quiz-creator-enhancements.js');
+    }
+    else if (isProfilePage) {
+        // Profile page needs real performance data
+        loadProfilePerformanceData();
+    }
+    else if (isDashboardPage) {
+        // Dashboard page needs real data
+        loadDashboardData();
+    }
+}
+
+/**
+ * Load profile performance data
+ */
+function loadProfilePerformanceData() {
+    // This function would be implemented in a separate profile-specific script
+    console.log("Profile performance data loading would be implemented here");
+}
+    </script>
+    <script src="score-connect.js"></script>
+</body>
+</html>

@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Management Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --accent-color: #2196F3;
+            --bg-color: #f0f2f5;
+            --text-color: #333;
+            --card-shadow: 
+                0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+                0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+                0 12.5px 10px rgba(0, 0, 0, 0.06);
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #ffffff, #f6f7f9);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(145deg, var(--accent-color), #1976D2);
+        }
+
+        .filters {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            padding-left: 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .filter-select {
+            padding: 12px 35px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+            appearance: none;
+            background-color: white;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+            min-width: 150px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .quiz-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .quiz-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .quiz-table th {
+            background-color: #f9f9f9;
+            color: #333;
+            font-weight: 600;
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .quiz-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .quiz-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .quiz-table tr:hover {
+            background-color: #f5f9ff;
+        }
+
+        .quiz-title-cell {
+            max-width: 300px;
+        }
+
+        .quiz-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .quiz-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .quiz-topic {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .quiz-grade {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e3f2fd;
+            color: #1976D2;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .mode-relaxed {
+            background-color: #e8f5e9;
+            color: #4CAF50;
+        }
+
+        .mode-competition {
+            background-color: #fff8e1;
+            color: #FFC107;
+        }
+
+        .mode-collaboration {
+            background-color: #e3f2fd;
+            color: #2196F3;
+        }
+
+        .mode-worksheet {
+            background-color: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: var(--transition);
+            color: #777;
+            padding: 5px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .action-btn:hover {
+            color: var(--primary-color);
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .page-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        .page-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .page-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+
+        .no-results h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #777;
+        }
+
+        .empty-state h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .empty-state p {
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 15px;
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .stat-icon-quizzes {
+            background: linear-gradient(45deg, #42a5f5, #2196f3);
+        }
+
+        .stat-icon-students {
+            background: linear-gradient(45deg, #66bb6a, #4caf50);
+        }
+
+        .stat-icon-submissions {
+            background: linear-gradient(45deg, #ffca28, #ffc107);
+        }
+
+        .stat-icon-improvement {
+            background: linear-gradient(45deg, #ec407a, #e91e63);
+        }
+
+        .stat-title {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quiz-table {
+                font-size: 14px;
+            }
+
+            .quiz-table th:nth-child(3), 
+            .quiz-table td:nth-child(3) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="quiz-management-dashboard">
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="header">
+            <h1>Quiz Management Dashboard</h1>
+            <div class="header-actions">
+                <button class="btn" id="createQuizBtn">✨ Create New Quiz</button>
+                <button class="btn btn-secondary" id="viewPerformanceReports">📊 View Performance Reports</button>
+
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-quizzes">📝</div>
+                <div class="stat-title">Total Quizzes</div>
+                <div class="stat-value" id="totalQuizzes">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-students">👥</div>
+                <div class="stat-title">Total Students</div>
+                <div class="stat-value" id="totalStudents">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-submissions">📊</div>
+                <div class="stat-title">Quiz Submissions</div>
+                <div class="stat-value" id="totalSubmissions">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-improvement">📈</div>
+                <div class="stat-title">Average Score</div>
+                <div class="stat-value" id="averageScore">-</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search quizzes...">
+            </div>
+            
+            <div>
+                <select class="filter-select" id="dateFilter">
+                    <option value="all">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                </select>
+            </div>
+            
+            <div>
+                <select class="filter-select" id="quizTypeFilter">
+                    <option value="all">All Modes</option>
+                    <option value="relaxed">Relaxed</option>
+                    <option value="competition">Competition</option>
+                    <option value="collaboration">Collaboration</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="quiz-table-container">
+            <table class="quiz-table">
+                <thead>
+                    <tr>
+                        <th>Quiz Title</th>
+                        <th>Score</th>
+                        <th>Name</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="quizHistoryBody">
+                    <!-- Will be filled with JavaScript -->
+                    <tr>
+                        <td colspan="5" class="loading" id="loading"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="no-results" id="noResults" style="display: none;">
+                <h3>No quizzes found</h3>
+                <p>There are no quizzes matching your search criteria.</p>
+            </div>
+            
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <h3>No quizzes created yet</h3>
+                <p>Create your first quiz to get started.</p>
+                <button class="btn" onclick="window.location.href='/quiz-creator'">Create Your First Quiz</button>
+            </div>
+        </div>
+        
+        <div class="pagination" id="pagination">
+            <!-- Will be filled with JavaScript -->
+        </div>
+    </div>
+    
+    <script src="quiz-management.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/index.html';
+        return;
+    }
+    
+    // Initialize dashboard
+    initDashboard();
+});
+
+/**
+ * Initialize the dashboard - ENHANCED with better debugging
+ */
+async function initDashboard() {
+    try {
+        // Show loading state
+        showLoading(true);
+        
+        console.log('🚀 Starting dashboard initialization...');
+        
+        // Fetch all quiz types including math quizzes
+        console.log('📡 Fetching all quiz data sources...');
+        const results = await Promise.allSettled([
+            fetchUserQuizzes(),
+            fetchLocalQuizScores(),
+            fetchGeometryQuizScores(),
+            fetchMathQuizScores()
+        ]);
+
+        console.log('📊 Fetch results:', results.map((r, i) => ({
+            source: ['external', 'local', 'geometry', 'math'][i],
+            status: r.status,
+            count: r.status === 'fulfilled' ? r.value.length : 0,
+            error: r.status === 'rejected' ? r.reason : null
+        })));
+
+        const regularQuizzes = results[0].status === 'fulfilled' ? results[0].value : [];
+        const localQuizScores = results[1].status === 'fulfilled' ? results[1].value : [];
+        const geometryScores = results[2].status === 'fulfilled' ? results[2].value : [];
+        const mathScores = results[3].status === 'fulfilled' ? results[3].value : [];
+        
+        console.log('📈 Quiz counts by type:');
+        console.log('  - Regular quizzes (external):', regularQuizzes.length);
+        console.log('  - Local quiz scores:', localQuizScores.length);
+        console.log('  - Geometry quizzes:', geometryScores.length);
+        console.log('  - Math quizzes:', mathScores.length);
+
+        // Combine quizzes from all sources including local scores
+        const allQuizzes = regularQuizzes.concat(localQuizScores).concat(geometryScores).concat(mathScores);
+        console.log('🎯 Total combined quizzes:', allQuizzes.length);
+        
+        if (allQuizzes.length === 0) {
+            console.warn('⚠️ No quizzes found from any source!');
+        }
+        
+        // Fetch quiz statistics (updated to include math stats)
+        console.log('📊 Fetching combined statistics...');
+        const stats = await fetchCombinedStatistics();
+        console.log('📈 Combined stats:', stats);
+        
+        // Update dashboard with fetched data
+        updateStatistics(stats);
+        renderQuizTable(allQuizzes);
+        setupFilters(allQuizzes);
+        showLoading(false);
+        
+        console.log('✅ Dashboard initialization complete!');
+        
+    } catch (error) {
+        console.error('❌ Error initializing dashboard:', error);
+        showError('Failed to load dashboard data. Please try again later.');
+        showLoading(false);
+    }
+}
+
+/**
+ * Fetch user's regular quizzes from external API - ENHANCED with better error handling
+ */
+async function fetchUserQuizzes() {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        console.warn('No authentication token found for external API');
+        return [];
+    }
+
+    try {
+        console.log('Attempting to fetch regular quizzes from external API...');
+
+        // First, fetch quiz definitions
+        const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/user/quizzes', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('External API response status:', response.status);
+
+        if (!response.ok) {
+            console.warn('External API returned error status:', response.status);
+            return [];
+        }
+
+        const data = await response.json();
+        console.log('External API raw data:', data);
+
+        // Handle different possible response structures
+        let quizzesArray = [];
+        if (data && Array.isArray(data.quizzes)) {
+            quizzesArray = data.quizzes;
+        } else if (data && Array.isArray(data.data)) {
+            quizzesArray = data.data;
+        } else if (Array.isArray(data)) {
+            quizzesArray = data;
+        } else {
+            console.warn('Unexpected external API response structure:', data);
+            return [];
+        }
+
+        // Try to fetch quiz submissions to get student names
+        let submissionsMap = {};
+        try {
+            const submissionsResponse = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/quiz-scores', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (submissionsResponse.ok) {
+                const submissionsData = await submissionsResponse.json();
+                const submissions = submissionsData.scores || submissionsData.data || submissionsData || [];
+
+                // Group submissions by quiz_id
+                submissions.forEach(function(sub) {
+                    if (sub.quiz_id) {
+                        if (!submissionsMap[sub.quiz_id]) {
+                            submissionsMap[sub.quiz_id] = [];
+                        }
+                        submissionsMap[sub.quiz_id].push(sub);
+                    }
+                });
+
+                console.log('✅ Fetched quiz submissions for student names:', Object.keys(submissionsMap).length);
+            } else {
+                console.warn('Could not fetch submissions, student names will show as Anonymous');
+            }
+        } catch (err) {
+            console.warn('Error fetching submissions for student names:', err);
+        }
+
+        // Mark these as regular quizzes and ensure required fields
+        const quizzes = quizzesArray.map(function(quiz) {
+            // Get student names from submissions if available
+            let studentName = 'Anonymous';
+            if (submissionsMap[quiz.id]) {
+                const uniqueStudents = [...new Set(submissionsMap[quiz.id].map(s => s.student_name).filter(Boolean))];
+                if (uniqueStudents.length === 1) {
+                    studentName = uniqueStudents[0];
+                } else if (uniqueStudents.length > 1) {
+                    studentName = uniqueStudents.length + ' students';
+                }
+            }
+
+            return Object.assign({}, quiz, {
+                quiz_type: 'regular',
+                source: 'external',
+                // Ensure required fields have defaults
+                title: quiz.title || quiz.name || 'Untitled Quiz',
+                topic: quiz.topic || quiz.subject || 'General',
+                grade_level: quiz.grade_level || quiz.gradeLevel || 'Not specified',
+                student_name: studentName,
+                mode: quiz.mode || 'relaxed',
+                created_at: quiz.created_at || quiz.createdAt || quiz.date || new Date().toISOString()
+            });
+        });
+
+        console.log('✅ Successfully fetched regular quizzes:', quizzes.length);
+        console.log('Regular quiz sample:', quizzes[0]);
+        return quizzes;
+
+    } catch (error) {
+        console.error('❌ Error fetching regular quizzes:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack
+        });
+        return []; // Return empty array instead of throwing
+    }
+}
+
+/**
+ * Fetch LOCAL quiz scores from the local database
+ * This retrieves quiz submissions stored when students complete regular quizzes
+ */
+async function fetchLocalQuizScores() {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        console.warn('No authentication token found for local quiz scores');
+        return [];
+    }
+
+    try {
+        console.log('📊 Fetching LOCAL quiz scores from database...');
+
+        const response = await fetch('/api/quiz-scores', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Local quiz scores API response status:', response.status);
+
+        if (!response.ok) {
+            console.warn('Local quiz scores endpoint returned error:', response.status);
+            return [];
+        }
+
+        const data = await response.json();
+        console.log('Local quiz scores raw data:', data);
+
+        // Transform submissions into quiz entries for display
+        const localQuizEntries = {};
+
+        (data.scores || data || []).forEach(function(score) {
+            const quizId = score.quiz_id;
+
+            if (!localQuizEntries[quizId]) {
+                localQuizEntries[quizId] = {
+                    id: quizId,
+                    title: score.quiz_title || 'Quiz ' + quizId.split('-')[0],
+                    topic: 'General',
+                    grade_level: 'Not specified',
+                    mode: 'relaxed',
+                    created_at: score.submission_date || score.created_at || new Date().toISOString(),
+                    quiz_type: 'regular',
+                    source: 'local',
+                    total_submissions: 0,
+                    last_submission: null,
+                    average_score: 0,
+                    scores: []
+                };
+            }
+
+            // Add this score to the quiz entry
+            localQuizEntries[quizId].scores.push(score);
+            localQuizEntries[quizId].total_submissions++;
+            localQuizEntries[quizId].last_submission = score.submission_date || score.created_at;
+
+            // Update average score
+            const totalScore = localQuizEntries[quizId].scores.reduce(function(sum, s) {
+                return sum + (s.percentage || ((s.score / s.max_score) * 100));
+            }, 0);
+            localQuizEntries[quizId].average_score = totalScore / localQuizEntries[quizId].scores.length;
+        });
+
+        const localQuizzes = Object.values(localQuizEntries).map(function(entry) {
+            // Get unique student names
+            const uniqueStudents = [...new Set(entry.scores.map(s => s.student_name))];
+            const studentDisplay = uniqueStudents.length === 1
+                ? uniqueStudents[0]
+                : uniqueStudents.length + ' students';
+
+            return {
+                id: entry.id,
+                title: entry.title + ' (' + entry.total_submissions + ' submission' + (entry.total_submissions > 1 ? 's' : '') + ')',
+                topic: entry.topic,
+                grade_level: entry.grade_level,
+                student_name: studentDisplay,
+                mode: entry.mode,
+                created_at: entry.last_submission || entry.created_at,
+                quiz_type: 'regular',
+                source: 'local',
+                total_submissions: entry.total_submissions,
+                average_score: Math.round(entry.average_score * 10) / 10
+            };
+        });
+
+        console.log('✅ Processed local quiz scores:', localQuizzes.length);
+        return localQuizzes;
+
+    } catch (error) {
+        console.error('❌ Error fetching local quiz scores:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack
+        });
+        return [];
+    }
+}
+
+/**
+ * Fetch geometry quiz scores instead of quiz definitions
+ */
+async function fetchGeometryQuizScores() {
+    try {
+        const response = await fetch('/api/geometry-quiz-scores', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            console.warn('Geometry quiz scores endpoint not available:', response.status);
+            return [];
+        }
+        
+        const data = await response.json();
+        console.log('Raw geometry scores data:', data);
+        
+        // Transform score submissions into quiz entries for display
+        const geometryQuizEntries = {};
+        
+        (data.scores || data || []).forEach(function(score) {
+            const quizId = score.quiz_id;
+            
+            if (!geometryQuizEntries[quizId]) {
+                geometryQuizEntries[quizId] = {
+                    id: quizId,
+                    title: 'Geometry Quiz ' + quizId.split('-')[0],
+                    topic: 'Geometry',
+                    grade_level: 'High School',
+                    mode: 'relaxed',
+                    created_at: score.submitted_at || score.created_at || new Date().toISOString(),
+                    quiz_type: 'geometry',
+                    source: 'local',
+                    total_submissions: 0,
+                    last_submission: null,
+                    average_score: 0,
+                    scores: []
+                };
+            }
+            
+            // Add this score to the quiz entry
+            geometryQuizEntries[quizId].scores.push(score);
+            geometryQuizEntries[quizId].total_submissions++;
+            geometryQuizEntries[quizId].last_submission = score.submitted_at || score.created_at;
+            
+            // Update average score
+            const totalScore = geometryQuizEntries[quizId].scores.reduce(function(sum, s) {
+                return sum + (s.score || 0);
+            }, 0);
+            geometryQuizEntries[quizId].average_score = totalScore / geometryQuizEntries[quizId].scores.length;
+        });
+        
+        const geometryQuizzes = Object.values(geometryQuizEntries).map(function(entry) {
+            // Get unique student names
+            const uniqueStudents = [...new Set(entry.scores.map(s => s.student_name))];
+            const studentDisplay = uniqueStudents.length === 1
+                ? uniqueStudents[0]
+                : uniqueStudents.length + ' students';
+
+            return {
+                id: entry.id,
+                title: entry.title + ' (' + entry.total_submissions + ' submissions)',
+                topic: entry.topic,
+                grade_level: entry.grade_level,
+                student_name: studentDisplay,
+                mode: entry.mode,
+                created_at: entry.last_submission || entry.created_at,
+                quiz_type: 'geometry',
+                source: 'local',
+                total_submissions: entry.total_submissions,
+                average_score: Math.round(entry.average_score * 10) / 10
+            };
+        });
+        
+        console.log('Processed geometry quizzes:', geometryQuizzes.length);
+        return geometryQuizzes;
+        
+    } catch (error) {
+        console.error('Error fetching geometry quiz scores:', error);
+        return [];
+    }
+}
+
+/**
+ * NEW: Fetch math quiz scores
+ */
+async function fetchMathQuizScores() {
+    try {
+        const response = await fetch('/api/math-quiz-scores', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            console.warn('Math quiz scores endpoint not available:', response.status);
+            return [];
+        }
+        
+        const data = await response.json();
+        console.log('Raw math scores data:', data);
+        
+        // Transform score submissions into quiz entries for display
+        const mathQuizEntries = {};
+        
+        (data.scores || data || []).forEach(function(score) {
+            const quizId = score.quiz_id;
+            
+            if (!mathQuizEntries[quizId]) {
+                mathQuizEntries[quizId] = {
+                    id: quizId,
+                    title: 'Math Quiz ' + quizId.split('-')[0],
+                    topic: 'Mathematics', 
+                    grade_level: 'High School',
+                    mode: 'relaxed',
+                    created_at: score.submitted_at || score.created_at || new Date().toISOString(),
+                    quiz_type: 'math',
+                    source: 'local',
+                    total_submissions: 0,
+                    last_submission: null,
+                    average_score: 0,
+                    scores: []
+                };
+            }
+            
+            // Add this score to the quiz entry
+            mathQuizEntries[quizId].scores.push(score);
+            mathQuizEntries[quizId].total_submissions++;
+            mathQuizEntries[quizId].last_submission = score.submitted_at || score.created_at;
+            
+            // Update average score
+            const totalScore = mathQuizEntries[quizId].scores.reduce(function(sum, s) {
+                return sum + (s.percentage || ((s.score / s.max_score) * 100));
+            }, 0);
+            mathQuizEntries[quizId].average_score = totalScore / mathQuizEntries[quizId].scores.length;
+        });
+        
+        const mathQuizzes = Object.values(mathQuizEntries).map(function(entry) {
+            // Get unique student names
+            const uniqueStudents = [...new Set(entry.scores.map(s => s.student_name))];
+            const studentDisplay = uniqueStudents.length === 1
+                ? uniqueStudents[0]
+                : uniqueStudents.length + ' students';
+
+            return {
+                id: entry.id,
+                title: entry.title + ' (' + entry.total_submissions + ' submissions)',
+                topic: entry.topic,
+                grade_level: entry.grade_level,
+                student_name: studentDisplay,
+                mode: entry.mode,
+                created_at: entry.last_submission || entry.created_at,
+                quiz_type: 'math',
+                source: 'local',
+                total_submissions: entry.total_submissions,
+                average_score: Math.round(entry.average_score * 10) / 10
+            };
+        });
+        
+        console.log('Processed math quizzes:', mathQuizzes.length);
+        return mathQuizzes;
+        
+    } catch (error) {
+        console.error('Error fetching math quiz scores:', error);
+        return [];
+    }
+}
+
+/**
+ * Fetch combined statistics from all sources - ENHANCED with better debugging
+ */
+async function fetchCombinedStatistics() {
+    const token = localStorage.getItem('token');
+    
+    try {
+        console.log('📊 Fetching combined statistics...');
+        
+        // Try to get stats from external API first
+        let externalStats = {};
+        try {
+            console.log('🌐 Fetching external API stats...');
+            const externalResponse = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/quiz-performance', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (externalResponse.ok) {
+                externalStats = await externalResponse.json();
+                console.log('✅ External stats:', externalStats);
+            } else {
+                console.warn('⚠️ External stats API returned:', externalResponse.status);
+            }
+        } catch (error) {
+            console.warn('⚠️ External stats not available:', error.message);
+        }
+        
+        // Get local quiz statistics
+        let localStats = {};
+        try {
+            console.log('📊 Fetching local quiz stats...');
+            const localResponse = await fetch('/api/quiz-scores', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (localResponse.ok) {
+                const localData = await localResponse.json();
+                const scores = localData.scores || localData || [];
+
+                const uniqueQuizIds = new Set();
+                const uniqueStudents = new Set();
+                scores.forEach(function(s) {
+                    uniqueQuizIds.add(s.quiz_id);
+                    uniqueStudents.add(s.student_name);
+                });
+
+                const averageScore = scores.length > 0 ?
+                    scores.reduce(function(sum, s) {
+                        return sum + (s.percentage || ((s.score / s.max_score) * 100));
+                    }, 0) / scores.length : 0;
+
+                localStats = {
+                    total_quizzes: uniqueQuizIds.size,
+                    total_students: uniqueStudents.size,
+                    total_submissions: scores.length,
+                    average_score: averageScore
+                };
+                console.log('✅ Calculated local stats:', localStats);
+            }
+        } catch (error) {
+            console.warn('⚠️ Local stats not available:', error.message);
+        }
+
+        // Get geometry quiz statistics
+        let geometryStats = {};
+        try {
+            console.log('🔺 Fetching geometry stats...');
+            const geometryResponse = await fetch('/api/geometry-quiz-stats', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (geometryResponse.ok) {
+                geometryStats = await geometryResponse.json();
+                console.log('✅ Geometry stats:', geometryStats);
+            } else {
+                console.log('📊 Calculating geometry stats from scores...');
+                // Fallback: calculate stats from scores
+                const scoresResponse = await fetch('/api/geometry-quiz-scores');
+                if (scoresResponse.ok) {
+                    const scoresData = await scoresResponse.json();
+                    const scores = scoresData.scores || scoresData || [];
+                    
+                    const uniqueQuizIds = new Set();
+                    const uniqueStudents = new Set();
+                    scores.forEach(function(s) {
+                        uniqueQuizIds.add(s.quiz_id);
+                        uniqueStudents.add(s.student_name);
+                    });
+                    
+                    const averageScore = scores.length > 0 ? 
+                        scores.reduce(function(sum, s) {
+                            return sum + ((s.score / s.max_score) * 100);
+                        }, 0) / scores.length : 0;
+                    
+                    geometryStats = {
+                        total_quizzes: uniqueQuizIds.size,
+                        total_students: uniqueStudents.size,
+                        total_submissions: scores.length,
+                        average_score: averageScore
+                    };
+                    console.log('✅ Calculated geometry stats:', geometryStats);
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Geometry stats not available:', error.message);
+        }
+        
+        // Get math quiz stats
+        let mathStats = {};
+        try {
+            console.log('🔢 Fetching math stats...');
+            const mathResponse = await fetch('/api/math-quiz-stats');
+            if (mathResponse.ok) {
+                mathStats = await mathResponse.json();
+                console.log('✅ Math stats:', mathStats);
+            } else {
+                console.log('📊 Calculating math stats from scores...');
+                // Fallback: calculate from scores
+                const scoresResponse = await fetch('/api/math-quiz-scores');
+                if (scoresResponse.ok) {
+                    const scoresData = await scoresResponse.json();
+                    const scores = scoresData.scores || scoresData || [];
+                    
+                    const uniqueQuizIds = new Set();
+                    const uniqueStudents = new Set();
+                    scores.forEach(function(s) {
+                        uniqueQuizIds.add(s.quiz_id);
+                        uniqueStudents.add(s.student_name);
+                    });
+                    
+                    const averageScore = scores.length > 0 ? 
+                        scores.reduce(function(sum, s) {
+                            return sum + (s.percentage || ((s.score / s.max_score) * 100));
+                        }, 0) / scores.length : 0;
+                    
+                    mathStats = {
+                        total_quizzes: uniqueQuizIds.size,
+                        total_students: uniqueStudents.size,
+                        total_submissions: scores.length,
+                        average_score: averageScore
+                    };
+                    console.log('✅ Calculated math stats:', mathStats);
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Math stats not available:', error.message);
+        }
+        
+        // Combine statistics including local, geometry, and math stats
+        const combinedStats = {
+            total_quizzes: (externalStats.total_quizzes || 0) + (localStats.total_quizzes || 0) + (geometryStats.total_quizzes || 0) + (mathStats.total_quizzes || 0),
+            total_students: Math.max(externalStats.total_students || 0, localStats.total_students || 0, geometryStats.total_students || 0, mathStats.total_students || 0),
+            total_submissions: (externalStats.total_submissions || 0) + (localStats.total_submissions || 0) + (geometryStats.total_submissions || 0) + (mathStats.total_submissions || 0),
+            average_score: calculateAverageScore(externalStats, localStats, geometryStats, mathStats)
+        };
+
+        console.log('🎯 Final combined statistics:', combinedStats);
+        console.log('📈 Stats breakdown:');
+        console.log('  - External:', externalStats);
+        console.log('  - Local:', localStats);
+        console.log('  - Geometry:', geometryStats);
+        console.log('  - Math:', mathStats);
+        
+        return combinedStats;
+        
+    } catch (error) {
+        console.error('❌ Error fetching statistics:', error);
+        // Return default stats
+        return {
+            total_quizzes: 0,
+            total_students: 0,
+            total_submissions: 0,
+            average_score: 0
+        };
+    }
+}
+
+/**
+ * Calculate weighted average score from multiple sources - UPDATED to include local and math stats
+ */
+function calculateAverageScore(externalStats, localStats, geometryStats, mathStats) {
+    const externalSubmissions = externalStats.total_submissions || 0;
+    const localSubmissions = localStats.total_submissions || 0;
+    const geometrySubmissions = geometryStats.total_submissions || 0;
+    const mathSubmissions = mathStats.total_submissions || 0;
+    const totalSubmissions = externalSubmissions + localSubmissions + geometrySubmissions + mathSubmissions;
+
+    if (totalSubmissions === 0) return 0;
+
+    const externalAvg = externalStats.average_score || 0;
+    const localAvg = localStats.average_score || 0;
+    const geometryAvg = geometryStats.average_score || 0;
+    const mathAvg = mathStats.average_score || 0;
+
+    // Weighted average including local, geometry, and math quizzes
+    const weightedAverage = (
+        (externalAvg * externalSubmissions) +
+        (localAvg * localSubmissions) +
+        (geometryAvg * geometrySubmissions) +
+        (mathAvg * mathSubmissions)
+    ) / totalSubmissions;
+
+    return Math.round(weightedAverage);
+}
+
+/**
+ * Update statistics display with real data
+ */
+function updateStatistics(stats) {
+    // Update stats cards with null checks
+    const totalQuizzes = document.getElementById('totalQuizzes');
+    const totalStudents = document.getElementById('totalStudents');
+    const totalSubmissions = document.getElementById('totalSubmissions');
+    const averageScore = document.getElementById('averageScore');
+    
+    if (totalQuizzes) totalQuizzes.textContent = stats.total_quizzes || 0;
+    if (totalStudents) totalStudents.textContent = stats.total_students || 0;
+    if (totalSubmissions) totalSubmissions.textContent = stats.total_submissions || 0;
+    if (averageScore) averageScore.textContent = Math.round(stats.average_score || 0) + '%';
+}
+
+/**
+ * Enhanced render function that handles all quiz types including math
+ */
+function renderQuizTable(quizzes) {
+    const tableBody = document.querySelector('tbody');
+    
+    // Clear existing rows
+    tableBody.innerHTML = '';
+    
+    if (!quizzes || quizzes.length === 0) {
+        // Show empty state with all quiz creation options
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = 
+            '<td colspan="5" style="text-align: center; padding: 30px;">' +
+                '<div style="margin-bottom: 15px;">You haven\'t created any quizzes yet.</div>' +
+                '<div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">' +
+                    '<a href="/quiz-creator" class="nav-button" ' +
+                       'style="display: inline-block; background: linear-gradient(145deg, var(--primary-color), var(--secondary-color)); ' +
+                              'color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px;">' +
+                        'Create Regular Quiz' +
+                    '</a>' +
+                    '<a href="/geometry-quiz.html" class="nav-button" ' +
+                       'style="display: inline-block; background: linear-gradient(145deg, #10B981, #34D399); ' +
+                              'color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px;">' +
+                        'Create Geometry Quiz' +
+                    '</a>' +
+                    '<a href="/mathsquiz-creator.html" class="nav-button" ' +
+                       'style="display: inline-block; background: linear-gradient(145deg, #6C63FF, #9796f0); ' +
+                              'color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px;">' +
+                        'Create Math Quiz' +
+                    '</a>' +
+                '</div>' +
+            '</td>';
+        tableBody.appendChild(emptyRow);
+        return;
+    }
+    
+    // Sort quizzes by created date (newest first)
+    const sortedQuizzes = quizzes.slice().sort(function(a, b) {
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+    
+    // Add each quiz to the table
+    sortedQuizzes.forEach(function(quiz) {
+        const row = document.createElement('tr');
+        
+        // Format date
+        const createdDate = new Date(quiz.created_at);
+        const formattedDate = createdDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+        
+        // Get student name from the quiz submission
+        const studentName = quiz.student_name || quiz.name || 'Anonymous';
+
+        // Add quiz type indicator with submission count
+        let quizTypeIndicator = '';
+        let submissionText = '';
+        
+        if (quiz.quiz_type === 'geometry') {
+            submissionText = quiz.total_submissions ? ' (' + quiz.total_submissions + ' submissions)' : '';
+            quizTypeIndicator = '<span style="background: #10B981; color: white; padding: 2px 6px; border-radius: 12px; font-size: 0.75em; margin-left: 8px;">GEOMETRY' + submissionText + '</span>';
+        } else if (quiz.quiz_type === 'math') {
+            submissionText = quiz.total_submissions ? ' (' + quiz.total_submissions + ' submissions)' : '';
+            quizTypeIndicator = '<span style="background: #6C63FF; color: white; padding: 2px 6px; border-radius: 12px; font-size: 0.75em; margin-left: 8px;">MATH' + submissionText + '</span>';
+        }
+        
+        // Determine the correct quiz URL based on type
+        let quizUrl;
+        if (quiz.quiz_type === 'geometry') {
+            quizUrl = '/geometry-quiz.html?id=' + quiz.id;
+        } else if (quiz.quiz_type === 'math') {
+            quizUrl = '/math-quiz.html?id=' + quiz.id;
+        } else {
+            quizUrl = '/quiz.html?id=' + quiz.id;
+        }
+        
+        // Display score for all quiz types
+        const scoreDisplay = quiz.average_score !== undefined
+            ? quiz.average_score + '%'
+            : (quiz.grade_level || 'N/A');
+
+        // Determine score color based on value
+        let scoreColor = '#666';
+        let scoreBg = '#e3f2fd';
+        if (quiz.average_score !== undefined) {
+            if (quiz.average_score >= 80) {
+                scoreColor = '#4CAF50';
+                scoreBg = '#e8f5e9';
+            } else if (quiz.average_score >= 60) {
+                scoreColor = '#ff9800';
+                scoreBg = '#fff3e0';
+            } else {
+                scoreColor = '#f44336';
+                scoreBg = '#ffebee';
+            }
+        }
+
+        row.innerHTML =
+            '<td class="quiz-title-cell">' +
+                '<div class="quiz-info">' +
+                    '<div class="quiz-title">' +
+                        (quiz.title || quiz.topic) +
+                        quizTypeIndicator +
+                    '</div>' +
+                    '<div class="quiz-topic">' + quiz.topic + '</div>' +
+                '</div>' +
+            '</td>' +
+            '<td><span class="quiz-grade" style="background-color: ' + scoreBg + '; color: ' + scoreColor + ';">' + scoreDisplay + '</span></td>' +
+            '<td><span style="font-weight: 500; color: #333;">' + studentName + '</span></td>' +
+            '<td>' + formattedDate + '</td>' +
+            '<td>' +
+                '<div class="quiz-actions">' +
+                    '<button class="action-btn view-scores-btn" title="View Scores" onclick="viewQuizScores(\'' + quiz.id + '\', \'' + quiz.quiz_type + '\')">' +
+                        '📊' +
+                    '</button>' +
+                    '<button class="action-btn view-analytics-btn" title="View Analytics" onclick="viewQuizAnalytics(\'' + quiz.id + '\', \'' + quiz.quiz_type + '\')">' +
+                        '📈' +
+                    '</button>' +
+                    '<a href="' + quizUrl + '" target="_blank" class="action-btn share-btn" title="View Quiz">' +
+                        '👁️' +
+                    '</a>' +
+                '</div>' +
+            '</td>';
+        
+        tableBody.appendChild(row);
+    });
+}
+
+/**
+ * View quiz scores - handles all quiz types including math
+ */
+function viewQuizScores(quizId, quizType) {
+    console.log('📊 Viewing scores for:', quizId, 'Type:', quizType);
+
+    if (quizType === 'geometry') {
+        showGeometryQuizScores(quizId);
+    } else if (quizType === 'math') {
+        showMathQuizScores(quizId);
+    } else if (quizType === 'regular') {
+        // For regular quizzes, show local quiz scores
+        showLocalQuizScores(quizId);
+    } else {
+        // Fallback to external scores page
+        window.open('/scores.html?id=' + quizId, '_blank');
+    }
+}
+
+/**
+ * Show local quiz scores in a modal
+ */
+async function showLocalQuizScores(quizId) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/quiz-scores/' + quizId, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch scores');
+
+        const data = await response.json();
+        const scores = data.submissions || [];
+
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText =
+            'position: fixed; top: 0; left: 0; width: 100%; height: 100%; ' +
+            'background: rgba(0,0,0,0.5); z-index: 1000; display: flex; ' +
+            'justify-content: center; align-items: center;';
+
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText =
+            'background: white; padding: 30px; border-radius: 12px; ' +
+            'max-width: 600px; max-height: 80vh; overflow-y: auto;' +
+            'box-shadow: 0 10px 30px rgba(0,0,0,0.3);';
+
+        let scoresHtml = '';
+        if (scores.length === 0) {
+            scoresHtml = '<p>No scores found for this quiz.</p>';
+        } else {
+            scoresHtml = scores.map(function(score) {
+                return '<div style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #333;">' + score.student_name + '</div>' +
+                    '<div style="color: #666; font-size: 14px;">Score: ' + score.score + '/' + score.max_score + ' (' + score.percentage + '%)</div>' +
+                    '<div style="color: #888; font-size: 12px;">Time: ' + (score.time_spent || 'N/A') + '</div>' +
+                    '<div style="color: #888; font-size: 12px;">Submitted: ' + new Date(score.submitted_at).toLocaleString() + '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        modalContent.innerHTML =
+            '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">' +
+                '<h2 style="margin: 0; color: #6C63FF;">Quiz Scores</h2>' +
+                '<button onclick="this.closest(\'.modal\').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>' +
+            '</div>' +
+            '<div style="margin-bottom: 15px; color: #666;">Quiz: ' + (data.quiz_title || quizId) + '</div>' +
+            '<div style="max-height: 400px; overflow-y: auto;">' +
+                scoresHtml +
+            '</div>';
+
+        modal.className = 'modal';
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+
+    } catch (error) {
+        console.error('Error showing local quiz scores:', error);
+        alert('Error loading scores. Please try again.');
+    }
+}
+
+/**
+ * View quiz analytics - handles all quiz types including math
+ */
+function viewQuizAnalytics(quizId, quizType) {
+    if (quizType === 'geometry') {
+        showGeometryQuizAnalytics(quizId);
+    } else if (quizType === 'math') {
+        showMathQuizAnalytics(quizId);
+    } else {
+        window.open('/performance.html?id=' + quizId, '_blank');
+    }
+}
+
+/**
+ * Show geometry quiz scores in a modal
+ */
+async function showGeometryQuizScores(quizId) {
+    try {
+        const response = await fetch('/api/geometry-quiz-scores?quiz_id=' + quizId);
+        if (!response.ok) throw new Error('Failed to fetch scores');
+        
+        const data = await response.json();
+        const scores = data.scores || data || [];
+        
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = 
+            'position: fixed; top: 0; left: 0; width: 100%; height: 100%; ' +
+            'background: rgba(0,0,0,0.5); z-index: 1000; display: flex; ' +
+            'justify-content: center; align-items: center;';
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = 
+            'background: white; padding: 30px; border-radius: 12px; ' +
+            'max-width: 600px; max-height: 80vh; overflow-y: auto;' +
+            'box-shadow: 0 10px 30px rgba(0,0,0,0.3);';
+        
+        let scoresHtml = '';
+        if (scores.length === 0) {
+            scoresHtml = '<p>No scores found for this quiz.</p>';
+        } else {
+            scoresHtml = scores.map(function(score) {
+                return '<div style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #333;">' + score.student_name + '</div>' +
+                    '<div style="color: #666; font-size: 14px;">Score: ' + score.score + '/' + score.max_score + ' (' + Math.round((score.score/score.max_score)*100) + '%)</div>' +
+                    '<div style="color: #888; font-size: 12px;">Submitted: ' + new Date(score.submitted_at || score.created_at).toLocaleString() + '</div>' +
+                '</div>';
+            }).join('');
+        }
+        
+        modalContent.innerHTML = 
+            '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">' +
+                '<h2 style="margin: 0; color: #10B981;">Geometry Quiz Scores</h2>' +
+                '<button onclick="this.closest(\'.modal\').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>' +
+            '</div>' +
+            '<div style="margin-bottom: 15px; color: #666;">Quiz ID: ' + quizId + '</div>' +
+            '<div style="max-height: 400px; overflow-y: auto;">' +
+                scoresHtml +
+            '</div>';
+        
+        modal.className = 'modal';
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+    } catch (error) {
+        console.error('Error showing geometry quiz scores:', error);
+        alert('Error loading scores. Please try again.');
+    }
+}
+
+/**
+ * NEW: Show math quiz scores in a modal
+ */
+async function showMathQuizScores(quizId) {
+    try {
+        const response = await fetch('/api/math-quiz-scores?quiz_id=' + quizId);
+        if (!response.ok) throw new Error('Failed to fetch scores');
+        
+        const data = await response.json();
+        const scores = data.scores || data || [];
+        
+        // Create modal (same style as geometry)
+        const modal = document.createElement('div');
+        modal.style.cssText = 
+            'position: fixed; top: 0; left: 0; width: 100%; height: 100%; ' +
+            'background: rgba(0,0,0,0.5); z-index: 1000; display: flex; ' +
+            'justify-content: center; align-items: center;';
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = 
+            'background: white; padding: 30px; border-radius: 12px; ' +
+            'max-width: 600px; max-height: 80vh; overflow-y: auto;' +
+            'box-shadow: 0 10px 30px rgba(0,0,0,0.3);';
+        
+        let scoresHtml = '';
+        if (scores.length === 0) {
+            scoresHtml = '<p>No scores found for this math quiz.</p>';
+        } else {
+            scoresHtml = scores.map(function(score) {
+                return '<div style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #333;">' + score.student_name + '</div>' +
+                    '<div style="color: #666; font-size: 14px;">Score: ' + score.score + '/' + score.max_score + ' (' + Math.round((score.score/score.max_score)*100) + '%)</div>' +
+                    '<div style="color: #888; font-size: 12px;">Submitted: ' + new Date(score.submitted_at || score.created_at).toLocaleString() + '</div>' +
+                '</div>';
+            }).join('');
+        }
+        
+        modalContent.innerHTML = 
+            '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">' +
+                '<h2 style="margin: 0; color: #6C63FF;">Math Quiz Scores</h2>' +
+                '<button onclick="this.closest(\'.modal\').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>' +
+            '</div>' +
+            '<div style="margin-bottom: 15px; color: #666;">Quiz ID: ' + quizId + '</div>' +
+            '<div style="max-height: 400px; overflow-y: auto;">' +
+                scoresHtml +
+            '</div>';
+        
+        modal.className = 'modal';
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+    } catch (error) {
+        console.error('Error showing math quiz scores:', error);
+        alert('Error loading scores. Please try again.');
+    }
+}
+
+/**
+ * Show geometry quiz analytics
+ */
+async function showGeometryQuizAnalytics(quizId) {
+    try {
+        const response = await fetch('/api/geometry-quiz-scores?quiz_id=' + quizId);
+        if (!response.ok) throw new Error('Failed to fetch scores');
+        
+        const data = await response.json();
+        const scores = data.scores || data || [];
+        
+        if (scores.length === 0) {
+            alert('No data available for analytics.');
+            return;
+        }
+        
+        // Calculate analytics
+        const totalSubmissions = scores.length;
+        const averageScore = scores.reduce(function(sum, s) {
+            return sum + ((s.score / s.max_score) * 100);
+        }, 0) / totalSubmissions;
+        
+        const percentages = scores.map(function(s) {
+            return (s.score / s.max_score) * 100;
+        });
+        
+        const highestScore = Math.max.apply(Math, percentages);
+        const lowestScore = Math.min.apply(Math, percentages);
+        
+        const uniqueStudents = new Set();
+        scores.forEach(function(s) {
+            uniqueStudents.add(s.student_name);
+        });
+        
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = 
+            'position: fixed; top: 0; left: 0; width: 100%; height: 100%; ' +
+            'background: rgba(0,0,0,0.5); z-index: 1000; display: flex; ' +
+            'justify-content: center; align-items: center;';
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = 
+            'background: white; padding: 30px; border-radius: 12px; ' +
+            'max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);';
+        
+        modalContent.innerHTML = 
+            '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">' +
+                '<h2 style="margin: 0; color: #10B981;">Quiz Analytics</h2>' +
+                '<button onclick="this.closest(\'.modal\').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>' +
+            '</div>' +
+            '<div style="display: grid; gap: 15px;">' +
+                '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #333;">Total Submissions</div>' +
+                    '<div style="font-size: 24px; color: #10B981;">' + totalSubmissions + '</div>' +
+                '</div>' +
+                '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #333;">Unique Students</div>' +
+                    '<div style="font-size: 24px; color: #10B981;">' + uniqueStudents.size + '</div>' +
+                '</div>' +
+                '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #333;">Average Score</div>' +
+                    '<div style="font-size: 24px; color: #10B981;">' + Math.round(averageScore) + '%</div>' +
+                '</div>' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+                    '<div style="background: #e8f5e9; padding: 15px; border-radius: 8px; text-align: center;">' +
+                        '<div style="font-weight: 600; color: #4CAF50;">Highest</div>' +
+                        '<div style="font-size: 20px; color: #4CAF50;">' + Math.round(highestScore) + '%</div>' +
+                    '</div>' +
+                    '<div style="background: #ffebee; padding: 15px; border-radius: 8px; text-align: center;">' +
+                        '<div style="font-weight: 600; color: #f44336;">Lowest</div>' +
+                        '<div style="font-size: 20px; color: #f44336;">' + Math.round(lowestScore) + '%</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        
+        modal.className = 'modal';
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+    } catch (error) {
+        console.error('Error showing geometry quiz analytics:', error);
+        alert('Error loading analytics. Please try again.');
+    }
+}
+
+/**
+ * NEW: Show math quiz analytics
+ */
+async function showMathQuizAnalytics(quizId) {
+    try {
+        const response = await fetch('/api/math-quiz-scores?quiz_id=' + quizId);
+        if (!response.ok) throw new Error('Failed to fetch scores');
+        
+        const data = await response.json();
+        const scores = data.scores || data || [];
+        
+        if (scores.length === 0) {
+            alert('No data available for analytics.');
+            return;
+        }
+        
+        // Calculate analytics
+        const totalSubmissions = scores.length;
+        const averageScore = scores.reduce(function(sum, s) {
+            return sum + (s.percentage || ((s.score / s.max_score) * 100));
+        }, 0) / totalSubmissions;
+        
+        const percentages = scores.map(function(s) {
+            return s.percentage || ((s.score / s.max_score) * 100);
+        });
+        
+        const highestScore = Math.max.apply(Math, percentages);
+        const lowestScore = Math.min.apply(Math, percentages);
+        
+        const uniqueStudents = new Set();
+        scores.forEach(function(s) {
+            uniqueStudents.add(s.student_name);
+        });
+        
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = 
+            'position: fixed; top: 0; left: 0; width: 100%; height: 100%; ' +
+            'background: rgba(0,0,0,0.5); z-index: 1000; display: flex; ' +
+            'justify-content: center; align-items: center;';
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = 
+            'background: white; padding: 30px; border-radius: 12px; ' +
+            'max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);';
+        
+        modalContent.innerHTML = 
+            '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">' +
+                '<h2 style="margin: 0; color: #6C63FF;">Math Quiz Analytics</h2>' +
+                '<button onclick="this.closest(\'.modal\').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>' +
+            '</div>' +
+            '<div style="display: grid; gap: 15px;">' +
+                '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #333;">Total Submissions</div>' +
+                    '<div style="font-size: 24px; color: #6C63FF;">' + totalSubmissions + '</div>' +
+                '</div>' +
+                '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #333;">Unique Students</div>' +
+                    '<div style="font-size: 24px; color: #6C63FF;">' + uniqueStudents.size + '</div>' +
+                '</div>' +
+                '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #333;">Average Score</div>' +
+                    '<div style="font-size: 24px; color: #6C63FF;">' + Math.round(averageScore) + '%</div>' +
+                '</div>' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+                    '<div style="background: #e8f5e9; padding: 15px; border-radius: 8px; text-align: center;">' +
+                        '<div style="font-weight: 600; color: #4CAF50;">Highest</div>' +
+                        '<div style="font-size: 20px; color: #4CAF50;">' + Math.round(highestScore) + '%</div>' +
+                    '</div>' +
+                    '<div style="background: #ffebee; padding: 15px; border-radius: 8px; text-align: center;">' +
+                        '<div style="font-weight: 600; color: #f44336;">Lowest</div>' +
+                        '<div style="font-size: 20px; color: #f44336;">' + Math.round(lowestScore) + '%</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        
+        modal.className = 'modal';
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+    } catch (error) {
+        console.error('Error showing math quiz analytics:', error);
+        alert('Error loading analytics. Please try again.');
+    }
+}
+
+/**
+ * Set up filter functionality - UPDATED to handle all quiz types including math
+ */
+function setupFilters(quizzes) {
+    const searchInput = document.querySelector('input[type="text"]');
+    const timeFilter = document.querySelector('select:nth-of-type(1)');
+    const modeFilter = document.querySelector('select:nth-of-type(2)');
+    
+    if (!searchInput || !timeFilter || !modeFilter) {
+        console.error('Filter elements not found');
+        return;
+    }
+    
+    // Populate mode filter with all quiz types including math
+    modeFilter.innerHTML = 
+        '<option value="all">All Types</option>' +
+        '<option value="regular">Regular Quizzes</option>' +
+        '<option value="geometry">Geometry Quizzes</option>' +
+        '<option value="math">Math Quizzes</option>' +
+        '<option disabled>────────────</option>' +
+        '<option value="relaxed">Relaxed Mode</option>' +
+        '<option value="competition">Competition Mode</option>' +
+        '<option value="collaboration">Collaboration Mode</option>';
+    
+    // Set up event listeners
+    searchInput.addEventListener('input', function() {
+        applyFilters(quizzes);
+    });
+    timeFilter.addEventListener('change', function() {
+        applyFilters(quizzes);
+    });
+    modeFilter.addEventListener('change', function() {
+        applyFilters(quizzes);
+    });
+}
+
+/**
+ * Enhanced apply filters function - UPDATED to handle math quiz type
+ */
+function applyFilters(quizzes) {
+    const searchInput = document.querySelector('input[type="text"]');
+    const timeFilter = document.querySelector('select:nth-of-type(1)');
+    const modeFilter = document.querySelector('select:nth-of-type(2)');
+    
+    if (!searchInput || !timeFilter || !modeFilter) {
+        console.error('Filter elements not found');
+        return;
+    }
+    
+    const searchTerm = searchInput.value.toLowerCase();
+    const timeFilterValue = timeFilter.value;
+    const modeFilterValue = modeFilter.value;
+    
+    // Filter quizzes based on search term, time, mode, and quiz type
+    const filteredQuizzes = quizzes.filter(function(quiz) {
+        // Search filter
+        const titleMatch = (quiz.title || '').toLowerCase().indexOf(searchTerm) !== -1;
+        const topicMatch = (quiz.topic || '').toLowerCase().indexOf(searchTerm) !== -1;
+        const searchMatch = titleMatch || topicMatch;
+        
+        // Time filter
+        let timeMatch = true;
+        if (timeFilterValue !== 'all') {
+            const quizDate = new Date(quiz.created_at);
+            const now = new Date();
+            
+            if (timeFilterValue === 'today') {
+                timeMatch = quizDate.toDateString() === now.toDateString();
+            } else if (timeFilterValue === 'week') {
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(now.getDate() - 7);
+                timeMatch = quizDate >= oneWeekAgo;
+            } else if (timeFilterValue === 'month') {
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(now.getMonth() - 1);
+                timeMatch = quizDate >= oneMonthAgo;
+            }
+        }
+        
+        // Mode filter (enhanced to handle all quiz types including math)
+        let modeMatch = true;
+        if (modeFilterValue !== 'all') {
+            if (modeFilterValue === 'regular') {
+                modeMatch = quiz.quiz_type === 'regular';
+            } else if (modeFilterValue === 'geometry') {
+                modeMatch = quiz.quiz_type === 'geometry';
+            } else if (modeFilterValue === 'math') {
+                modeMatch = quiz.quiz_type === 'math';
+            } else {
+                // Filter by quiz mode
+                modeMatch = (quiz.mode || 'relaxed') === modeFilterValue;
+            }
+        }
+        
+        return searchMatch && timeMatch && modeMatch;
+    });
+    
+    // Render filtered quizzes
+    renderQuizTable(filteredQuizzes);
+}
+
+/**
+ * Show loading state
+ */
+function showLoading(isLoading) {
+    const totalQuizzes = document.getElementById('totalQuizzes');
+    const totalStudents = document.getElementById('totalStudents');
+    const totalSubmissions = document.getElementById('totalSubmissions');
+    const averageScore = document.getElementById('averageScore');
+    
+    if (isLoading) {
+        if (totalQuizzes) totalQuizzes.textContent = '-';
+        if (totalStudents) totalStudents.textContent = '-';
+        if (totalSubmissions) totalSubmissions.textContent = '-';
+        if (averageScore) averageScore.textContent = '-';
+        
+        const tableBody = document.querySelector('tbody');
+        if (tableBody) {
+            tableBody.innerHTML = 
+                '<tr>' +
+                    '<td colspan="5" style="text-align: center; padding: 30px;">' +
+                        '<div class="loading-spinner" style="' +
+                            'width: 40px;' +
+                            'height: 40px;' +
+                            'border: 3px solid #f3f3f3;' +
+                            'border-top: 3px solid var(--primary-color);' +
+                            'border-radius: 50%;' +
+                            'margin: 0 auto;' +
+                            'animation: spin 1s linear infinite;' +
+                        '"></div>' +
+                    '</td>' +
+                '</tr>';
+        }
+        
+        if (!document.getElementById('loading-animation-style')) {
+            const style = document.createElement('style');
+            style.id = 'loading-animation-style';
+            style.textContent = 
+                '@keyframes spin {' +
+                    '0% { transform: rotate(0deg); }' +
+                    '100% { transform: rotate(360deg); }' +
+                '}';
+            document.head.appendChild(style);
+        }
+    }
+}
+
+/**
+ * Show error message
+ */
+function showError(message) {
+    let errorContainer = document.getElementById('error-container');
+    if (!errorContainer) {
+        errorContainer = document.createElement('div');
+        errorContainer.id = 'error-container';
+        errorContainer.style.position = 'fixed';
+        errorContainer.style.top = '20px';
+        errorContainer.style.right = '20px';
+        errorContainer.style.backgroundColor = '#f8d7da';
+        errorContainer.style.color = '#721c24';
+        errorContainer.style.padding = '10px 20px';
+        errorContainer.style.borderRadius = '5px';
+        errorContainer.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        errorContainer.style.zIndex = '9999';
+        document.body.appendChild(errorContainer);
+    }
+    
+    errorContainer.textContent = message;
+    errorContainer.style.display = 'block';
+    
+    setTimeout(function() {
+        errorContainer.style.display = 'none';
+    }, 5000);
+}
+
+// Event listeners for header buttons
+var createQuizBtn = document.getElementById('createQuizBtn');
+if (createQuizBtn) {
+    createQuizBtn.addEventListener('click', function() {
+        window.location.href = '/quiz-creator';
+    });
+}
+
+var viewPerformanceBtn = document.getElementById('viewPerformanceReports');
+if (viewPerformanceBtn) {
+    viewPerformanceBtn.addEventListener('click', function() {
+        window.location.href = '/performance.html';
+    });
+}
+
+// Log integration completion
+console.log('✅ QUIZ DASHBOARD INTEGRATION COMPLETE!');
+console.log('📊 Quiz scores from all sources will now appear in dashboard:');
+console.log('  ✓ External API quiz scores');
+console.log('  ✓ LOCAL database quiz scores (NEW FIX)');
+console.log('  ✓ Geometry quiz scores');
+console.log('  ✓ Math quiz scores');
+console.log('🔧 Quiz submissions are saved to /api/quiz-scores');
+console.log('📈 Dashboard fetches from local /api/quiz-scores endpoint');
+console.log('🎯 All quiz types (external, local, geometry, math) fully supported');
+
+    </script>
+</body>
+</html>

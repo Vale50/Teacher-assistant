@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Deciph.AI</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💼</text></svg>" type="image/svg+xml">
+    <style>
+        :root {
+            --primary-color: #DC2626;
+            --primary-dark: #B91C1C;
+            --primary-gradient: linear-gradient(135deg, #DC2626, #B91C1C);
+            --secondary-color: #059669;
+            --accent-color: #D97706;
+            --text-color: #1F2937;
+            --light-bg: #F3F4F6;
+            --white: #FFFFFF;
+            --card-shadow: 0 20px 50px -10px rgba(220, 38, 38, 0.15);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --error-color: #EF4444;
+            --success-color: #10B981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            position: relative;
+            background: white;
+        }
+
+        .branding-section {
+            flex: 0.4;
+            background: var(--primary-gradient);
+            padding: 3rem 2rem;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            min-width: 300px;
+        }
+        
+        .branding-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7-7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z'/%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+
+        .logo-container {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .logo-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .admin-features {
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: slideInLeft 0.6s ease forwards;
+        }
+
+        .feature-item:nth-child(1) { animation-delay: 0.2s; }
+        .feature-item:nth-child(2) { animation-delay: 0.4s; }
+        .feature-item:nth-child(3) { animation-delay: 0.6s; }
+        .feature-item:nth-child(4) { animation-delay: 0.8s; }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .form-section {
+            flex: 1;
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .form-subtitle {
+            color: #6B7280;
+            font-size: 1rem;
+        }
+        
+        .login-form, .change-password-form {
+            width: 100%;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: #F9FAFB;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .secondary-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #6B7280;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .secondary-btn:hover {
+            background: #4B5563;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--error-color);
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e5e7eb;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .back-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .back-link a:hover {
+            color: var(--primary-dark);
+        }
+
+        .security-notice {
+            background: rgba(220, 38, 38, 0.05);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .security-notice-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .security-notice-text {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .change-password-form {
+            display: none;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .password-strength.weak { color: #EF4444; }
+        .password-strength.medium { color: #F59E0B; }
+        .password-strength.strong { color: #10B981; }
+
+        .password-requirements {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #6B7280;
+            display: none;
+        }
+
+        .password-requirements ul {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+        }
+
+        .password-requirements li {
+            margin: 0.25rem 0;
+        }
+
+        .password-requirements li.valid {
+            color: var(--success-color);
+        }
+
+        .form-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6B7280;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+            
+            .branding-section {
+                padding: 2rem 1.5rem;
+                min-width: auto;
+            }
+            
+            .form-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-title {
+                font-size: 1.75rem;
+            }
+
+            .logo-text {
+                font-size: 1.75rem;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Entrance animation */
+        .login-container {
+            animation: scaleIn 0.6s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="branding-section">
+            <div class="logo-container">
+                <span class="logo-icon">👨‍💼</span>
+                <div class="logo-text">Admin Portal</div>
+                <div class="logo-subtitle">Deciph.AI Management System</div>
+            </div>
+            
+            <div class="admin-features">
+                <div class="feature-item">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-text">Manage Students</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-text">Assign Tasks</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💳</div>
+                    <div class="feature-text">A-Card Management</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Real-time Analytics</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-header">
+                <h1 class="form-title">Administrator Access</h1>
+                <p class="form-subtitle">Secure login and account management</p>
+            </div>
+
+            <div class="form-tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" onclick="switchTab('change-password')">Change Password</button>
+            </div>
+
+            <div class="security-notice">
+                <span class="security-notice-icon">🔒</span>
+                <div class="security-notice-text">
+                    Secure admin access - All actions are logged and monitored
+                </div>
+            </div>
+            
+            <!-- Login Form -->
+            <form class="login-form" id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail" class="form-label">Admin Email</label>
+                    <input 
+                        type="email" 
+                        id="adminEmail" 
+                        class="form-input" 
+                        placeholder="Enter your admin email" 
+                        autocomplete="email" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminPassword" class="form-label">Password</label>
+                    <input 
+                        type="password" 
+                        id="adminPassword" 
+                        class="form-input" 
+                        placeholder="Enter your password" 
+                        autocomplete="current-password" 
+                        required
+                    >
+                </div>
+                
+                <div class="error-message" id="loginErrorMessage"></div>
+                <div class="success-message" id="loginSuccessMessage"></div>
+                
+                <button type="submit" class="submit-btn" id="loginSubmitBtn">
+                    Access Dashboard
+                </button>
+                
+                <div class="loading" id="loginLoading"></div>
+            </form>
+
+            <!-- Change Password Form -->
+            <form class="change-password-form" id="changePasswordForm">
+                <div class="form-group">
+                    <label for="currentEmail" class="form-label">Admin Email</label>
+                    <input 
+                        type="email" 
+                        id="currentEmail" 
+                        class="form-input" 
+                        placeholder="Enter your admin email" 
+                        autocomplete="email" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <input 
+                        type="password" 
+                        id="currentPassword" 
+                        class="form-input" 
+                        placeholder="Enter your current password" 
+                        autocomplete="current-password" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <input 
+                        type="password" 
+                        id="newPassword" 
+                        class="form-input" 
+                        placeholder="Enter your new password" 
+                        autocomplete="new-password" 
+                        required
+                    >
+                    <div class="password-strength" id="passwordStrength"></div>
+                    <div class="password-requirements" id="passwordRequirements">
+                        <strong>Password must contain:</strong>
+                        <ul>
+                            <li id="req-length">At least 8 characters</li>
+                            <li id="req-upper">One uppercase letter</li>
+                            <li id="req-lower">One lowercase letter</li>
+                            <li id="req-number">One number</li>
+                            <li id="req-special">One special character (!@#$%^&*)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        class="form-input" 
+                        placeholder="Confirm your new password" 
+                        autocomplete="new-password" 
+                        required
+                    >
+                </div>
+                
+                <div class="error-message" id="changePasswordErrorMessage"></div>
+                <div class="success-message" id="changePasswordSuccessMessage"></div>
+                
+                <button type="submit" class="submit-btn" id="changePasswordSubmitBtn">
+                    Change Password
+                </button>
+                
+                <div class="loading" id="changePasswordLoading"></div>
+            </form>
+
+            <div class="back-link">
+                <a href="/super-admin">← Back to Main Site</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentTab = 'login';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if admin is already logged in
+            checkExistingAdminToken();
+            
+            // Set up form submissions
+            const adminLoginForm = document.getElementById('adminLoginForm');
+            const changePasswordForm = document.getElementById('changePasswordForm');
+            
+            adminLoginForm.addEventListener('submit', handleAdminLogin);
+            changePasswordForm.addEventListener('submit', handleChangePassword);
+
+            // Set up password validation
+            const newPasswordInput = document.getElementById('newPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            
+            newPasswordInput.addEventListener('input', validatePassword);
+            confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+        });
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide forms
+            const loginForm = document.querySelector('.login-form');
+            const changePasswordForm = document.querySelector('.change-password-form');
+            
+            if (tab === 'login') {
+                loginForm.style.display = 'block';
+                changePasswordForm.style.display = 'none';
+                document.querySelector('.form-title').textContent = 'Administrator Login';
+                document.querySelector('.form-subtitle').textContent = 'Access the admin dashboard to manage students and assignments';
+            } else {
+                loginForm.style.display = 'none';
+                changePasswordForm.style.display = 'block';
+                document.querySelector('.form-title').textContent = 'Change Password';
+                document.querySelector('.form-subtitle').textContent = 'Update your admin account password';
+            }
+            
+            // Clear messages
+            clearAllMessages();
+        }
+
+        function validatePassword() {
+            const password = document.getElementById('newPassword').value;
+            const strengthDiv = document.getElementById('passwordStrength');
+            const requirementsDiv = document.getElementById('passwordRequirements');
+            
+            if (!password) {
+                strengthDiv.style.display = 'none';
+                requirementsDiv.style.display = 'none';
+                return;
+            }
+            
+            strengthDiv.style.display = 'block';
+            requirementsDiv.style.display = 'block';
+            
+            // Check requirements
+            const requirements = {
+                length: password.length >= 8,
+                upper: /[A-Z]/.test(password),
+                lower: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+            };
+            
+            // Update requirement list
+            document.getElementById('req-length').className = requirements.length ? 'valid' : '';
+            document.getElementById('req-upper').className = requirements.upper ? 'valid' : '';
+            document.getElementById('req-lower').className = requirements.lower ? 'valid' : '';
+            document.getElementById('req-number').className = requirements.number ? 'valid' : '';
+            document.getElementById('req-special').className = requirements.special ? 'valid' : '';
+            
+            // Calculate strength
+            const validCount = Object.values(requirements).filter(Boolean).length;
+            let strength = 'weak';
+            let strengthText = 'Weak';
+            
+            if (validCount >= 3) {
+                strength = 'medium';
+                strengthText = 'Medium';
+            }
+            if (validCount >= 5) {
+                strength = 'strong';
+                strengthText = 'Strong';
+            }
+            
+            strengthDiv.className = `password-strength ${strength}`;
+            strengthDiv.textContent = `Password Strength: ${strengthText}`;
+            strengthDiv.style.display = 'block';
+        }
+
+        function validatePasswordMatch() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const confirmInput = document.getElementById('confirmPassword');
+            
+            if (confirmPassword && newPassword !== confirmPassword) {
+                confirmInput.style.borderColor = '#EF4444';
+            } else {
+                confirmInput.style.borderColor = '#E5E7EB';
+            }
+        }
+
+        function checkExistingAdminToken() {
+            // Check if we're coming from a logout
+            const justLoggedOut = sessionStorage.getItem('admin_just_logged_out');
+            if (justLoggedOut) {
+                sessionStorage.removeItem('admin_just_logged_out');
+                return; // Skip automatic login check
+            }
+            
+            const token = localStorage.getItem('admin_token') || 
+                        sessionStorage.getItem('admin_token') || 
+                        getCookie('admin_token');
+                            
+            if (token) {
+                // Validate token with server
+                fetch('https://seashell-app-onfk3.ondigitalocean.app/api/admin/dashboard/stats', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Token is valid, redirect to dashboard
+                        window.location.href = '/super-admin';
+                    } else {
+                        // Token is invalid, clear it
+                        clearAdminTokens();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error validating admin token:', error);
+                    clearAdminTokens();
+                });
+            }
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            const loading = document.getElementById('loginLoading');
+            const errorMessage = document.getElementById('loginErrorMessage');
+            const successMessage = document.getElementById('loginSuccessMessage');
+            
+            // Get form data
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            // Clear previous messages
+            hideMessage(errorMessage);
+            hideMessage(successMessage);
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Authenticating...';
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store admin token and data
+                    storeAdminToken(data.token);
+                    localStorage.setItem('admin_user', JSON.stringify(data.admin));
+                    
+                    // Show success message
+                    showMessage(successMessage, 'Login successful! Redirecting to dashboard...');
+                    
+                    // Redirect to admin dashboard
+                    setTimeout(() => {
+                        window.location.href = '/super-admin';
+                    }, 1000);
+                    
+                } else {
+                    // Show error message
+                    showMessage(errorMessage, data.error || 'Login failed. Please check your credentials.');
+                }
+
+            } catch (error) {
+                console.error('Admin login error:', error);
+                showMessage(errorMessage, 'Connection error. Please try again.');
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Access Dashboard';
+                loading.style.display = 'none';
+            }
+        }
+
+        async function handleChangePassword(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('changePasswordSubmitBtn');
+            const loading = document.getElementById('changePasswordLoading');
+            const errorMessage = document.getElementById('changePasswordErrorMessage');
+            const successMessage = document.getElementById('changePasswordSuccessMessage');
+            
+            // Get form data
+            const email = document.getElementById('currentEmail').value;
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Clear previous messages
+            hideMessage(errorMessage);
+            hideMessage(successMessage);
+            
+            // Validate passwords match
+            if (newPassword !== confirmPassword) {
+                showMessage(errorMessage, 'New passwords do not match.');
+                return;
+            }
+            
+            // Validate password strength
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+            if (!passwordRegex.test(newPassword)) {
+                showMessage(errorMessage, 'Password does not meet requirements.');
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Changing Password...';
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/admin/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        email, 
+                        current_password: currentPassword, 
+                        new_password: newPassword 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    showMessage(successMessage, 'Password changed successfully! You can now log in with your new password.');
+                    
+                    // Clear the form
+                    document.getElementById('changePasswordForm').reset();
+                    
+                    // Switch back to login tab after 2 seconds
+                    setTimeout(() => {
+                        switchTab('login');
+                    }, 2000);
+                    
+                } else {
+                    // Show error message
+                    showMessage(errorMessage, data.error || 'Failed to change password. Please check your current password.');
+                }
+
+            } catch (error) {
+                console.error('Change password error:', error);
+                showMessage(errorMessage, 'Connection error. Please try again.');
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Change Password';
+                loading.style.display = 'none';
+            }
+        }
+
+        function storeAdminToken(token) {
+            try {
+                localStorage.setItem('admin_token', token);
+                console.log("Admin token stored in localStorage");
+            } catch (e) {
+                console.warn('Could not store in localStorage:', e);
+            }
+            
+            try {
+                sessionStorage.setItem('admin_token', token);
+                console.log("Admin token stored in sessionStorage");
+            } catch (e) {
+                console.warn('Could not store in sessionStorage:', e);
+            }
+            
+            try {
+                const date = new Date();
+                date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day expiry
+                document.cookie = `admin_token=${token}; expires=${date.toUTCString()}; path=/; secure`;
+                console.log("Admin token stored in cookie");
+            } catch (e) {
+                console.warn('Could not set cookie:', e);
+            }
+        }
+
+        function clearAdminTokens() {
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_user');
+            sessionStorage.removeItem('admin_token');
+            document.cookie = 'admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function showMessage(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function hideMessage(element) {
+            element.style.display = 'none';
+        }
+
+        function clearAllMessages() {
+            const messages = document.querySelectorAll('.error-message, .success-message');
+            messages.forEach(msg => hideMessage(msg));
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Alt + A for quick access to email field
+            if (e.altKey && e.key === 'a') {
+                e.preventDefault();
+                if (currentTab === 'login') {
+                    document.getElementById('adminEmail').focus();
+                } else {
+                    document.getElementById('currentEmail').focus();
+                }
+            }
+            
+            // Alt + P for quick access to password field
+            if (e.altKey && e.key === 'p') {
+                e.preventDefault();
+                if (currentTab === 'login') {
+                    document.getElementById('adminPassword').focus();
+                } else {
+                    document.getElementById('currentPassword').focus();
+                }
+            }
+
+            // Alt + T to switch tabs
+            if (e.altKey && e.key === 't') {
+                e.preventDefault();
+                switchTab(currentTab === 'login' ? 'change-password' : 'login');
+            }
+        });
+
+        // Auto-focus first field on page load and tab switch
+        setTimeout(() => {
+            document.getElementById('adminEmail').focus();
+        }, 500);
+
+        // Add form validation
+        document.getElementById('adminEmail').addEventListener('input', function() {
+            validateEmail(this);
+        });
+
+        document.getElementById('currentEmail').addEventListener('input', function() {
+            validateEmail(this);
+        });
+
+        function validateEmail(input) {
+            const email = input.value;
+            const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            
+            if (email && !isValid) {
+                input.style.borderColor = '#EF4444';
+            } else {
+                input.style.borderColor = '#E5E7EB';
+            }
+        }
+
+        // Security: Disable right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Security: Disable F12 and other dev tools shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Disable F12
+            if (e.keyCode === 123) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Disable Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Disable Ctrl+U
+            if (e.ctrlKey && e.keyCode === 85) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

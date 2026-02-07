@@ -1,0 +1,2708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Geometry Quiz</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📐</text></svg>" type="image/svg+xml">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* Root Variables */
+        :root {
+            --primary-color: #10B981;
+            --primary-hover: #059669;
+            --secondary-color: #F59E0B;
+            --secondary-hover: #D97706;
+            --accent-color: #6C63FF;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --warning-color: #ff9800;
+            --bg-gradient-start: #f8f9fa;
+            --bg-gradient-end: #e9ecef;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #6c757d;
+            --border-radius: 12px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+            --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            font-size: 16px;
+            color: var(--text-primary);
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Enhanced Header Styling */
+        .quiz-header {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .quiz-header.scrolled {
+            padding: 10px 20px;
+            background: rgba(16, 185, 129, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .quiz-header .student-info {
+            flex: 2;
+            min-width: 200px;
+        }
+
+        .quiz-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .quiz-header .quiz-meta {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .academy-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Enhanced Timer Styling */
+        .timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(4px);
+            padding: 8px 15px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+
+        .timer-container.fixed {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+
+        .timer-container::before {
+            content: '⏱️';
+            font-size: 16px;
+            margin-right: 8px;
+        }
+
+        .timer {
+            font-weight: 600;
+            color: white;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .timer.warning {
+            color: var(--warning-color);
+            animation: pulse 1s infinite;
+        }
+
+        .timer.danger {
+            color: var(--error-color);
+            animation: pulse 0.5s infinite;
+        }
+
+        /* Sound Control */
+        .sound-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: var(--transition);
+        }
+
+        .sound-toggle:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .sound-toggle i {
+            font-size: 20px;
+            color: white;
+        }
+
+        /* Main Container Styling */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        /* 3D Question Styling */
+        .question-container {
+            margin: 25px 0;
+            padding: 25px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 16px -8px rgba(0,0,0,0.1), 
+                        0 -4px 0 rgba(0,0,0,0.02) inset,
+                        0 4px 0 rgba(255,255,255,0.7) inset;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: var(--transition);
+            transform: translateY(0) rotateX(0deg);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .question-container:hover {
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15), 
+                        0 -4px 0 rgba(0,0,0,0.02) inset,
+                        0 4px 0 rgba(255,255,255,0.7) inset;
+            transform: translateY(-5px) rotateX(2deg);
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), #34D399);
+            color: white;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Geometry Shape Container Styling */
+        .shape-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .shape-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .shape-container img:hover {
+            transform: scale(1.02);
+        }
+
+        .shape-container .shape-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .shape-measurements {
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            display: inline-block;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .shape-loading {
+            text-align: center;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .shape-loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+        }
+
+        .shape-error {
+            color: var(--error-color);
+            padding: 15px;
+            background-color: rgba(244, 67, 54, 0.1);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .retry-shape-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* FIXED: Enhanced Option Styling - Ensuring all options are clickable */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .option-container {
+            position: relative !important;
+            z-index: 5 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            padding: 15px 20px;
+            background: var(--card-bg);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 10px;
+            transition: var(--transition);
+            overflow: hidden;
+            transform: translateZ(0);
+        }
+
+        /* Ensure 3rd and 4th options have higher z-index */
+        .option-container:nth-child(n+3) {
+            z-index: 10 !important;
+            position: relative !important;
+        }
+
+        .option-container:hover {
+            background-color: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-container:active {
+            transform: scale(0.98) translateY(0);
+        }
+
+        .option-container input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            margin: 0;
+            cursor: pointer !important;
+            z-index: 2;
+        }
+
+        .option-container label {
+            display: block;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            padding-left: 35px;
+            position: relative;
+            user-select: none;
+            font-weight: 400;
+            color: var(--text-primary);
+            z-index: 3;
+        }
+
+        .option-container label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            transition: var(--transition);
+            background-color: white;
+            z-index: 1;
+        }
+
+        .option-container input[type="radio"]:checked + label:before {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        .option-container input[type="radio"]:checked + label:after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        /* Selected option styling */
+        .option-container.option-selected {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        /* Results Styling */
+        .option-container.correct-answer {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-color: var(--success-color);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .option-container.correct-answer::after {
+            content: '✓';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--success-color);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .option-container.wrong-answer {
+            background-color: rgba(244, 67, 54, 0.1);
+            border-color: var(--error-color);
+            animation: shake 0.5s ease-out;
+        }
+
+        .option-container.wrong-answer::after {
+            content: '✗';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--error-color);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Paragraph Question Styling */
+        .paragraph-answer {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            font-family: var(--font-family);
+            font-size: 1em;
+            transition: var(--transition);
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .paragraph-answer:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Submit Button */
+        .submit-container {
+            margin-top: 40px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, var(--primary-color), #059669);
+            color: white;
+            font-size: 1.1em;
+            font-weight: 600;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3), 
+                          0 -2px 0 rgba(0,0,0,0.1) inset;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4), 
+                        0 -2px 0 rgba(0,0,0,0.1) inset;
+            transform: translateY(-2px);
+        }
+
+        .submit-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(16, 185, 129, 0.2), 
+                        0 -1px 0 rgba(0,0,0,0.1) inset;
+        }
+
+        /* Auto-Navigation Mode Styling */
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: var(--text-primary);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05),
+                         0 -1px 0 rgba(0,0,0,0.05) inset,
+                         0 1px 0 white inset;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.07),
+                         0 -1px 0 rgba(0,0,0,0.05) inset,
+                         0 1px 0 white inset;
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #next-btn {
+            background: linear-gradient(135deg, var(--primary-color), #34D399);
+            color: white;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2),
+                         0 -1px 0 rgba(0,0,0,0.1) inset;
+        }
+
+        #next-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #059669, #10B981);
+            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3),
+                         0 -1px 0 rgba(0,0,0,0.1) inset;
+            transform: translateY(-2px);
+        }
+
+        /* Student Name Modal */
+        .modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .modal h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .modal input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .modal button {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .modal button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Score Container Styling */
+        .score-container {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-top: 40px;
+            text-align: center;
+            position: relative;
+            display: none;
+        }
+
+        .score-container h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .score-container p {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .show-explanations-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: var(--transition);
+        }
+
+        .show-explanations-btn:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .explanations {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            text-align: left;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .question-explanation {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .explanation-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-size: 1.05em;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 0;
+            flex-direction: column;
+        }
+
+        .loading:after {
+            content: "";
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-top: 15px;
+        }
+
+        /* Error Message */
+        .error-message {
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #e53e3e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .error-message h2 {
+            color: #e53e3e;
+            margin-bottom: 10px;
+        }
+
+        .error-message button {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .error-message button:hover {
+            background-color: #c53030;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px 10px;
+            }
+
+            .quiz-header .student-info {
+                order: 2;
+                margin-top: 10px;
+            }
+
+            .timer-container {
+                order: 1;
+                margin: 10px auto;
+            }
+
+            .timer-container.fixed {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                left: unset;
+                transform: none;
+            }
+
+            .question-container {
+                padding: 20px 15px;
+                margin: 15px 0;
+            }
+
+            .question-text {
+                font-size: 1.1em;
+            }
+
+            .option-container label {
+                padding-left: 30px;
+                font-size: 0.95em;
+            }
+
+            .option-container label:before {
+                width: 18px;
+                height: 18px;
+            }
+
+            .option-container input[type="radio"]:checked + label:after {
+                left: 6px;
+                width: 8px;
+                height: 8px;
+            }
+
+            .submit-button {
+                width: 100%;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            #prev-btn, #next-btn {
+                width: 100%;
+            }
+        }
+
+        /* Mathematical Notation Styling */
+        .math-sup {
+            vertical-align: super;
+            font-size: 0.75em;
+            line-height: 0;
+        }
+
+        .math-sub {
+            vertical-align: sub;
+            font-size: 0.75em;
+            line-height: 0;
+        }
+
+        .math-fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .math-fraction .numerator {
+            display: block;
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 2px;
+            margin-bottom: 2px;
+        }
+
+        .math-fraction .denominator {
+            display: block;
+            padding-top: 2px;
+        }
+
+        .math-symbol {
+            font-family: 'Times New Roman', serif;
+            font-style: normal;
+        }
+
+        .math-sqrt {
+            position: relative;
+            display: inline-block;
+            border-top: 1px solid currentColor;
+            padding-top: 2px;
+        }
+
+        .math-sqrt::before {
+            content: '√';
+            position: absolute;
+            left: -12px;
+            top: -2px;
+            font-size: 1.2em;
+        }
+
+        .MathJax_Display {
+            margin: 0.5em 0 !important;
+        }
+
+        .MathJax {
+            font-size: inherit !important;
+        }
+    </style>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Student Name Modal -->
+    <div class="modal" id="studentNameModal">
+        <div class="modal-content">
+            <h2>Welcome to Your Geometry Quiz!</h2>
+            <p style="margin-bottom: 15px; text-align: center;">Please enter your name to begin:</p>
+            <input type="text" id="studentNameInput" placeholder="Your Name" required>
+            <button onclick="startQuizWithName()">Start Quiz</button>
+        </div>
+    </div>
+
+    <!-- Quiz Header -->
+    <div class="quiz-header" id="quizHeader" style="display: none;">
+        <div class="academy-name" id="academy-name"></div>
+        <div class="student-info">
+            <h2 id="studentWelcome">Welcome, Student!</h2>
+            <div class="quiz-meta">
+                <span id="quizTitle">Geometry Quiz</span> 
+                <span id="gradeLevel">Grade Level</span>
+            </div>
+        </div>
+        <div class="timer-container" id="timerContainer">
+            <div class="timer" id="timer">00:00</div>
+            <button class="sound-toggle" id="soundToggle">
+                <i class="fas fa-volume-up" id="soundIcon"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div id="quiz-content">
+            <div class="loading">Loading geometry quiz...</div>
+        </div>
+        <div class="score-container" id="score-container"></div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="successSound" preload="auto">
+        <source src="success.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound" preload="auto">
+        <source src="click.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="errorSound" preload="auto">
+        <source src="error.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Quiz Variables
+        let quizData = null;
+        let currentQuestion = 0;
+        let timeLeft = 0;
+        let timerInterval;
+        let userAnswers = {};
+        let soundEnabled = true;
+        let geometryShapes = {};  // Store rendered shapes by question ID
+
+        // DOM Elements
+        const quizContent = document.getElementById('quiz-content');
+        const timerElement = document.getElementById('timer');
+        const soundToggle = document.getElementById('soundToggle');
+        const soundIcon = document.getElementById('soundIcon');
+        const successSound = document.getElementById('successSound');
+        const clickSound = document.getElementById('clickSound');
+        const errorSound = document.getElementById('errorSound');
+
+        // Enhanced Mathematical Notation Renderer
+        function renderMathNotation(text) {
+            if (!text) return '';
+            
+            let formattedText = text;
+            
+            // Convert common superscript notations
+            formattedText = formattedText.replace(/\^2/g, '²');
+            formattedText = formattedText.replace(/\^3/g, '³');
+            formattedText = formattedText.replace(/\^4/g, '⁴');
+            formattedText = formattedText.replace(/\^5/g, '⁵');
+            formattedText = formattedText.replace(/\^6/g, '⁶');
+            formattedText = formattedText.replace(/\^7/g, '⁷');
+            formattedText = formattedText.replace(/\^8/g, '⁸');
+            formattedText = formattedText.replace(/\^9/g, '⁹');
+            formattedText = formattedText.replace(/\^0/g, '⁰');
+            formattedText = formattedText.replace(/\^1/g, '¹');
+            
+            // Handle more complex superscripts like ^(n+1)
+            formattedText = formattedText.replace(/\^(\([^)]+\))/g, '<span class="math-sup">$1</span>');
+            formattedText = formattedText.replace(/\^([a-zA-Z]+)/g, '<span class="math-sup">$1</span>');
+            
+            // Convert common subscript notations
+            formattedText = formattedText.replace(/_([0-9]+)/g, '<span class="math-sub">$1</span>');
+            formattedText = formattedText.replace(/_([a-zA-Z]+)/g, '<span class="math-sub">$1</span>');
+            
+            // Handle fractions - simple cases first
+            formattedText = formattedText.replace(/(\d+)\/(\d+)/g, '<span class="math-fraction"><span class="numerator">$1</span><span class="denominator">$2</span></span>');
+            
+            // Handle more complex fractions with parentheses
+            formattedText = formattedText.replace(/\(([^)]+)\)\/\(([^)]+)\)/g, '<span class="math-fraction"><span class="numerator">($1)</span><span class="denominator">($2)</span></span>');
+            
+            // Mathematical symbols replacement
+            formattedText = formattedText.replace(/×/g, '×');
+            formattedText = formattedText.replace(/\*/g, '×');
+            formattedText = formattedText.replace(/÷/g, '÷');
+            formattedText = formattedText.replace(/±/g, '±');
+            formattedText = formattedText.replace(/<=/g, '≤');
+            formattedText = formattedText.replace(/>=/g, '≥');
+            formattedText = formattedText.replace(/!=/g, '≠');
+            formattedText = formattedText.replace(/pi/gi, 'π');
+            formattedText = formattedText.replace(/Pi/g, 'π');
+            formattedText = formattedText.replace(/PI/g, 'π');
+            formattedText = formattedText.replace(/theta/gi, 'θ');
+            formattedText = formattedText.replace(/alpha/gi, 'α');
+            formattedText = formattedText.replace(/beta/gi, 'β');
+            formattedText = formattedText.replace(/gamma/gi, 'γ');
+            formattedText = formattedText.replace(/delta/gi, 'δ');
+            formattedText = formattedText.replace(/infinity/gi, '∞');
+            
+            // Handle square roots
+            formattedText = formattedText.replace(/sqrt\(([^)]+)\)/gi, '<span class="math-sqrt">$1</span>');
+            formattedText = formattedText.replace(/√\(([^)]+)\)/g, '<span class="math-sqrt">$1</span>');
+            
+            // Handle degrees
+            formattedText = formattedText.replace(/(\d+)\s*deg/gi, '$1°');
+            formattedText = formattedText.replace(/(\d+)\s*degree/gi, '$1°');
+            
+            // Common unit conversions with proper superscripts
+            formattedText = formattedText.replace(/cm\s*\^\s*2/gi, 'cm²');
+            formattedText = formattedText.replace(/cm\s*\^\s*3/gi, 'cm³');
+            formattedText = formattedText.replace(/m\s*\^\s*2/gi, 'm²');
+            formattedText = formattedText.replace(/m\s*\^\s*3/gi, 'm³');
+            formattedText = formattedText.replace(/ft\s*\^\s*2/gi, 'ft²');
+            formattedText = formattedText.replace(/ft\s*\^\s*3/gi, 'ft³');
+            formattedText = formattedText.replace(/in\s*\^\s*2/gi, 'in²');
+            formattedText = formattedText.replace(/in\s*\^\s*3/gi, 'in³');
+            formattedText = formattedText.replace(/km\s*\^\s*2/gi, 'km²');
+            formattedText = formattedText.replace(/km\s*\^\s*3/gi, 'km³');
+            
+            // Handle units that might be separated
+            formattedText = formattedText.replace(/(\d+)\s*cm\s*2/gi, '$1 cm²');
+            formattedText = formattedText.replace(/(\d+)\s*cm\s*3/gi, '$1 cm³');
+            formattedText = formattedText.replace(/(\d+)\s*m\s*2/gi, '$1 m²');
+            formattedText = formattedText.replace(/(\d+)\s*m\s*3/gi, '$1 m³');
+            
+            // Special mathematical expressions
+            formattedText = formattedText.replace(/\(([^)]+)\)\s*²/g, '($1)²');
+            formattedText = formattedText.replace(/\(([^)]+)\)\s*³/g, '($1)³');
+            
+            // Handle LaTeX-style notation if present
+            if (formattedText.includes('\\')) {
+                // Keep LaTeX notation for MathJax
+                formattedText = formattedText.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '<span class="math-fraction"><span class="numerator">$1</span><span class="denominator">$2</span></span>');
+                formattedText = formattedText.replace(/\\sqrt\{([^}]+)\}/g, '<span class="math-sqrt">$1</span>');
+                formattedText = formattedText.replace(/\\pi/g, 'π');
+                formattedText = formattedText.replace(/\\theta/g, 'θ');
+                formattedText = formattedText.replace(/\\alpha/g, 'α');
+                formattedText = formattedText.replace(/\\beta/g, 'β');
+                formattedText = formattedText.replace(/\\gamma/g, 'γ');
+                formattedText = formattedText.replace(/\\delta/g, 'δ');
+                formattedText = formattedText.replace(/\\times/g, '×');
+                formattedText = formattedText.replace(/\\div/g, '÷');
+                formattedText = formattedText.replace(/\\pm/g, '±');
+                formattedText = formattedText.replace(/\\leq/g, '≤');
+                formattedText = formattedText.replace(/\\geq/g, '≥');
+                formattedText = formattedText.replace(/\\neq/g, '≠');
+                formattedText = formattedText.replace(/\\infty/g, '∞');
+            }
+            
+            return formattedText;
+        }
+
+        // Function to reprocess math notation after dynamic content updates
+        function reprocessMathNotation() {
+            if (window.MathJax) {
+                if (MathJax.typesetPromise) {
+                    // MathJax v3
+                    MathJax.typesetPromise().catch(function (err) {
+                        console.log('MathJax typeset error: ' + err.message);
+                    });
+                } else if (MathJax.Hub) {
+                    // MathJax v2
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                }
+            }
+        }
+
+        // Sound toggle functionality
+        if (soundToggle) {
+            soundToggle.addEventListener('click', function() {
+                soundEnabled = !soundEnabled;
+                if (soundEnabled) {
+                    soundIcon.className = 'fas fa-volume-up';
+                } else {
+                    soundIcon.className = 'fas fa-volume-mute';
+                }
+            });
+        }
+
+        // Play sound function with checks
+        function playSound(sound) {
+            if (soundEnabled && sound) {
+                try {
+                    sound.currentTime = 0;
+                    sound.play().catch(e => console.log('Sound play prevented:', e));
+                } catch (e) {
+                    console.log('Error playing sound:', e);
+                }
+            }
+        }
+
+        // Function to start quiz with student name
+        function startQuizWithName() {
+            const studentNameInput = document.getElementById('studentNameInput');
+            const studentName = studentNameInput.value.trim();
+
+            if (!studentName) {
+                studentNameInput.style.border = '2px solid var(--error-color)';
+                studentNameInput.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    studentNameInput.style.animation = '';
+                }, 500);
+                return;
+            }
+
+            // Hide the modal
+            document.getElementById('studentNameModal').style.display = 'none';
+
+            // Set student name in header
+            const studentWelcome = document.getElementById('studentWelcome');
+            if (studentWelcome) {
+                studentWelcome.textContent = `Welcome, ${studentName}!`;
+            }
+
+            // Show header
+            document.getElementById('quizHeader').style.display = 'flex';
+
+            // Store student name for submission
+            window.studentName = studentName;
+
+            // Load the quiz
+            loadQuiz();
+        }
+
+        // Add keydown event listener for the input field
+        if (document.getElementById('studentNameInput')) {
+            document.getElementById('studentNameInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    startQuizWithName();
+                }
+            });
+        }
+
+        // Function to setup academy name and header
+        function setupAcademyName() {
+            try {
+                const academyElement = document.getElementById('academy-name');
+                const quizHeader = document.getElementById('quizHeader');
+
+                if (!academyElement || !quizHeader) {
+                    console.error("Academy element or quiz header not found");
+                    return;
+                }
+
+                // Get academy name from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const academyNameParam = urlParams.get('academy');
+
+                if (academyNameParam) {
+                    console.log("Setting academy name from URL parameter");
+                    academyElement.textContent = `${decodeURIComponent(academyNameParam)} Academy`;
+                    academyElement.style.display = "block";
+                }
+            } catch (e) {
+                console.error("Academy name setup error:", e);
+            }
+        }
+
+       // UPDATED: JavaScript functions to use the renamed endpoints
+
+// Function to register the geometry quiz with your local server
+function registerGeometryQuiz(quizId, quizData = null) {
+    console.log("Registering geometry quiz with server:", quizId);
+    
+    const registrationData = {
+        id: quizId,
+        title: (quizData && quizData.title) || "Geometry Quiz",
+        topic: (quizData && quizData.topic) || "Geometry",
+        grade_level: (quizData && quizData.grade_level) || "High School",
+        time_limit: (quizData && quizData.time_limit) || 30,
+        mode: (quizData && quizData.mode) || 'list',
+        questions: (quizData && quizData.questions) || [],
+        geometry_types: extractGeometryTypes(quizData)
+    };
+    
+    // Try authenticated registration first, then fallback to anonymous
+    return fetch('/api/register-geometry-quiz', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(getAuthToken() && { 'Authorization': `Bearer ${getAuthToken()}` })
+        },
+        body: JSON.stringify(registrationData)
+    })
+    .then(response => {
+        if (response.status === 401 || response.status === 403) {
+            // Try anonymous registration if auth fails
+            console.log("Auth failed, trying anonymous registration");
+            return fetch('/api/register-geometry-quiz-anonymous', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(registrationData)
+            });
+        }
+        return response;
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Registration failed: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Successfully registered geometry quiz:", data);
+        return data;
+    })
+    .catch(error => {
+        console.error("Failed to register geometry quiz:", error);
+        throw error;
+    });
+}
+
+// UPDATED: Modified loadQuiz function to use the new endpoint
+function loadQuiz() {
+    setupAcademyName();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let quizId = urlParams.get('id');
+    const quizMode = urlParams.get('mode') || 'list';
+
+    // If no quiz ID provided, generate one
+    if (!quizId) {
+        quizId = getGeometryQuizId();
+        console.log("Using geometry quiz ID:", quizId);
+    }
+
+    // Try to fetch from server first using the new endpoint
+    fetch(`/api/geometry-quiz-data/${quizId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to load quiz (${response.status})`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Loaded existing geometry quiz from server:", data);
+            
+            data.id = quizId;
+            quizData = data;
+            
+            displayQuiz(data);
+            updateQuizHeaders(data);
+            setupQuizFeatures(data);
+        })
+        .catch(error => {
+            console.warn("Quiz not found on server, creating default:", error);
+            
+            // Create default geometry quiz
+            const defaultQuizData = createDefaultGeometryQuiz(quizId);
+            
+            // Register this quiz with the server
+            registerGeometryQuiz(quizId, defaultQuizData)
+                .then(() => {
+                    console.log("Default geometry quiz registered successfully");
+                    quizData = defaultQuizData;
+                    
+                    displayQuiz(defaultQuizData);
+                    updateQuizHeaders(defaultQuizData);
+                    setupQuizFeatures(defaultQuizData);
+                })
+                .catch(registrationError => {
+                    console.error("Failed to register quiz:", registrationError);
+                    // Still show the quiz even if registration fails
+                    quizData = defaultQuizData;
+                    
+                    displayQuiz(defaultQuizData);
+                    updateQuizHeaders(defaultQuizData);
+                    setupQuizFeatures(defaultQuizData);
+                    
+                    // Show warning to user
+                    showRegistrationWarning();
+                });
+        });
+}
+
+// UPDATED: Submit scores to database using the new endpoint
+function submitScoreToAnalytics(scoreData) {
+    const quizId = quizData.id || getGeometryQuizId();
+    
+    const requestData = {
+        quiz_id: quizId,
+        student_name: scoreData.student_name || 'Anonymous',
+        score: scoreData.score || 0,
+        max_score: scoreData.total_questions || 1,
+        time_taken: scoreData.time_taken || 0,
+        answers: scoreData.answers || {}
+    };
+    
+    console.log("Submitting geometry quiz score:", requestData);
+    
+    // Submit to local geometry quiz endpoint using the new endpoint name
+    return fetch('/api/submit-geometry-quiz-score', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(errorText => {
+                throw new Error(`Submission failed: ${response.status} - ${errorText}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Geometry quiz submission successful:", data);
+        return data;
+    })
+    .catch(error => {
+        console.error("Error submitting geometry quiz:", error);
+        throw error;
+    });
+}
+
+// Extract geometry types from quiz data
+function extractGeometryTypes(quizData) {
+    if (!quizData || !quizData.questions) return [];
+    
+    const types = new Set();
+    quizData.questions.forEach(question => {
+        if (question.geometry_data && question.geometry_data.type) {
+            types.add(question.geometry_data.type);
+        } else {
+            const extractedType = extractShapeType(question.text);
+            if (extractedType) types.add(extractedType);
+        }
+    });
+    
+    return Array.from(types);
+}
+
+// Generate consistent quiz ID
+function getGeometryQuizId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlQuizId = urlParams.get('id');
+    
+    if (urlQuizId && urlQuizId.trim() !== '') {
+        console.log("Using quiz ID from URL:", urlQuizId);
+        return urlQuizId;
+    }
+    
+    // Create a new ID
+    const newQuizId = `geometry-quiz-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.log("Created new geometry quiz ID:", newQuizId);
+    return newQuizId;
+}
+
+// Show warning if registration fails
+function showRegistrationWarning() {
+    const warningDiv = document.createElement('div');
+    warningDiv.style.cssText = `
+        background: #fff3cd; 
+        color: #856404; 
+        padding: 10px; 
+        border-radius: 5px; 
+        margin: 10px 0; 
+        border: 1px solid #ffeaa7;
+        text-align: center;
+    `;
+    warningDiv.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i> 
+        Quiz registration failed. You can still take the quiz, but scores may not be saved properly.
+    `;
+    
+    const container = document.querySelector('.container');
+    if (container) {
+        container.insertBefore(warningDiv, container.firstChild);
+    }
+}
+
+// Helper functions
+function updateQuizHeaders(data) {
+    const quizTitle = document.getElementById('quizTitle');
+    const gradeLevel = document.getElementById('gradeLevel');
+    
+    if (quizTitle) quizTitle.textContent = `Quiz: ${data.title || 'Geometry Quiz'}`;
+    if (gradeLevel) gradeLevel.textContent = `Level: ${data.grade_level || 'Student'}`;
+}
+
+function setupQuizFeatures(data) {
+    if (data.time_limit) {
+        startTimer(data.time_limit * 60);
+    }
+    
+    setupScrollEffects();
+    
+    setTimeout(() => {
+        reprocessMathNotation();
+    }, 100);
+}
+
+function getAuthToken() {
+    return localStorage.getItem('token') || 
+           sessionStorage.getItem('token') || 
+           getCookie('token');
+}
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+function displaySuccessMessage() {
+    const statusDiv = document.getElementById('submission-status');
+    if (statusDiv) {
+        statusDiv.innerHTML = `
+            <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 6px; margin: 10px 0; border: 1px solid #c3e6cb;">
+                <i class="fas fa-check-circle"></i> Score submitted successfully!
+                <br><small>View results in the scores dashboard.</small>
+            </div>
+        `;
+    }
+}
+
+function displaySubmissionError(error) {
+    const statusDiv = document.getElementById('submission-status');
+    if (statusDiv) {
+        statusDiv.innerHTML = `
+            <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin: 10px 0; border: 1px solid #f5c6cb;">
+                <i class="fas fa-exclamation-triangle"></i> Submission failed: ${error.message}
+                <br><small>Please try again or contact support.</small>
+            </div>
+        `;
+    }
+}
+        // FIXED: Function to display quiz with improved option handling
+        function displayQuiz(quizData) {
+            const mode = quizData.mode || 'list';
+            console.log(`Displaying geometry quiz in ${mode} mode`);
+
+            let html = `<div class="quiz-content">`;
+
+            if (mode === 'list') {
+                html += `<div class="questions">`;
+
+                quizData.questions.forEach((question, index) => {
+                    html += `
+                        <div class="question-container" id="question-${index}">
+                            <div class="question-text">
+                                <span class="question-number">${index + 1}</span>
+                                <span>${renderMathNotation(question.text)}</span>
+                            </div>
+                    `;
+
+                    // Add shape container for geometry shapes
+                    html += `<div id="shape-container-${index}" class="shape-container">
+                        <div class="shape-loading">Loading geometry shape...</div>
+                    </div>`;
+
+                    html += `<div class="options-container">`;
+
+                    // Render based on question type
+                    if (question.type === 'paragraph') {
+                        html += `
+                            <textarea 
+                                id="q${index}-answer" 
+                                class="paragraph-answer" 
+                                placeholder="Type your answer here..."
+                                onchange="saveAnswer(${index}, this.value)"
+                                oninput="saveAnswer(${index}, this.value)"
+                                rows="4"></textarea>
+                        `;
+                    } 
+                    else if (question.type === 'true_false') {
+                        html += `
+                            <div class="option-container" data-question="${index}" data-option="0">
+                                <input type="radio" 
+                                    id="q${index}-opt0" 
+                                    name="question-${index}" 
+                                    value="0">
+                                <label for="q${index}-opt0">${renderMathNotation(question.options[0].text)}</label>
+                            </div>
+                            <div class="option-container" data-question="${index}" data-option="1">
+                                <input type="radio" 
+                                    id="q${index}-opt1" 
+                                    name="question-${index}" 
+                                    value="1">
+                                <label for="q${index}-opt1">${renderMathNotation(question.options[1].text)}</label>
+                            </div>
+                        `;
+                    }
+                    else if (question.type === 'multiple_choice') {
+                        question.options.forEach((option, optIndex) => {
+                            html += `
+                                <div class="option-container" data-question="${index}" data-option="${optIndex}">
+                                    <input type="radio" 
+                                        id="q${index}-opt${optIndex}" 
+                                        name="question-${index}" 
+                                        value="${optIndex}">
+                                    <label for="q${index}-opt${optIndex}">${renderMathNotation(option.text)}</label>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    html += `</div></div>`;
+                });
+
+                html += `</div>`;
+            } else if (mode === 'auto') {
+                // Auto-navigation mode
+                html += `
+                    <div id="current-question"></div>
+                    <div class="navigation-buttons">
+                        <button id="prev-btn" class="nav-button" onclick="prevQuestion()">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button id="next-btn" class="nav-button" onclick="nextQuestion()">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            // Add submit button
+            html += `
+                <div class="submit-container">
+                    <button onclick="submitQuiz()" class="submit-button">
+                        <i class="fas fa-check-circle"></i> Submit Quiz
+                    </button>
+                </div>
+            </div>`;
+
+            document.getElementById('quiz-content').innerHTML = html;
+
+            // FIXED: Setup option click handlers after content is loaded
+            setupOptionClickHandlers();
+
+            // If we're in auto-navigation mode, display the first question
+            if (mode === 'auto') {
+                displayCurrentQuestion();
+            } else {
+                // In list mode, render all shapes
+                quizData.questions.forEach((question, index) => {
+                    renderGeometryShape(question, `shape-container-${index}`);
+                });
+            }
+
+            // Reprocess math notation after content is loaded
+            setTimeout(() => {
+                reprocessMathNotation();
+            }, 100);
+        }
+
+        // FIXED: Improved option click handler setup
+        function setupOptionClickHandlers() {
+            console.log("Setting up option click handlers");
+            
+            // Remove any existing event listeners to prevent duplicates
+            document.querySelectorAll('.option-container').forEach(container => {
+                container.replaceWith(container.cloneNode(true));
+            });
+
+            // Add click handlers to all option containers
+            document.querySelectorAll('.option-container').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const questionIndex = parseInt(this.getAttribute('data-question'));
+                    const optionIndex = parseInt(this.getAttribute('data-option'));
+                    
+                    if (!isNaN(questionIndex) && !isNaN(optionIndex)) {
+                        selectOption(questionIndex, optionIndex);
+                    }
+                });
+
+                // Also add click handler to the radio input directly
+                const radio = container.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.addEventListener('change', function() {
+                        const questionIndex = parseInt(container.getAttribute('data-question'));
+                        const optionIndex = parseInt(this.value);
+                        
+                        if (!isNaN(questionIndex) && !isNaN(optionIndex)) {
+                            selectOption(questionIndex, optionIndex);
+                        }
+                    });
+                }
+
+                // Add hover effects
+                container.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('option-selected')) {
+                        this.style.backgroundColor = 'rgba(16, 185, 129, 0.05)';
+                    }
+                });
+
+                container.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('option-selected')) {
+                        this.style.backgroundColor = '';
+                    }
+                });
+            });
+
+            console.log(`Set up click handlers for ${document.querySelectorAll('.option-container').length} options`);
+        }
+
+        // FIXED: Improved selectOption function
+        function selectOption(questionIndex, optionIndex) {
+            console.log(`Option selected: Q${questionIndex}, Option ${optionIndex}`);
+            
+            try {
+                // Get the radio button
+                const radioId = `q${questionIndex}-opt${optionIndex}`;
+                const radio = document.getElementById(radioId);
+                
+                if (radio) {
+                    // Check the radio
+                    radio.checked = true;
+                    
+                    // Remove selected class from all options in this question
+                    const allOptions = document.querySelectorAll(`[data-question="${questionIndex}"]`);
+                    allOptions.forEach(opt => {
+                        opt.classList.remove('option-selected');
+                        opt.style.backgroundColor = '';
+                        opt.style.borderColor = '';
+                    });
+                    
+                    // Add selected class to this option
+                    const container = radio.closest('.option-container');
+                    if (container) {
+                        container.classList.add('option-selected');
+                        container.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                        container.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                    }
+                    
+                    // Save answer
+                    saveAnswer(questionIndex, optionIndex);
+                    
+                    // Play sound
+                    playSound(clickSound);
+                } else {
+                    console.error(`Radio button not found: ${radioId}`);
+                }
+            } catch (error) {
+                console.error('Error in selectOption:', error);
+            }
+        }
+
+        // Function to render a geometry shape for a question
+        function renderGeometryShape(question, index) {
+            const shapeContainer = document.getElementById(`shape-container-${index}`);
+            if (!shapeContainer) return;
+
+            // Skip if no geometry data or this question doesn't require a shape
+            if (!question.geometry_data || !question.requires_shape) {
+                shapeContainer.innerHTML = `
+                    <div style="padding: 15px; font-style: italic; color: #718096;">
+                        No geometry shape required for this question
+                    </div>
+                `;
+                return;
+            }
+
+            // Prepare request data for the shape rendering
+            const shapeType = question.geometry_data.type || extractShapeType(question.text);
+            const measurements = question.geometry_data.measurements || {};
+            
+            console.log(`Rendering geometry shape for question ${index}:`, shapeType, measurements);
+            
+            // Send request to API to get the shape
+            fetch('/api/geometry/render-shape', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type: shapeType,
+                    measurements: measurements,
+                    question_id: question.id || index
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Shape rendering failed (${response.status})`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.image) {
+                    // Store the shape in our cache
+                    geometryShapes[index] = data;
+                    
+                    // Display the shape
+                    let measurementsHtml = '';
+                    if (data.measurements && Object.keys(data.measurements).length > 0) {
+                        measurementsHtml = `<div class="shape-measurements">`;
+                        
+                        // Format measurements for display
+                        Object.entries(data.measurements).forEach(([key, value]) => {
+                            if (key !== 'type') {
+                                const formattedKey = key.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
+                                measurementsHtml += `${formattedKey}: ${renderMathNotation(value)} `;
+                            }
+                        });
+                        
+                        measurementsHtml += `</div>`;
+                    }
+                    
+                    shapeContainer.innerHTML = `
+                        <div class="shape-title">${capitalizeFirstLetter(shapeType)}</div>
+                        <img src="${data.image}" alt="${shapeType} geometry shape" />
+                        ${measurementsHtml}
+                    `;
+
+                    // Reprocess math notation for measurements
+                    setTimeout(() => {
+                        reprocessMathNotation();
+                    }, 50);
+                } else {
+                    throw new Error('Invalid shape data received');
+                }
+            })
+            .catch(error => {
+                console.error(`Error rendering shape for question ${index}:`, error);
+                shapeContainer.innerHTML = `
+                    <div class="shape-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading geometry shape</p>
+                        <button class="retry-shape-btn" onclick="retryRenderShape(${index})">
+                            <i class="fas fa-sync-alt"></i> Retry
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // Function to retry rendering a shape
+        function retryRenderShape(questionIndex) {
+            if (!quizData || !quizData.questions || !quizData.questions[questionIndex]) return;
+            
+            const question = quizData.questions[questionIndex];
+            renderGeometryShape(question, questionIndex);
+        }
+
+        // Function to extract shape type from question text
+        function extractShapeType(questionText) {
+            if (!questionText) return 'triangle'; // Default shape
+            
+            const text = questionText.toLowerCase();
+            
+            // Check for shape types in the text
+            if (text.includes('triangle')) return 'triangle';
+            if (text.includes('square')) return 'square';
+            if (text.includes('rectangle')) return 'rectangle';
+            if (text.includes('circle')) return 'circle';
+            if (text.includes('trapezoid') || text.includes('trapezium')) return 'trapezium';
+            if (text.includes('parallelogram')) return 'quadrilateral';
+            if (text.includes('rhombus')) return 'rhombus';
+            if (text.includes('pentagon')) return 'polygon';
+            if (text.includes('hexagon')) return 'polygon';
+            if (text.includes('octagon')) return 'polygon';
+            if (text.includes('cube')) return 'cube';
+            if (text.includes('sphere')) return 'sphere';
+            if (text.includes('cylinder')) return 'cylinder';
+            if (text.includes('cone')) return 'cone';
+            
+            // Default to triangle if no shape detected
+            return 'triangle';
+        }
+
+        // Helper function to capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        // Enhanced display current question function for auto-navigation mode
+        function displayCurrentQuestion() {
+            const questionContainer = document.getElementById('current-question');
+            if (!questionContainer) return;
+
+            const question = quizData.questions[currentQuestion];
+
+            let html = `
+                <div class="question-container" id="question-${currentQuestion}">
+                    <div class="question-text">
+                        <span class="question-number">${currentQuestion + 1}</span>
+                        <span>${renderMathNotation(question.text)}</span>
+                    </div>
+            `;
+
+            // Add shape container for geometry shapes
+            html += `<div id="shape-container-${currentQuestion}" class="shape-container">
+                <div class="shape-loading">Loading geometry shape...</div>
+            </div>`;
+
+            html += `<div class="options-container">`;
+
+            // Render based on question type
+            if (question.type === 'paragraph') {
+                const value = userAnswers[currentQuestion] || '';
+                html += `
+                    <textarea 
+                        id="q${currentQuestion}-answer" 
+                        class="paragraph-answer" 
+                        placeholder="Type your answer here..."
+                        onchange="saveAnswer(${currentQuestion}, this.value)"
+                        rows="4">${value}</textarea>
+                `;
+            } 
+            else if (question.type === 'true_false') {
+                const trueChecked = userAnswers[currentQuestion] === 0 ? 'checked' : '';
+                const falseChecked = userAnswers[currentQuestion] === 1 ? 'checked' : '';
+
+                html += `
+                    <div class="option-container" data-question="${currentQuestion}" data-option="0">
+                        <input type="radio" 
+                            id="q${currentQuestion}-opt0" 
+                            name="question-${currentQuestion}" 
+                            value="0"
+                            ${trueChecked}>
+                        <label for="q${currentQuestion}-opt0">${renderMathNotation(question.options[0].text)}</label>
+                    </div>
+                    <div class="option-container" data-question="${currentQuestion}" data-option="1">
+                        <input type="radio" 
+                            id="q${currentQuestion}-opt1" 
+                            name="question-${currentQuestion}" 
+                            value="1"
+                            ${falseChecked}>
+                        <label for="q${currentQuestion}-opt1">${renderMathNotation(question.options[1].text)}</label>
+                    </div>
+                `;
+            }
+            else if (question.type === 'multiple_choice') {
+                question.options.forEach((option, optIndex) => {
+                    const checked = userAnswers[currentQuestion] === optIndex ? 'checked' : '';
+                    html += `
+                        <div class="option-container" data-question="${currentQuestion}" data-option="${optIndex}">
+                            <input type="radio" 
+                                id="q${currentQuestion}-opt${optIndex}" 
+                                name="question-${currentQuestion}" 
+                                value="${optIndex}"
+                                ${checked}>
+                            <label for="q${currentQuestion}-opt${optIndex}">${renderMathNotation(option.text)}</label>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div></div>`;
+
+            questionContainer.innerHTML = html;
+
+            // Setup click handlers for the newly created options
+            setupOptionClickHandlers();
+
+            // Render the geometry shape
+            renderGeometryShape(question, currentQuestion);
+
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = currentQuestion === 0;
+            document.getElementById('next-btn').disabled = currentQuestion === quizData.questions.length - 1;
+
+            // If it's the last question, change Next to Finish
+            if (currentQuestion === quizData.questions.length - 1) {
+                document.getElementById('next-btn').innerHTML = 'Finish <i class="fas fa-flag-checkered"></i>';
+            } else {
+                document.getElementById('next-btn').innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+            }
+
+            // Render math notation after a short delay
+            setTimeout(() => {
+                reprocessMathNotation();
+            }, 100);
+        }
+
+        // Navigation functions for auto-navigation mode
+        function nextQuestion() {
+            if (currentQuestion < quizData.questions.length - 1) {
+                currentQuestion++;
+                displayCurrentQuestion();
+                playSound(clickSound);
+
+                // If last question, play success sound
+                if (currentQuestion === quizData.questions.length - 1) {
+                    setTimeout(() => {
+                        playSound(successSound);
+                    }, 300);
+                }
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                displayCurrentQuestion();
+                playSound(clickSound);
+            }
+        }
+
+        // Save user answer
+        function saveAnswer(questionIndex, answer) {
+            userAnswers[questionIndex] = answer;
+            console.log('Saved answer:', { questionIndex, answer });
+        }
+
+        // Setup scroll effects for header
+        function setupScrollEffects() {
+            const header = document.getElementById('quizHeader');
+            const timerContainer = document.getElementById('timerContainer');
+
+            if (!header || !timerContainer) return;
+
+            window.addEventListener('scroll', function() {
+                // Header style changes on scroll
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                    timerContainer.classList.add('fixed');
+                } else {
+                    header.classList.remove('scrolled');
+                    timerContainer.classList.remove('fixed');
+                }
+            });
+        }
+
+        // Start timer for quiz
+        function startTimer(seconds) {
+            timeLeft = seconds;
+
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitQuiz();
+                } else {
+                    updateTimerDisplay();
+
+                    // Warning at 1 minute
+                    if (timeLeft === 60) {
+                        timerElement.classList.add('warning');
+                        playSound(clickSound);
+                    }
+
+                    // Danger at 30 seconds
+                    if (timeLeft === 30) {
+                        timerElement.classList.add('danger');
+                        playSound(errorSound);
+                    }
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const remainingSeconds = timeLeft % 60;
+            timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        // Format time for display
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}m ${remainingSeconds}s`;
+        }
+
+        // Helper function to show quiz errors
+        function showQuizError(message) {
+            const quizContent = document.getElementById('quiz-content');
+            if (quizContent) {
+                quizContent.innerHTML = `
+                    <div class="error-message">
+                        <h2>Error</h2>
+                        <p>${message}</p>
+                        <button onclick="window.history.back()">Go Back</button>
+                    </div>
+                `;
+            } else {
+                console.error(`Quiz error: ${message}`);
+                alert(`Quiz error: ${message}`);
+            }
+        }
+
+      // FIXED: Move submitScoreToAnalytics OUTSIDE of submitQuiz function
+// Helper function to get cookie value
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+// FIXED: Submit score data to analytics endpoint (moved outside submitQuiz)
+function submitScoreToAnalytics(scoreData) {
+    // Only proceed if we have required data
+    if (!scoreData.quiz_id || !scoreData.total_questions || scoreData.total_questions === 0) {
+        console.warn("Incomplete score data, skipping analytics submission:", scoreData);
+        return Promise.reject(new Error("Incomplete score data"));
+    }
+
+    console.log("Submitting score data to analytics:", scoreData);
+    
+    // Get the correct token
+    const token = localStorage.getItem('token') || 
+                  sessionStorage.getItem('token') || 
+                  getCookie('token');
+
+    // Prepare the request data
+    const requestData = {
+        quiz_id: scoreData.quiz_id,
+        student_name: scoreData.student_name || 'Anonymous',
+        score: scoreData.score || 0,
+        max_score: scoreData.total_questions,
+        time_taken: scoreData.time_taken || 0,
+        answers: scoreData.answers || {}
+    };
+
+    // Add flashcard_set_id if it exists
+    if (scoreData.flashcard_set_id) {
+        requestData.flashcard_set_id = scoreData.flashcard_set_id;
+    }
+
+    console.log("Sending request data:", requestData);
+
+    // Submit to scores endpoint with improved error handling
+    return fetch('https://seashell-app-onfk3.ondigitalocean.app/api/quiz-scores', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        console.log("Analytics API response status:", response.status);
+        
+        if (!response.ok) {
+            // Try to get error details from response
+            return response.text().then(errorText => {
+                console.error("Analytics API error response:", errorText);
+                throw new Error(`Failed to submit score: ${response.status} - ${errorText}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Score submission successful:", data);
+
+        // Store the submission ID for reference
+        try {
+            localStorage.setItem(`quiz_submission_${scoreData.quiz_id}`, JSON.stringify({
+                submission_id: data.submission_id || Date.now(),
+                score: scoreData.score,
+                total: scoreData.total_questions,
+                student: scoreData.student_name,
+                timestamp: new Date().toISOString()
+            }));
+        } catch (e) {
+            console.warn("Could not store submission data:", e);
+        }
+
+        return data;
+    })
+    .catch(error => {
+        console.error("Error submitting score to analytics:", error);
+        
+        // Store locally as fallback
+        try {
+            const localSubmission = {
+                quiz_id: scoreData.quiz_id,
+                student_name: scoreData.student_name,
+                score: scoreData.score,
+                total_questions: scoreData.total_questions,
+                time_taken: scoreData.time_taken,
+                submission_time: new Date().toISOString(),
+                answers: scoreData.answers || {},
+                status: 'failed_to_submit',
+                error: error.message
+            };
+
+            // Store in localStorage as backup
+            const existingSubmissions = JSON.parse(localStorage.getItem(`quiz_submissions_${scoreData.quiz_id}`) || '[]');
+            existingSubmissions.push(localSubmission);
+            localStorage.setItem(`quiz_submissions_${scoreData.quiz_id}`, JSON.stringify(existingSubmissions));
+            
+            console.log("Score stored locally as fallback:", localSubmission);
+        } catch (storageError) {
+            console.error("Could not store submission locally:", storageError);
+        }
+        
+        // Re-throw the error so calling code can handle it
+        throw error;
+    });
+}
+
+// FIXED: Updated submitQuiz function to use the correct geometry quiz endpoint
+
+function submitQuiz() {
+    // Check if quizData exists
+    if (!quizData || !Array.isArray(quizData.questions)) {
+        showQuizError("Quiz data is not properly loaded. Please try reloading the page.");
+        return;
+    }
+
+    // Stop the timer
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+
+    console.log("Submitting geometry quiz...");
+
+    // Calculate score
+    let score = 0;
+    let totalQuestions = quizData.questions.length;
+    let incorrectAnswers = [];
+    let answers = {}; // Store answers for submission
+
+    // Check answers and show results
+    quizData.questions.forEach((question, index) => {
+        if (question.type === 'multiple_choice' || question.type === 'true_false') {
+            const selectedAnswer = userAnswers[index];
+            let isCorrect = false;
+
+            if (selectedAnswer !== undefined && question.options && question.options[selectedAnswer]) {
+                isCorrect = question.options[selectedAnswer].isCorrect;
+                if (isCorrect) score++;
+
+                // Store answer for submission
+                answers[index] = {
+                    selectedOption: selectedAnswer,
+                    isCorrect: isCorrect,
+                    questionType: question.type
+                };
+
+                // Show correct/incorrect answers in UI
+                const questionDiv = document.getElementById(`question-${index}`);
+                if (questionDiv) {
+                    const options = questionDiv.querySelectorAll('.option-container');
+                    options.forEach((option, optIndex) => {
+                        if (question.options[optIndex] && question.options[optIndex].isCorrect) {
+                            option.classList.add('correct-answer');
+                        } else if (optIndex === selectedAnswer && !question.options[optIndex].isCorrect) {
+                            option.classList.add('wrong-answer');
+                        }
+                    });
+                }
+
+                // Store incorrect answers for explanations
+                if (!isCorrect) {
+                    incorrectAnswers.push({
+                        questionIndex: index,
+                        question: question.text,
+                        userAnswer: question.options[selectedAnswer].text,
+                        correctAnswer: question.options.find(opt => opt.isCorrect)?.text || 'Unknown'
+                    });
+                }
+            }
+        }
+        // Handle paragraph questions if they exist
+        else if (question.type === 'paragraph') {
+            const textAnswer = userAnswers[index];
+            if (textAnswer && textAnswer.trim() !== '') {
+                answers[index] = {
+                    paragraphAnswer: textAnswer,
+                    questionType: question.type
+                };
+                // For paragraph questions, assume they're correct for now
+                score += 0.8; // Give partial credit
+            }
+        }
+    });
+
+    // Disable all inputs
+    document.querySelectorAll('input, textarea').forEach(input => {
+        input.disabled = true;
+    });
+
+    // Calculate percentage
+    const percentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
+    const perfect = score === totalQuestions && totalQuestions > 0;
+
+    // FIXED: Submit to the correct geometry quiz endpoint
+    const scoreData = {
+        quiz_id: quizData.id || `geometry-quiz-${Date.now()}`,
+        student_name: window.studentName || 'Anonymous',
+        score: score,
+        total_questions: totalQuestions,
+        time_taken: (quizData.time_limit || 30) * 60 - (timeLeft || 0),
+        answers: answers
+    };
+
+    // Submit using the correct function that calls the right endpoint
+    submitScoreToAnalytics(scoreData)
+        .then(result => {
+            console.log("Geometry quiz submission successful:", result);
+            displaySuccessMessage();
+        })
+        .catch(error => {
+            console.error("Geometry quiz submission failed:", error);
+            displaySubmissionError(error);
+        });
+
+    // Display score container (regardless of submission result)
+    const scoreContainer = document.getElementById('score-container');
+    scoreContainer.innerHTML = `
+        <h2>${perfect ? '🎉 Perfect Score!' : '📝 Geometry Quiz Results'}</h2>
+        <p>Your Score: <strong>${score}</strong> out of <strong>${totalQuestions}</strong> (<strong>${percentage.toFixed(1)}%</strong>)</p>
+        <p>Time Taken: ${formatTime((quizData.time_limit || 30) * 60 - (timeLeft || 0))}</p>
+        <div id="submission-status"></div>
+        <button onclick="window.location.reload()" style="margin-top: 15px; background: var(--primary-color); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+            <i class="fas fa-redo"></i> Try Again
+        </button>
+    `;
+    scoreContainer.style.display = 'block';
+
+    // Scroll to score container
+    setTimeout(() => {
+        scoreContainer.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+
+    // Play appropriate sound
+    if (perfect) {
+        playSound(successSound);
+    } else {
+        playSound(clickSound);
+    }
+
+    // Generate explanations for incorrect answers (if any)
+    if (incorrectAnswers.length > 0) {
+        generateAndDisplayExplanations(incorrectAnswers);
+    }
+
+    // Reprocess math notation in results
+    setTimeout(() => {
+        reprocessMathNotation();
+    }, 100);
+}
+
+// FIXED: Make sure submitScoreToAnalytics uses the correct endpoint
+function submitScoreToAnalytics(scoreData) {
+    const quizId = quizData.id || getGeometryQuizId();
+    
+    const requestData = {
+        quiz_id: quizId,
+        student_name: scoreData.student_name || 'Anonymous',
+        score: scoreData.score || 0,
+        max_score: scoreData.total_questions || 1,
+        time_taken: scoreData.time_taken || 0,
+        answers: scoreData.answers || {}
+    };
+    
+    console.log("Submitting geometry quiz score to correct endpoint:", requestData);
+    
+    // FIXED: Submit to the CORRECT geometry quiz endpoint
+    return fetch('/api/submit-geometry-quiz-score', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        console.log("Response status:", response.status);
+        if (!response.ok) {
+            return response.text().then(errorText => {
+                console.error("Error response:", errorText);
+                throw new Error(`Submission failed: ${response.status} - ${errorText}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Geometry quiz submission successful:", data);
+        return data;
+    })
+    .catch(error => {
+        console.error("Error submitting geometry quiz:", error);
+        throw error;
+    });
+}
+
+// Helper function to generate and display explanations
+function generateAndDisplayExplanations(incorrectAnswers) {
+    // Add loading indicator
+    const scoreContainer = document.getElementById('score-container');
+    scoreContainer.innerHTML += `
+        <div class="explanations" id="explanations">
+            <h3>Corrections and Explanations</h3>
+            <div id="explanations-loading" style="text-align: center; padding: 20px;">
+                <p>Generating detailed explanations...</p>
+                <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            </div>
+            <div id="explanations-content"></div>
+        </div>
+    `;
+
+    // Try to get explanations from API
+    fetch('/api/generate-explanations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            topic: quizData.topic || 'Geometry',
+            incorrectAnswers: incorrectAnswers
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.explanations && Array.isArray(data.explanations)) {
+            displayExplanations(data.explanations);
+        } else {
+            throw new Error('Invalid explanations format');
+        }
+    })
+    .catch(error => {
+        console.error('Error getting explanations:', error);
+        // Use fallback explanations
+        const fallbackExplanations = generateFallbackExplanations(incorrectAnswers);
+        displayExplanations(fallbackExplanations);
+    });
+}
+
+// Function to display explanations in the UI
+function displayExplanations(explanations) {
+    const loadingElement = document.getElementById('explanations-loading');
+    const contentElement = document.getElementById('explanations-content');
+    
+    if (loadingElement) loadingElement.style.display = 'none';
+    
+    if (contentElement && explanations && explanations.length > 0) {
+        let explanationsHtml = '';
+        explanations.forEach(item => {
+            explanationsHtml += `
+                <div class="question-explanation">
+                    <div class="explanation-header">Question ${Number(item.questionIndex) + 1}: ${renderMathNotation(item.question)}</div>
+                    <div class="explanation-content">
+                        <p>Your answer: <span style="color: var(--error-color);">${renderMathNotation(item.userAnswer)}</span></p>
+                        <p>Correct answer: <span style="color: var(--success-color);">${renderMathNotation(item.correctAnswer)}</span></p>
+                        <p><strong>Explanation:</strong> ${renderMathNotation(item.explanation)}</p>
+                    </div>
+                </div>
+            `;
+        });
+        contentElement.innerHTML = explanationsHtml;
+        
+        // Reprocess math notation for explanations
+        setTimeout(() => {
+            reprocessMathNotation();
+        }, 100);
+    }
+}
+
+// Generate fallback explanations if API fails
+function generateFallbackExplanations(incorrectAnswers) {
+    return incorrectAnswers.map(item => {
+        const question = quizData.questions.find((q, i) => i === Number(item.questionIndex));
+        let explanation = "The correct answer follows from geometric principles and properties.";
+
+        if (question) {
+            const shapeType = question.geometry_data?.type || extractShapeType(question.text);
+            explanation = generateGeometryExplanation(shapeType, item.correctAnswer, item.userAnswer);
+        }
+
+        return {
+            ...item,
+            explanation: explanation
+        };
+    });
+}
+
+// Generate explanations based on shape type
+function generateGeometryExplanation(shapeType, correctAnswer, userAnswer) {
+    switch(shapeType.toLowerCase()) {
+        case 'triangle':
+            return `In triangles, the sum of interior angles is always 180°. The correct answer considers the properties of triangles including the Pythagorean theorem for right triangles, and area formulas. ${correctAnswer} is correct because it properly applies these principles.`;
+        
+        case 'circle':
+            return `Circles have special properties related to their radius, diameter, circumference, and area. The formula for circumference is 2πr and the area is πr². ${correctAnswer} correctly applies these formulas and principles.`;
+        
+        case 'square':
+            return `A square has four equal sides and four right angles (90°). Its area is calculated as side² and its perimeter is 4 × side. ${correctAnswer} correctly applies these properties.`;
+        
+        case 'rectangle':
+            return `A rectangle has opposite sides equal and all angles are 90°. Its area is length × width and its perimeter is 2(length + width). ${correctAnswer} correctly applies these formulas.`;
+        
+        default:
+            return `The correct answer (${correctAnswer}) follows from geometric principles and properties. The mathematical reasoning requires careful consideration of shape properties, measurement relationships, and geometric formulas.`;
+    }
+}
+// Toggle explanations visibility
+function toggleExplanations() {
+    const explanations = document.getElementById('explanations');
+    const button = document.querySelector('.show-explanations-btn');
+
+    if (!explanations || !button) return;
+
+    if (explanations.style.display === 'block') {
+        explanations.style.display = 'none';
+        button.innerHTML = '<i class="fas fa-info-circle"></i> Show Corrections';
+    } else {
+        explanations.style.display = 'block';
+        button.innerHTML = '<i class="fas fa-times-circle"></i> Hide Corrections';
+
+        // Scroll to explanations
+        setTimeout(() => {
+            explanations.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            // Rerender math notation if needed
+            reprocessMathNotation();
+        }, 100);
+    }
+}
+        // Enhanced MathJax initialization (v3 compatible)
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+
+        // Function to re-typeset math after dynamic content changes
+        function retypeset() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise().catch(function (err) {
+                    console.error('MathJax typeset error:', err);
+                });
+            }
+        }
+
+        // Initialize quiz when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing geometry quiz interface...');
+
+            try {
+                // Check for student parameter in URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const studentParam = urlParams.get('student');
+                
+                if (studentParam && studentParam.trim() !== '') {
+                    window.studentName = decodeURIComponent(studentParam);
+
+                    // Hide modal and show header
+                    document.getElementById('studentNameModal').style.display = 'none';
+                    document.getElementById('quizHeader').style.display = 'flex';
+
+                    // Set student name in header
+                    document.getElementById('studentWelcome').textContent = `Welcome, ${window.studentName}!`;
+
+                    // Load the quiz
+                    loadQuiz();
+                }
+
+                // Add keyboard shortcuts
+                document.addEventListener('keydown', function(e) {
+                    // ESC to toggle sound
+                    if (e.key === 'Escape') {
+                        soundEnabled = !soundEnabled;
+                        if (soundIcon) {
+                            soundIcon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+                        }
+                    }
+                    
+                    // Arrow keys for navigation in auto mode
+                    if (quizData && quizData.mode === 'auto') {
+                        if (e.key === 'ArrowRight' && document.getElementById('next-btn') && !document.getElementById('next-btn').disabled) {
+                            nextQuestion();
+                        } else if (e.key === 'ArrowLeft' && document.getElementById('prev-btn') && !document.getElementById('prev-btn').disabled) {
+                            prevQuestion();
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Error during initialization:", error);
+            }
+        });
+
+        // FIXED: Additional safety net to ensure options are clickable
+        setTimeout(function() {
+            console.log("Applying final fix to ensure all options are clickable");
+            
+            // Force re-setup of click handlers
+            setupOptionClickHandlers();
+            
+            // Add additional CSS fixes
+            const style = document.createElement('style');
+            style.textContent = `
+                .option-container {
+                    position: relative !important;
+                    z-index: 100 !important;
+                    cursor: pointer !important;
+                    pointer-events: auto !important;
+                }
+                
+                .option-container * {
+                    pointer-events: auto !important;
+                }
+                
+                .options-container {
+                    position: relative !important;
+                    z-index: 50 !important;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            console.log("Final fix applied successfully");
+        }, 2000);
+    // Extra safety net to ensure transformations are fixed
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit for dynamic content
+    setTimeout(function() {
+        if (typeof fixGeometryTransformations === 'function') {
+            fixGeometryTransformations();
+        }
+    }, 1000);
+});
+</script>
+    <script>
+// ==================== GEOMETRY SHAPE RENDERER ====================
+/**
+ * Renders geometry shapes by calling the backend API
+ */
+async function renderGeometryShape(questionData, containerId) {
+    console.log('🎨 Rendering shape for container:', containerId);
+    console.log('📊 Question data:', questionData);
+    
+    const container = document.getElementById(containerId);
+    if (!container) {
+        console.error('❌ Container not found:', containerId);
+        return;
+    }
+    
+    // Check if geometry_data exists
+    if (!questionData.geometry_data || !questionData.geometry_data.shape_type) {
+        console.log('⚠️ No geometry_data found for question');
+        container.innerHTML = '<p style="color: #9CA3AF; font-style: italic; text-align: center; padding: 2rem;">No geometry shape required for this question</p>';
+        return;
+    }
+    
+    // Show loading state
+    container.innerHTML = '<p style="color: #6B7280; text-align: center; padding: 2rem;">Loading shape...</p>';
+    
+    try {
+        console.log('🔧 Calling render API with:', {
+            type: questionData.geometry_data.shape_type,
+            measurements: questionData.geometry_data.measurements
+        });
+        
+        // Call backend to render shape
+        const response = await fetch('/api/geometry/render-shape', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                type: questionData.geometry_data.shape_type,
+                measurements: questionData.geometry_data.measurements || {},
+                question_context: {
+                    text: questionData.question || '',
+                    hide_answer: true,
+                    is_preview: false
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Render API response:', result.success ? 'success' : 'failed');
+        
+        if (result.success && result.image) {
+            // Display the rendered shape
+            container.innerHTML = `
+                <div style="background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <img src="data:image/png;base64,${result.image}" 
+                         alt="${questionData.geometry_data.shape_type}" 
+                         style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
+                </div>
+            `;
+            console.log('✅ Shape rendered successfully');
+        } else {
+            throw new Error(result.error || 'Failed to render shape');
+        }
+    } catch (error) {
+        console.error('❌ Error rendering shape:', error);
+        container.innerHTML = `
+            <div style="background: #FEE2E2; border: 1px solid #EF4444; border-radius: 8px; padding: 1rem; text-align: center;">
+                <p style="color: #DC2626; margin: 0; font-weight: 500;">Failed to render shape</p>
+                <p style="color: #991B1B; margin: 0.5rem 0 0 0; font-size: 0.875rem;">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// ==================== QUIZ LOADER ====================
+/**
+ * Loads quiz data and renders all shapes
+ */
+async function loadAndRenderQuiz(quizId) {
+    console.log('📚 Loading quiz:', quizId);
+    
+    try {
+        // Fetch quiz data
+        const response = await fetch(`/api/geometry-quiz-data/${quizId}`);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load quiz: ${response.status}`);
+        }
+        
+        const quizData = await response.json();
+        console.log('✅ Quiz loaded:', quizData.title);
+        console.log('📊 Number of questions:', quizData.questions.length);
+        
+        // Render shapes for each question
+        quizData.questions.forEach((question, index) => {
+            const containerId = `shape-container-${index}`;
+            console.log(`🎨 Processing Q${index + 1}, container: ${containerId}`);
+            
+            // Wait a moment for DOM to be ready, then render
+            setTimeout(() => {
+                renderGeometryShape(question, containerId);
+            }, 100 * index); // Stagger renders slightly
+        });
+        
+        return quizData;
+        
+    } catch (error) {
+        console.error('❌ Error loading quiz:', error);
+        throw error;
+    }
+}
+
+// ==================== AUTO-LOAD ON PAGE READY ====================
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 Page loaded, checking for quiz ID...');
+    
+    // Get quiz ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizId = urlParams.get('id');
+    
+    if (quizId) {
+        console.log('🎯 Found quiz ID:', quizId);
+        
+        // Wait for your existing quiz loading code to finish
+        // Then trigger shape rendering
+        setTimeout(() => {
+            console.log('🚀 Triggering shape rendering...');
+            loadAndRenderQuiz(quizId).catch(err => {
+                console.error('Failed to load quiz:', err);
+            });
+        }, 1000); // Wait 1 second for quiz to be displayed
+    } else {
+        console.warn('⚠️ No quiz ID found in URL');
+    }
+});
+
+console.log('✅ Geometry shape renderer loaded');
+</script>
+
+</body>
+</html>

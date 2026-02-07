@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Decipher Learning Platform</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" type="image/svg+xml">
+    <style>
+        :root {
+            --primary-color: #00bfff;
+            --primary-dark: #00bfff;
+            --secondary-color: #10B981;
+            --accent-color: #F59E0B;
+            --text-color: #1F2937;
+            --light-bg: #F3F4F6;
+            --white: #FFFFFF;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: var(--transition);
+        }
+        
+        .user-info:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-name {
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        .subscription-widget {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 10px;
+    }
+
+    .widget-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #4361ee;
+      margin: 0;
+    }
+
+    .widget-content {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .subscription-status {
+      padding: 15px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-trial {
+      border-left: 4px solid #ff9800;
+    }
+
+    .status-active {
+      border-left: 4px solid #4caf50;
+    }
+
+    .status-inactive {
+      border-left: 4px solid #f44336;
+    }
+
+    .subscription-options {
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .days-remaining {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff9800;
+      margin: 10px 0;
+    }
+
+    .days-remaining.urgent {
+      color: #f44336;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+
+    .widget-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    .subscribe-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #4361ee, #3a0ca3);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .subscribe-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 768px) {
+      .subscription-widget {
+        margin: 15px 10px;
+        padding: 15px;
+      }
+    }
+        .nav-link:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+            border-radius: 0 0 1rem 1rem;
+        }
+        
+        .hero-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background-color: var(--white);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .feature-image {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+        }
+        .flashcard-creator-img {
+          background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80');
+       }
+        .quiz-creator-img {
+            background-image: url('https://images.unsplash.com/photo-1532619187608-e5375cab36aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+        }
+        
+        .video-quiz-img {
+            background-image: url('https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80');
+        }
+        
+        .lesson-planner-img {
+            background-image: url('https://images.unsplash.com/photo-1517842645767-c639042777db?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+        }
+        
+        .feature-content {
+            padding: 1.5rem;
+        }
+        
+        .feature-content h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .feature-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #0ea271;
+        }
+        
+        .coming-soon-badge {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--white);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        
+        .how-it-works {
+            background-color: var(--white);
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-header p {
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.8;
+        }
+        
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+        
+        .step {
+            flex-basis: 300px;
+            text-align: center;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-radius: 50%;
+            font-weight: 600;
+            line-height: 40px;
+            margin-bottom: 1rem;
+        }
+        
+        .step h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        footer {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-link {
+            color: var(--white);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+        
+        .footer-link:hover {
+            opacity: 1;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 60px;
+            right: 2rem;
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            box-shadow: var(--card-shadow);
+            width: 200px;
+            z-index: 100;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .dropdown-menu.active {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .dropdown-item i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .user-menu {
+                margin-top: 1rem;
+            }
+            
+            .hero {
+                padding: 2rem 0;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+    </style>
+    <style>
+        /* Onboarding Overlay */
+        .onboarding-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease-out;
+        }
+    
+        .onboarding-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 32rem;
+            overflow: hidden;
+            position: relative;
+        }
+    
+        .header-gradient {
+            height: 8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+    
+        .header-icon {
+            font-size: 3rem;
+        }
+    
+        .slide-content {
+            padding: 2rem;
+            padding-top: 2.5rem;
+            position: relative;
+            margin-top: -4rem;
+        }
+    
+        .icon-container {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin: 0 auto 1.5rem auto;
+            width: max-content;
+        }
+    
+        .slide-icon {
+            width: 7rem;
+            height: 7rem;
+            color: #2563eb; /* blue-600 */
+        }
+    
+        .slide-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: #1f2937; /* gray-800 */
+            margin-bottom: 1rem;
+        }
+    
+        .slide-description {
+            text-align: center;
+            color: #4b5563; /* gray-600 */
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+    
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+    
+        .progress-dot {
+            height: 0.5rem;
+            width: 0.5rem;
+            border-radius: 9999px;
+            background-color: #d1d5db; /* gray-300 */
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+    
+        .progress-dot.active {
+            width: 2rem;
+            background-color: #3b82f6; /* blue-500 */
+        }
+    
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        .navigation-btn {
+            padding: 0.5rem;
+            border-radius: 9999px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: #374151; /* gray-700 */
+        }
+    
+        .navigation-btn:disabled {
+            color: #9ca3af; /* gray-400 */
+            cursor: not-allowed;
+        }
+    
+        .navigation-btn:not(:disabled):hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+    
+        .navigation-btn svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+    
+        .skip-btn {
+            padding: 0.5rem 1rem;
+            color: #6b7280; /* gray-500 */
+            background: transparent;
+            border: none;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+    
+        .skip-btn:hover {
+            color: #374151; /* gray-700 */
+        }
+    
+        .next-btn {
+            padding: 0.625rem 1.5rem;
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1), 0 2px 4px -1px rgba(37, 99, 235, 0.06);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+    
+        .next-btn:hover {
+            background-color: #1d4ed8; /* blue-700 */
+            box-shadow: 0 6px 10px -1px rgba(37, 99, 235, 0.1), 0 2px 6px -1px rgba(37, 99, 235, 0.06);
+            transform: translateY(-1px);
+        }
+    
+        /* Slide-specific gradients */
+        .gradient-welcome { background-image: linear-gradient(135deg, #3b82f6, #7c3aed); } /* blue to purple */
+        .gradient-quizzes { background-image: linear-gradient(135deg, #10b981, #0d9488); } /* green to teal */
+        .gradient-tracking { background-image: linear-gradient(135deg, #f97316, #dc2626); } /* orange to red */
+        .gradient-lessons { background-image: linear-gradient(135deg, #ec4899, #8b5cf6); } /* pink to purple */
+        .gradient-complete { background-image: linear-gradient(135deg, #2563eb, #4f46e5); } /* blue to indigo */
+    
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .onboarding-card {
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .slide-icon {
+                width: 5rem;
+                height: 5rem;
+            }
+            
+            .header-gradient {
+                height: 6rem;
+            }
+            
+            .slide-content {
+                padding: 1.5rem;
+            }
+            
+            .button-group {
+                gap: 0.5rem;
+            }
+            
+            .next-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">
+                <span class="logo-icon">📚</span>
+                <span>Decipher Learning</span>
+            </a>
+            
+            <nav class="nav-links">
+                <a href="#" class="nav-link">Home</a>
+                <a href="#" class="nav-link">Dashboard</a>
+                <a href="#" class="nav-link">Performance</a>
+            </nav>
+            
+            <div class="user-menu">
+                <div class="user-info" id="userInfoDropdown">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span class="user-name" id="userName">Username</span>
+                </div>
+                
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="https://deciph.ai.deciphersacad.online/profile.html" class="dropdown-item">
+                        <i>👤</i> My Profile
+                    </a>
+                    <a href="https://deciph.ai.deciphersacad.online/performance.html" class="dropdown-item">
+                        <i>📊</i> Performance
+                    </a>
+                    <a href="/profile.html" class="dropdown-item">
+                        <i>⚙️</i> Settings
+                    </a>
+                    <a href="/index.html" class="dropdown-item" id="logoutBtn">
+                        <i>🚪</i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="main-content">
+    <section class="hero">
+        <div class="hero-container">
+            <h1>Welcome to Decipher Learning Platform</h1>
+            <p>Create engaging quizzes, analyze student performance, and identify learning gaps to enhance educational outcomes.</p>
+            <a href="#features" class="btn" style="background-color: #10B981; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
+                Explore Features
+            </a>
+                    </div>
+    </section>
+    <section class="container" id="features">
+        <div class="section-header">
+            <h2>Choose Your Tool</h2>
+            <p>Select from our suite of educational tools designed to enhance the learning experience</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card" onclick="window.location.href='/quiz-creator'">
+                <div class="feature-image quiz-creator-img"></div>
+                <div class="feature-content">
+                    <h2>Quiz Creator</h2>
+                    <p>Create customized quizzes with multiple choice, true/false, and paragraph questions. Track student performance and identify learning gaps.</p>
+                    <a href="https://deciph.ai.deciphersacad.online/quiz-creator" class="btn">Get Started</a>
+                </div>
+            </div>
+            
+            <div class="feature-card" onclick="window.location.href='#'">
+                <div class="feature-image lesson-planner-img"></div>
+                <div class="feature-content">
+                    <h2>Lesson-Planner</h2>
+                    <p>Plan comprehensive lessons with objectives, activities, and assessments. Align with curriculum standards and track progress.</p>
+                    <a href="https://deciph.ai.deciphersacad.online/stem-plan" class="btn">Try Now</a>
+                </div>
+            </div>
+           
+            <div class="feature-card" onclick="window.location.href='/flashcard-creator'">
+                <div class="feature-image flashcard-creator-img"></div>
+                <div class="feature-content">
+                    <h2>Flashcard Creator</h2>
+                    <p>Create interactive flashcards to help students memorize key concepts, vocabulary, and facts. Perfect for review sessions and self-directed learning.</p>
+                    <a href="https://deciph.ai.deciphersacad.online/flashcard-creator" class="btn btn-outline">Create Flashcards</a>
+                </div>
+            </div> 
+           
+            
+            <div class="feature-card">
+                <div class="feature-image video-quiz-img"></div>
+                <div class="feature-content">
+                    <h2>Worksheet Creator <span class="coming-soon-badge"></span></h2>
+                    <p>Combine the power of visual learning with assessment. Create quizzes based on educational videos and track comprehension.</p>
+                    <a href="https://deciph.ai.deciphersacad.online/create-worksheet" class="btn btn-outline">Create Worksheet</a>
+                </div>
+            </div>
+        </div>
+    </section> 
+           
+           
+ 
+
+    <section class="how-it-works container">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p>Our platform is designed to be intuitive and effective</p>
+        </div>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Create Quizzes</h3>
+                <p>Design customized assessments with various question types tailored to your specific subject matter and educational level.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Share with Students</h3>
+                <p>Distribute quizzes to your students with a simple link. No account creation required for students.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Analyze Results</h3>
+                <p>Review detailed performance metrics to identify knowledge gaps and areas for improvement.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Adapt Teaching</h3>
+                <p>Use insights from the performance analysis to customize your teaching approach and focus on areas that need attention.</p>
+            </div>
+        </div>
+    </section>
+         <!-- Add the subscription widget here -->
+        
+        <!-- Replace the subscription widget section with this simplified version -->
+<div class="subscription-widget">
+    <!-- This title will be hidden by JavaScript -->
+    <div class="widget-header" style="display: none;">
+      <h3 class="widget-title">Your Subscription Status</h3>
+      <button id="refresh-subscription" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+      </button>
+    </div>
+  
+    <!-- This will be cleared by JavaScript -->
+    <div class="widget-content" id="subscription-content"></div>
+    
+    <!-- This is where the Stripe button will be shown -->
+    <div id="stripe-button-container" style="display: block; text-align: center; padding: 20px;">
+      <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+      <stripe-buy-button
+        buy-button-id="buy_btn_1QzjCWDzaE07qply7fuswPwn"
+        publishable-key="pk_live_51Qv2LcDzaE07qplyqkNiy74cQxVfnJtTIfZKBKnJN9tYb1XhEHqVokvfJc8me3mw9f8VG0rVRfEQ22dohGIXKtxe00HyVbW4FV"
+      >
+      </stripe-buy-button>
+    </div>
+  </div>
+      
+        
+          <!-- This is where the Stripe button will be added -->
+          <div id="stripe-button-container" style="display: none;">
+            <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+            <stripe-buy-button
+              buy-button-id="buy_btn_1QzjCWDzaE07qply7fuswPwn"
+              publishable-key="pk_live_51Qv2LcDzaE07qplyqkNiy74cQxVfnJtTIfZKBKnJN9tYb1XhEHqVokvfJc8me3mw9f8VG0rVRfEQ22dohGIXKtxe00HyVbW4FV"
+            >
+            </stripe-buy-button>
+          </div>
+        </div>
+        <!-- Settings Tab Container (Hidden by default) -->
+<div class="settings-modal" id="settingsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; overflow: auto;">
+    <div class="settings-modal-content" style="background-color: white; margin: 10% auto; padding: 20px; width: 80%; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+      <div class="settings-modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Settings</h2>
+        <span class="close-settings" style="font-size: 24px; cursor: pointer;">&times;</span>
+      </div>
+      
+      <div class="tab-content" id="settings-tab">
+        <div class="content-container">
+          <h2 class="section-title">
+              <span>⚙️</span> Account Settings
+          </h2>
+          
+          <form id="profileForm">
+              <div style="margin-bottom: 1.5rem;">
+                  <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Full Name</label>
+                  <input type="text" id="inputName" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+              </div>
+              
+              <div style="margin-bottom: 1.5rem;">
+                  <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email Address</label>
+                  <input type="email" id="inputEmail" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;" disabled>
+                  <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">Email address cannot be changed</p>
+              </div>
+              
+              <div style="margin-bottom: 1.5rem;">
+                  <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Country</label>
+                  <select id="inputCountry" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                      <option value="United States">United States</option>
+                      <option value="United Kingdom">United Kingdom</option>
+                      <option value="Canada">Canada</option>
+                      <option value="Australia">Australia</option>
+                      <option value="Germany">Germany</option>
+                      <option value="France">France</option>
+                      <option value="Japan">Japan</option>
+                      <option value="China">China</option>
+                      <option value="India">India</option>
+                      <option value="Brazil">Brazil</option>
+                  </select>
+              </div>
+              
+              <div style="text-align: right;">
+                  <button type="submit" class="btn" style="background-color: var(--primary-color);">Save Changes</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2025 Decipher Learning Platform. All rights reserved.</p>
+            
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+    // ⭐ LOOP DETECTION: Check if we're in a redirect loop
+    const loopCheck = sessionStorage.getItem('welcome_loop_check');
+    const now = Date.now();
+
+    if (loopCheck) {
+        const loopData = JSON.parse(loopCheck);
+        const timeDiff = now - loopData.timestamp;
+
+        // If we've been here within the last 3 seconds, we're in a loop
+        if (timeDiff < 3000) {
+            loopData.count = (loopData.count || 0) + 1;
+
+            // If we've looped more than 3 times in 3 seconds, stop
+            if (loopData.count > 3) {
+                console.error('⚠️ WELCOME PAGE LOOP DETECTED - Stopping automatic redirects');
+                sessionStorage.removeItem('welcome_loop_check');
+                sessionStorage.removeItem('auth_loop_check');
+
+                // Clear all tokens and stay on login page
+                clearAllTokens();
+                window.location.href = '/index.html';
+                return;
+            }
+
+            loopData.timestamp = now;
+            sessionStorage.setItem('welcome_loop_check', JSON.stringify(loopData));
+        } else {
+            // More than 3 seconds have passed, reset the counter
+            sessionStorage.setItem('welcome_loop_check', JSON.stringify({ count: 1, timestamp: now }));
+        }
+    } else {
+        // First check, start tracking
+        sessionStorage.setItem('welcome_loop_check', JSON.stringify({ count: 1, timestamp: now }));
+    }
+
+    // Helper function to get cookie
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
+    // Check if user is logged in - check all storage locations
+    const token = localStorage.getItem('token') ||
+                  sessionStorage.getItem('token') ||
+                  getCookie('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (!token) {
+        // No token, redirect to login
+        sessionStorage.removeItem('welcome_loop_check');
+        window.location.href = '/index.html';
+        return;
+    }
+
+    // Token exists, clear loop check
+    sessionStorage.removeItem('welcome_loop_check');
+    
+    // Display user name and avatar initial
+    const userName = document.getElementById('userName');
+    const userAvatar = document.getElementById('userAvatar');
+    
+    if (user.name) {
+        userName.textContent = user.name;
+        userAvatar.textContent = user.name.charAt(0).toUpperCase();
+    }
+    
+    // Toggle dropdown menu
+    const userInfoDropdown = document.getElementById('userInfoDropdown');
+    const userDropdown = document.getElementById('userDropdown');
+    
+    userInfoDropdown.addEventListener('click', function() {
+        userDropdown.classList.toggle('active');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!userInfoDropdown.contains(event.target) && !userDropdown.contains(event.target)) {
+            userDropdown.classList.remove('active');
+        }
+    });
+    
+    // Logout functionality
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // Set a flag to indicate we just logged out
+        sessionStorage.setItem('just_logged_out', 'true');
+
+        // Clear loop checks
+        sessionStorage.removeItem('welcome_loop_check');
+        sessionStorage.removeItem('auth_loop_check');
+
+        // Clear all tokens using helper function
+        clearAllTokens();
+
+        // Clear user data
+        localStorage.removeItem('user');
+
+        // Redirect to login page
+        window.location.href = '/index.html';
+    });
+
+    // Load subscription widget
+    loadSubscriptionWidget();
+    
+    // Refresh button event listener
+    document.getElementById('refresh-subscription').addEventListener('click', function() {
+        loadSubscriptionWidget(true);
+    });
+});
+
+// Replace the loadSubscriptionWidget function with this simpler version
+// that only shows the buy button
+function loadSubscriptionWidget() {
+    // Get the subscription content area
+    const contentArea = document.getElementById('subscription-content');
+    
+    // Clear any existing content
+    contentArea.innerHTML = '';
+    
+    // Hide the widget header that contains the "Your Subscription Status" text
+    document.querySelector('.widget-header').style.display = 'none';
+    
+    // Show only the buy button
+    const stripeButtonContainer = document.getElementById('stripe-button-container');
+    stripeButtonContainer.style.display = 'block';
+    
+    // Center the button and add some padding
+    stripeButtonContainer.style.textAlign = 'center';
+    stripeButtonContainer.style.padding = '20px';
+}
+
+// Modify the showStripeButton function to be simpler
+function showStripeButton() {
+    // Just do nothing - we don't need this function anymore since
+    // we're showing the button directly
+    // Or you can make it show the button in a larger size
+    const stripeButton = document.querySelector('stripe-buy-button');
+    if (stripeButton) {
+        stripeButton.style.transform = 'scale(1.1)';
+    }
+}
+
+// Helper function to clear all tokens from all storage locations
+function clearAllTokens() {
+    try {
+        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        console.log('All tokens cleared');
+    } catch (e) {
+        console.error('Error clearing tokens:', e);
+    }
+}
+
+function showStripeButton() {
+    // Create a modal to contain the Stripe button
+    const modal = document.createElement('div');
+    modal.id = 'stripe-modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '9999';
+    
+    const buttonContainer = document.getElementById('stripe-button-container');
+    const stripeButton = buttonContainer.querySelector('stripe-buy-button');
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; text-align: center;">
+            <h2 style="color: #4361ee; margin-bottom: 20px;">Start your Free Trial Plan</h2>
+            <p style="margin-bottom: 20px;">Select a plan that works best for you and enjoy uninterrupted access to all premium features.</p>
+            
+            <div id="modal-stripe-container" style="margin-bottom: 25px;">
+                <!-- The Stripe button will be moved here -->
+            </div>
+            
+            <button id="close-modal" style="background: #e9ecef; color: #495057; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                Maybe Later
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Move the Stripe button into the modal
+    const modalContainer = document.getElementById('modal-stripe-container');
+    modalContainer.appendChild(stripeButton.cloneNode(true));
+    
+    // Close button closes the modal
+    document.getElementById('close-modal').addEventListener('click', () => {
+        modal.remove();
+        // Put the original button back
+        buttonContainer.appendChild(stripeButton);
+    });
+}
+    </script>
+    <script>
+        // ===== Onboarding Configuration & Initialization =====
+        
+        // Slide data for the carousel
+        // ===== Onboarding Configuration & Initialization =====
+
+// Slide data for the carousel
+const onboardingSlides = [
+    {
+        title: "Welcome to Decipher Learning",
+        description: "Your all-in-one platform for creating engaging educational content and assessments.",
+        icon: "📚",
+        color: "gradient-welcome",
+        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 21l-8-9h16l-8 9z"></path>
+                  <path d="M12 21V5"></path>
+                  <path d="M8 3h8"></path>
+                  <path d="M8 7h8"></path>
+                </svg>`
+    },
+    {
+        title: "Create Custom Quizzes",
+        description: "Build interactive quizzes with multiple choice, true/false, and written response questions. Share with students via a simple link.",
+        icon: "📝",
+        color: "gradient-quizzes",
+        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <path d="M7 7h10"></path>
+                  <path d="M7 12h10"></path>
+                  <circle cx="7" cy="17" r="1"></circle>
+                  <circle cx="12" cy="17" r="1"></circle>
+                  <circle cx="17" cy="17" r="1"></circle>
+                </svg>`
+    },
+    {
+        title: "Track Student Performance",
+        description: "Analyze detailed results to identify knowledge gaps and improve teaching strategies.",
+        icon: "📊",
+        color: "gradient-tracking",
+        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6"></path>
+                  <path d="M16 16l1-3 1 3"></path>
+                  <path d="M17 13v6"></path>
+                  <path d="M21 16l-1-3-1 3"></path>
+                  <path d="M21 19v-6"></path>
+                </svg>`
+    },
+    {
+        title: "Design Comprehensive Lesson Plans",
+        description: "Craft structured lesson plans with learning objectives, activities, and assessments that align with curriculum standards.",
+        icon: "📋",
+        color: "gradient-lessons",
+        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                  <path d="M9 14h6"></path>
+                  <path d="M9 10h6"></path>
+                  <path d="M9 18h6"></path>
+                </svg>`
+    },
+    {
+        title: "You're All Set!",
+        description: "Start creating quizzes and lesson plans to enhance your teaching experience.",
+        icon: "🚀",
+        color: "gradient-complete",
+        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 2L11 13"></path>
+                  <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+                </svg>`
+    }
+];
+
+// Current slide index
+let currentSlide = 0;
+
+// Create onboarding overlay
+function initializeOnboarding() {
+    console.log("Initializing onboarding...");
+    
+    // Inject onboarding HTML if it doesn't exist
+    if (!document.getElementById('onboardingCarousel')) {
+        const onboardingHTML = `
+        <div id="onboardingCarousel" class="onboarding-overlay" style="display: none;">
+            <div class="onboarding-card">
+                <button class="close-btn" onclick="dismissOnboarding()" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <div id="slideContainer">
+                    <!-- Content will be filled by JavaScript -->
+                </div>
+            </div>
+        </div>`;
+        
+        // Append to body
+        document.body.insertAdjacentHTML('beforeend', onboardingHTML);
+    }
+    
+    // Render first slide
+    renderSlide(currentSlide);
+    
+    // Handle swipe gestures on mobile
+    const carousel = document.getElementById('onboardingCarousel');
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    carousel.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    carousel.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    });
+    
+    function handleSwipe() {
+        if (touchEndX < touchStartX - 50) {
+            // Swipe left (next)
+            nextSlide();
+        } else if (touchEndX > touchStartX + 50) {
+            // Swipe right (previous)
+            previousSlide();
+        }
+    }
+    
+    // Check if this is a new user who just logged in
+    window.setTimeout(checkFirstTimeLoginStatus, 500); // Delay to ensure DOM is ready
+}
+
+// Check if this is a first-time login
+function checkFirstTimeLoginStatus() {
+    console.log("Checking first-time login status...");
+    
+    // Check multiple conditions to determine if onboarding should show
+    const isNewLogin = sessionStorage.getItem('newLogin') === 'true';
+    const onboardingComplete = localStorage.getItem('onboardingComplete') === 'true';
+    const firstLoginTime = localStorage.getItem('firstLoginTime');
+    const justCreatedAccount = sessionStorage.getItem('accountJustCreated') === 'true';
+    
+    console.log("New login:", isNewLogin);
+    console.log("Onboarding complete:", onboardingComplete);
+    console.log("First login time:", firstLoginTime);
+    
+    // If this is a new login and they haven't seen onboarding yet, show it
+    if ((isNewLogin || justCreatedAccount) && !onboardingComplete) {
+        console.log("Showing onboarding for new user!");
+        // Show onboarding with a slight delay to ensure elements are properly loaded
+        setTimeout(showOnboarding, 300);
+        
+        // Clear the new login flag
+        sessionStorage.removeItem('newLogin');
+        sessionStorage.removeItem('accountJustCreated');
+    }
+}
+
+// Render a specific slide
+function renderSlide(index) {
+    const slide = onboardingSlides[index];
+    const slideContainer = document.getElementById('slideContainer');
+    
+    // Create slide HTML
+    const slideHTML = `
+        <!-- Color Header -->
+        <div class="header-gradient ${slide.color}">
+            <div class="header-icon">${slide.icon}</div>
+        </div>
+        
+        <!-- Slide Content -->
+        <div class="slide-content">
+            <div class="icon-container">
+                ${slide.image}
+            </div>
+            
+            <h2 class="slide-title">${slide.title}</h2>
+            <p class="slide-description">${slide.description}</p>
+            
+            <!-- Progress Indicator -->
+            <div class="progress-indicator">
+                ${onboardingSlides.map((_, i) => `
+                    <button class="progress-dot ${i === index ? 'active' : ''}" 
+                            onclick="goToSlide(${i})" 
+                            aria-label="Go to slide ${i + 1}">
+                    </button>
+                `).join('')}
+            </div>
+            
+            <!-- Navigation buttons -->
+            <div class="action-buttons">
+                <button onclick="previousSlide()" 
+                        class="navigation-btn prev-btn" 
+                        ${index === 0 ? 'disabled' : ''} 
+                        aria-label="Previous slide">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                
+                <div class="button-group">
+                    <button onclick="dismissOnboarding()" class="skip-btn">
+                        Skip tutorial
+                    </button>
+                    
+                    <button onclick="${index === onboardingSlides.length - 1 ? 'dismissOnboarding()' : 'nextSlide()'}" class="next-btn">
+                        ${index === onboardingSlides.length - 1 ? 'Get Started' : 'Next'}
+                    </button>
+                </div>
+                
+                <button onclick="nextSlide()" 
+                        class="navigation-btn next-btn" 
+                        ${index === onboardingSlides.length - 1 ? 'disabled' : ''} 
+                        aria-label="Next slide">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Update slide container
+    slideContainer.innerHTML = slideHTML;
+}
+
+// Navigation functions
+function nextSlide() {
+    if (currentSlide < onboardingSlides.length - 1) {
+        currentSlide++;
+        renderSlide(currentSlide);
+    } else {
+        dismissOnboarding();
+    }
+}
+
+function previousSlide() {
+    if (currentSlide > 0) {
+        currentSlide--;
+        renderSlide(currentSlide);
+    }
+}
+
+function goToSlide(index) {
+    currentSlide = index;
+    renderSlide(currentSlide);
+}
+
+// Show/dismiss onboarding
+function showOnboarding() {
+    console.log("Showing onboarding carousel...");
+    const carousel = document.getElementById('onboardingCarousel');
+    if (carousel) {
+        carousel.style.display = 'flex';
+        
+        // Apply blur to the main content (if elements exist)
+        const mainContent = document.querySelector('main');
+        const header = document.querySelector('header');
+        
+        if (mainContent) mainContent.style.filter = 'blur(8px)';
+        if (header) header.style.filter = 'blur(8px)';
+        
+        // Disable scrolling on the body
+        document.body.style.overflow = 'hidden';
+    } else {
+        console.error("Carousel element not found!");
+    }
+}
+
+function dismissOnboarding() {
+    console.log("Dismissing onboarding carousel...");
+    const carousel = document.getElementById('onboardingCarousel');
+    if (carousel) {
+        carousel.style.display = 'none';
+        
+        // Remove blur from main content (if elements exist)
+        const mainContent = document.querySelector('main');
+        const header = document.querySelector('header');
+        
+        if (mainContent) mainContent.style.filter = 'none';
+        if (header) header.style.filter = 'none';
+        
+        // Enable scrolling on the body
+        document.body.style.overflow = '';
+        
+        // Mark onboarding as completed
+        localStorage.setItem('onboardingComplete', 'true');
+    }
+}
+
+// Make functions accessible globally
+window.nextSlide = nextSlide;
+window.previousSlide = previousSlide;
+window.goToSlide = goToSlide;
+window.showOnboarding = showOnboarding;
+window.dismissOnboarding = dismissOnboarding;
+
+// Initialize when the DOM is loaded
+if (document.readyState === "loading") {
+    document.addEventListener('DOMContentLoaded', initializeOnboarding);
+} else {
+    // DOM already loaded, initialize now
+    initializeOnboarding();
+}
+    
+            // This script forces the onboarding to show for new users
+            (function() {
+                // Make sure the page is fully loaded
+                window.addEventListener('load', function() {
+                    console.log("Window fully loaded, checking for onboarding...");
+                    
+                    // Give everything a moment to settle
+                    setTimeout(function() {
+                        // Check login status directly from localStorage/sessionStorage
+                        const isNewLogin = sessionStorage.getItem('newLogin') === 'true';
+                        const hasSeenOnboarding = localStorage.getItem('onboardingComplete') === 'true';
+                        
+                        console.log("New login check:", isNewLogin);
+                        console.log("Has seen onboarding:", hasSeenOnboarding);
+                        
+                        // If this is a new login and user hasn't seen onboarding
+                        if (isNewLogin && !hasSeenOnboarding) {
+                            console.log("New user detected! Showing onboarding...");
+                            
+                            // Create the onboarding carousel if it doesn't exist
+                            if (!document.getElementById('onboardingCarousel')) {
+                                console.log("Creating onboarding carousel element...");
+                                
+                                // Create carousel HTML (simplified version)
+                                const carouselHTML = `
+                                <div id="onboardingCarousel" class="onboarding-overlay">
+                                    <div class="onboarding-card">
+                                        <div class="header-gradient gradient-welcome">
+                                            <div class="header-icon">📚</div>
+                                        </div>
+                                        <div class="slide-content">
+                                            <h2 class="slide-title">Welcome to Decipher Learning</h2>
+                                            <p class="slide-description">Your all-in-one platform for creating engaging educational content and assessments.</p>
+                                            <div class="action-buttons">
+                                                <button onclick="document.getElementById('onboardingCarousel').style.display='none'; localStorage.setItem('onboardingComplete', 'true');" 
+                                                        class="next-btn" style="margin: 0 auto;">
+                                                    Get Started
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
+                                
+                                // Append to body
+                                document.body.insertAdjacentHTML('beforeend', carouselHTML);
+                            }
+                            
+                            // Force display the carousel
+                            const carousel = document.getElementById('onboardingCarousel');
+                            if (carousel) {
+                                console.log("Displaying onboarding carousel");
+                                carousel.style.display = 'flex';
+                                document.body.style.overflow = 'hidden'; // Prevent scrolling
+                            } else {
+                                console.error("Failed to find carousel element after creation!");
+                            }
+                            
+                            // Clear the new login flag
+                            sessionStorage.removeItem('newLogin');
+                        } else {
+                            console.log("Not showing onboarding: either not a new login or already seen");
+                        }
+                    }, 1000); // Delay execution by 1 second
+                });
+            })();
+
+            // Fix dropdown toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const userInfoDropdown = document.getElementById('userInfoDropdown');
+  const userDropdown = document.getElementById('userDropdown');
+  
+  userInfoDropdown.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+  });
+  
+  // Close dropdown when clicking elsewhere
+  document.addEventListener('click', function(event) {
+    if (!userInfoDropdown.contains(event.target)) {
+      userDropdown.classList.remove('active');
+    }
+  });
+});
+
+// Settings modal functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // Get the settings link from dropdown
+  const settingsLink = document.querySelector('a[href="/profile.html"]');
+  const settingsModal = document.getElementById('settingsModal');
+  const closeSettings = document.querySelector('.close-settings');
+  
+  // Open settings modal when settings is clicked
+  if (settingsLink) {
+    settingsLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      settingsModal.style.display = 'block';
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
+      
+      // Load user data
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      document.getElementById('inputName').value = user.name || '';
+      document.getElementById('inputEmail').value = user.email || '';
+      document.getElementById('inputCountry').value = user.country || 'United States';
+    });
+  }
+  
+  // Close settings modal
+  if (closeSettings) {
+    closeSettings.addEventListener('click', function() {
+      settingsModal.style.display = 'none';
+      document.body.style.overflow = ''; // Enable scrolling
+    });
+  }
+  
+  // Close modal when clicking outside
+  window.addEventListener('click', function(event) {
+    if (event.target === settingsModal) {
+      settingsModal.style.display = 'none';
+      document.body.style.overflow = ''; // Enable scrolling
+    }
+  });
+  
+  // Save profile form
+  const profileForm = document.getElementById('profileForm');
+  if (profileForm) {
+    profileForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get current user data
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      // Update with form data
+      user.name = document.getElementById('inputName').value;
+      user.country = document.getElementById('inputCountry').value;
+      
+      // Save back to localStorage
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Update display name in header
+      const userName = document.getElementById('userName');
+      const userAvatar = document.getElementById('userAvatar');
+      if (userName && user.name) {
+        userName.textContent = user.name;
+        userAvatar.textContent = user.name.charAt(0).toUpperCase();
+      }
+      
+      // Show success message
+      alert('Settings saved successfully!');
+      
+      // Close the modal
+      settingsModal.style.display = 'none';
+      document.body.style.overflow = ''; // Enable scrolling
+    });
+  }
+});
+
+            </script>
+</body>
+</html>
