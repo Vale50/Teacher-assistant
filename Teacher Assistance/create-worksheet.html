@@ -924,6 +924,153 @@
                 width: 95%;
             }
         }
+
+        /* Login Prompt Modal Styles */
+        .login-prompt-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-prompt-modal.show {
+            display: flex;
+        }
+
+        .login-prompt-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            max-width: 520px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: loginPromptSlide 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes loginPromptSlide {
+            0% { transform: translateY(40px) scale(0.95); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .login-prompt-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .login-prompt-content h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-prompt-content > p {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-prompt-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.8rem;
+            text-align: left;
+        }
+
+        .login-prompt-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 0.4rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #334155;
+            background: #f8fafc;
+            transition: background 0.2s;
+        }
+
+        .login-prompt-features li:hover {
+            background: #f1f5f9;
+        }
+
+        .login-prompt-features li i {
+            color: #2563eb;
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .login-prompt-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .login-prompt-btn {
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .login-prompt-btn.primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .login-prompt-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .login-prompt-btn.secondary {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .login-prompt-btn.secondary:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        @media (max-width: 480px) {
+            .login-prompt-content {
+                padding: 1.8rem 1.2rem;
+            }
+
+            .login-prompt-actions {
+                flex-direction: column;
+            }
+
+            .login-prompt-btn {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1331,6 +1478,44 @@
                <button class="close-modal-btn" onclick="closeWorksheetLinkModal()">
                    <i class="fas fa-check"></i>
                    Done
+               </button>
+           </div>
+       </div>
+   </div>
+
+   <!-- Login Prompt Modal -->
+   <div class="login-prompt-modal" id="loginPromptModal">
+       <div class="login-prompt-content">
+           <div class="login-prompt-icon">
+               <i class="fas fa-lock"></i>
+           </div>
+           <h2>Unlock Full Access</h2>
+           <p>Log in to access powerful tools for managing your classroom</p>
+           <ul class="login-prompt-features">
+               <li>
+                   <i class="fas fa-chart-bar"></i>
+                   <span>View students' worksheet scores & performance reports</span>
+               </li>
+               <li>
+                   <i class="fas fa-book-open"></i>
+                   <span>Create comprehensive lesson plans</span>
+               </li>
+               <li>
+                   <i class="fas fa-shapes"></i>
+                   <span>Generate geometry shapes & graphs</span>
+               </li>
+               <li>
+                   <i class="fas fa-clone"></i>
+                   <span>Build interactive flashcards for students</span>
+               </li>
+           </ul>
+           <div class="login-prompt-actions">
+               <button class="login-prompt-btn primary" onclick="goToLogin()">
+                   <i class="fas fa-sign-in-alt"></i>
+                   Log In
+               </button>
+               <button class="login-prompt-btn secondary" onclick="closeLoginPrompt()">
+                   Cancel
                </button>
            </div>
        </div>
@@ -2420,18 +2605,21 @@
            const linkElement = document.getElementById('shareableLink');
            const copyBtn = document.getElementById('copyLinkBtn');
            const copyBtnText = document.getElementById('copyBtnText');
-           
+
            // Copy to clipboard
            navigator.clipboard.writeText(linkElement.href || linkElement.textContent).then(() => {
                // Update button appearance
                copyBtn.classList.add('copied');
                copyBtnText.textContent = 'Copied!';
-               
+
                // Reset after 2 seconds
                setTimeout(() => {
                    copyBtn.classList.remove('copied');
                    copyBtnText.textContent = 'Copy Link';
                }, 2000);
+
+               // Trigger login prompt for non-logged-in users
+               triggerLoginPrompt();
            }).catch(err => {
                console.error('Failed to copy: ', err);
                // Fallback for older browsers
@@ -2441,13 +2629,16 @@
                textArea.select();
                document.execCommand('copy');
                document.body.removeChild(textArea);
-               
+
                copyBtn.classList.add('copied');
                copyBtnText.textContent = 'Copied!';
                setTimeout(() => {
                    copyBtn.classList.remove('copied');
                    copyBtnText.textContent = 'Copy Link';
                }, 2000);
+
+               // Trigger login prompt for non-logged-in users
+               triggerLoginPrompt();
            });
        }
 
@@ -2455,13 +2646,16 @@
            const linkEl = document.getElementById('shareableLink');
            const shareableLink = linkEl.href || linkEl.textContent;
            const title = currentWorksheetData?.title || 'Worksheet';
-           
+
            if (navigator.share) {
                // Use native sharing API if available
                navigator.share({
                    title: `${title} - Deciph.AI Worksheet`,
                    text: `Complete this worksheet: ${title}`,
                    url: shareableLink
+               }).then(() => {
+                   // Trigger login prompt for non-logged-in users after sharing
+                   triggerLoginPrompt();
                }).catch(err => console.log('Error sharing:', err));
            } else {
                // Fallback: copy to clipboard and show message
@@ -2610,6 +2804,46 @@ function toggleQRCode() {
            if ((e.ctrlKey || e.metaKey) && e.key === 'g' && mediaItems.some(m => m.type === 'image')) {
                e.preventDefault();
                generateQuestionsFromImage();
+           }
+       });
+
+       // Login Prompt Logic
+       let loginPromptTimer = null;
+       let loginPromptShown = false;
+
+       function isUserLoggedIn() {
+           const token = localStorage.getItem('token') ||
+                         sessionStorage.getItem('token') ||
+                         localStorage.getItem('tutor_token');
+           return token && token !== 'demo-token';
+       }
+
+       function triggerLoginPrompt() {
+           if (loginPromptShown || isUserLoggedIn()) return;
+
+           // Clear any existing timer
+           if (loginPromptTimer) clearTimeout(loginPromptTimer);
+
+           loginPromptTimer = setTimeout(() => {
+               if (!isUserLoggedIn() && !loginPromptShown) {
+                   loginPromptShown = true;
+                   document.getElementById('loginPromptModal').classList.add('show');
+               }
+           }, 2500);
+       }
+
+       function closeLoginPrompt() {
+           document.getElementById('loginPromptModal').classList.remove('show');
+       }
+
+       function goToLogin() {
+           window.location.href = '/';
+       }
+
+       // Close login prompt when clicking outside
+       document.getElementById('loginPromptModal').addEventListener('click', function(e) {
+           if (e.target === this) {
+               closeLoginPrompt();
            }
        });
 
