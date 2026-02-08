@@ -2549,18 +2549,21 @@
            const linkElement = document.getElementById('shareableLink');
            const copyBtn = document.getElementById('copyLinkBtn');
            const copyBtnText = document.getElementById('copyBtnText');
-           
+
            // Copy to clipboard
            navigator.clipboard.writeText(linkElement.href || linkElement.textContent).then(() => {
                // Update button appearance
                copyBtn.classList.add('copied');
                copyBtnText.textContent = 'Copied!';
-               
+
                // Reset after 2 seconds
                setTimeout(() => {
                    copyBtn.classList.remove('copied');
                    copyBtnText.textContent = 'Copy Link';
                }, 2000);
+
+               // Show login prompt after 2.5s if user is not logged in
+               triggerLoginPromptIfNeeded();
            }).catch(err => {
                console.error('Failed to copy: ', err);
                // Fallback for older browsers
@@ -2570,14 +2573,33 @@
                textArea.select();
                document.execCommand('copy');
                document.body.removeChild(textArea);
-               
+
                copyBtn.classList.add('copied');
                copyBtnText.textContent = 'Copied!';
                setTimeout(() => {
                    copyBtn.classList.remove('copied');
                    copyBtnText.textContent = 'Copy Link';
                }, 2000);
+
+               // Show login prompt after 2.5s if user is not logged in
+               triggerLoginPromptIfNeeded();
            });
+       }
+
+       function triggerLoginPromptIfNeeded() {
+           var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+           if (token) return; // User is logged in, no prompt needed
+
+           setTimeout(function() {
+               // Double-check before showing
+               var tokenRecheck = localStorage.getItem('token') || sessionStorage.getItem('token');
+               if (tokenRecheck) return;
+
+               var overlay = document.getElementById('loginPromptOverlay');
+               if (overlay) {
+                   overlay.classList.add('show');
+               }
+           }, 2500);
        }
 
        function shareWorksheet() {
@@ -2782,61 +2804,30 @@ function toggleQRCode() {
     </div>
 
     <script>
-    // Login prompt: show after 2.5s of copying link if user isn't logged in
+    // Login prompt popup - cancel/login/close handlers
     (function() {
-        function isUserLoggedIn() {
-            var token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            return !!token;
-        }
-
         var overlay = document.getElementById('loginPromptOverlay');
-        var cancelBtn = document.getElementById('loginPromptCancel');
-        var loginBtn = document.getElementById('loginPromptLogin');
-        var copyBtn = document.getElementById('copyLinkBtn');
-
         if (!overlay) return;
 
-        // Cancel button
-        cancelBtn.addEventListener('click', function() {
-            overlay.classList.remove('show');
-        });
+        var cancelBtn = document.getElementById('loginPromptCancel');
+        var loginBtn = document.getElementById('loginPromptLogin');
 
-        // Login button
-        loginBtn.addEventListener('click', function() {
-            sessionStorage.setItem('redirectAfterLogin', window.location.href);
-            window.location.href = '/index.html';
-        });
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+                overlay.classList.remove('show');
+            });
+        }
 
-        // Close on overlay click
+        if (loginBtn) {
+            loginBtn.addEventListener('click', function() {
+                sessionStorage.setItem('redirectAfterLogin', window.location.href);
+                window.location.href = '/index.html';
+            });
+        }
+
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) overlay.classList.remove('show');
         });
-
-        // Listen for click on the Copy Link button directly
-        // This fires alongside the existing onclick="copyWorksheetLink()"
-        if (copyBtn) {
-            copyBtn.addEventListener('click', function() {
-                if (!isUserLoggedIn()) {
-                    setTimeout(function() {
-                        if (isUserLoggedIn()) return;
-                        overlay.classList.add('show');
-                    }, 2500);
-                }
-            });
-        }
-
-        // Also listen for click on the Share button
-        var shareBtn = document.querySelector('.share-btn');
-        if (shareBtn) {
-            shareBtn.addEventListener('click', function() {
-                if (!isUserLoggedIn()) {
-                    setTimeout(function() {
-                        if (isUserLoggedIn()) return;
-                        overlay.classList.add('show');
-                    }, 2500);
-                }
-            });
-        }
     })();
     </script>
 </body>
