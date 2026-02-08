@@ -587,11 +587,12 @@ async function initDashboard() {
             fetchUserQuizzes(),
             fetchLocalQuizScores(),
             fetchGeometryQuizScores(),
-            fetchMathQuizScores()
+            fetchMathQuizScores(),
+            fetchWorksheetScores()
         ]);
 
         console.log('📊 Fetch results:', results.map((r, i) => ({
-            source: ['external', 'local', 'geometry', 'math'][i],
+            source: ['external', 'local', 'geometry', 'math', 'worksheet'][i],
             status: r.status,
             count: r.status === 'fulfilled' ? r.value.length : 0,
             error: r.status === 'rejected' ? r.reason : null
@@ -601,15 +602,17 @@ async function initDashboard() {
         const localQuizScores = results[1].status === 'fulfilled' ? results[1].value : [];
         const geometryScores = results[2].status === 'fulfilled' ? results[2].value : [];
         const mathScores = results[3].status === 'fulfilled' ? results[3].value : [];
-        
+        const worksheetScores = results[4].status === 'fulfilled' ? results[4].value : [];
+
         console.log('📈 Quiz counts by type:');
         console.log('  - Regular quizzes (external):', regularQuizzes.length);
         console.log('  - Local quiz scores:', localQuizScores.length);
         console.log('  - Geometry quizzes:', geometryScores.length);
         console.log('  - Math quizzes:', mathScores.length);
+        console.log('  - Worksheet scores:', worksheetScores.length);
 
-        // Combine quizzes from all sources including local scores
-        const allQuizzes = regularQuizzes.concat(localQuizScores).concat(geometryScores).concat(mathScores);
+        // Combine quizzes from all sources including local scores and worksheets
+        const allQuizzes = regularQuizzes.concat(localQuizScores).concat(geometryScores).concat(mathScores).concat(worksheetScores);
         console.log('🎯 Total combined quizzes:', allQuizzes.length);
         
         if (allQuizzes.length === 0) {
@@ -1031,6 +1034,57 @@ async function fetchMathQuizScores() {
 }
 
 /**
+ * Fetch worksheet scores from the worksheet submissions endpoint
+ */
+async function fetchWorksheetScores() {
+    try {
+        console.log('📝 Fetching worksheet scores...');
+
+        const response = await fetch('/api/worksheet-submissions', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            console.warn('Worksheet submissions endpoint not available:', response.status);
+            return [];
+        }
+
+        const data = await response.json();
+        console.log('Raw worksheet submissions data:', data);
+
+        var worksheets = data.worksheets || data || [];
+
+        var worksheetEntries = worksheets.map(function(ws) {
+            return {
+                id: ws.worksheet_id || ws.id,
+                title: ws.title || 'Worksheet',
+                topic: ws.subject || 'General',
+                grade_level: 'Worksheet',
+                student_name: ws.submission_count
+                    ? ws.submission_count + ' student' + (ws.submission_count > 1 ? 's' : '')
+                    : 'No submissions',
+                mode: 'worksheet',
+                created_at: ws.created_at || ws.last_submission || new Date().toISOString(),
+                quiz_type: 'worksheet',
+                source: 'local',
+                total_submissions: ws.submission_count || 0,
+                average_score: ws.average_score !== undefined
+                    ? Math.round(ws.average_score * 10) / 10
+                    : undefined
+            };
+        });
+
+        console.log('Processed worksheet entries:', worksheetEntries.length);
+        return worksheetEntries;
+
+    } catch (error) {
+        console.error('Error fetching worksheet scores:', error);
+        return [];
+    }
+}
+
+/**
  * Fetch combined statistics from all sources - ENHANCED with better debugging
  */
 async function fetchCombinedStatistics() {
@@ -1189,12 +1243,31 @@ async function fetchCombinedStatistics() {
             console.warn('⚠️ Math stats not available:', error.message);
         }
         
-        // Combine statistics including local, geometry, and math stats
+        // Get worksheet stats
+        let worksheetStats = {};
+        try {
+            console.log('📝 Fetching worksheet stats...');
+            const wsResponse = await fetch('/api/worksheet-performance');
+            if (wsResponse.ok) {
+                const wsData = await wsResponse.json();
+                worksheetStats = {
+                    total_quizzes: wsData.total_worksheets || 0,
+                    total_students: wsData.total_students || 0,
+                    total_submissions: wsData.total_submissions || 0,
+                    average_score: wsData.average_score || 0
+                };
+                console.log('Worksheet stats:', worksheetStats);
+            }
+        } catch (error) {
+            console.warn('Worksheet stats not available:', error.message);
+        }
+
+        // Combine statistics including local, geometry, math, and worksheet stats
         const combinedStats = {
-            total_quizzes: (externalStats.total_quizzes || 0) + (localStats.total_quizzes || 0) + (geometryStats.total_quizzes || 0) + (mathStats.total_quizzes || 0),
-            total_students: Math.max(externalStats.total_students || 0, localStats.total_students || 0, geometryStats.total_students || 0, mathStats.total_students || 0),
-            total_submissions: (externalStats.total_submissions || 0) + (localStats.total_submissions || 0) + (geometryStats.total_submissions || 0) + (mathStats.total_submissions || 0),
-            average_score: calculateAverageScore(externalStats, localStats, geometryStats, mathStats)
+            total_quizzes: (externalStats.total_quizzes || 0) + (localStats.total_quizzes || 0) + (geometryStats.total_quizzes || 0) + (mathStats.total_quizzes || 0) + (worksheetStats.total_quizzes || 0),
+            total_students: Math.max(externalStats.total_students || 0, localStats.total_students || 0, geometryStats.total_students || 0, mathStats.total_students || 0, worksheetStats.total_students || 0),
+            total_submissions: (externalStats.total_submissions || 0) + (localStats.total_submissions || 0) + (geometryStats.total_submissions || 0) + (mathStats.total_submissions || 0) + (worksheetStats.total_submissions || 0),
+            average_score: calculateAverageScore(externalStats, localStats, geometryStats, mathStats, worksheetStats)
         };
 
         console.log('🎯 Final combined statistics:', combinedStats);
@@ -1203,6 +1276,7 @@ async function fetchCombinedStatistics() {
         console.log('  - Local:', localStats);
         console.log('  - Geometry:', geometryStats);
         console.log('  - Math:', mathStats);
+        console.log('  - Worksheet:', worksheetStats);
         
         return combinedStats;
         
@@ -1221,12 +1295,13 @@ async function fetchCombinedStatistics() {
 /**
  * Calculate weighted average score from multiple sources - UPDATED to include local and math stats
  */
-function calculateAverageScore(externalStats, localStats, geometryStats, mathStats) {
+function calculateAverageScore(externalStats, localStats, geometryStats, mathStats, worksheetStats) {
     const externalSubmissions = externalStats.total_submissions || 0;
     const localSubmissions = localStats.total_submissions || 0;
     const geometrySubmissions = geometryStats.total_submissions || 0;
     const mathSubmissions = mathStats.total_submissions || 0;
-    const totalSubmissions = externalSubmissions + localSubmissions + geometrySubmissions + mathSubmissions;
+    const worksheetSubmissions = (worksheetStats && worksheetStats.total_submissions) || 0;
+    const totalSubmissions = externalSubmissions + localSubmissions + geometrySubmissions + mathSubmissions + worksheetSubmissions;
 
     if (totalSubmissions === 0) return 0;
 
@@ -1234,13 +1309,15 @@ function calculateAverageScore(externalStats, localStats, geometryStats, mathSta
     const localAvg = localStats.average_score || 0;
     const geometryAvg = geometryStats.average_score || 0;
     const mathAvg = mathStats.average_score || 0;
+    const worksheetAvg = (worksheetStats && worksheetStats.average_score) || 0;
 
-    // Weighted average including local, geometry, and math quizzes
+    // Weighted average including local, geometry, math, and worksheet quizzes
     const weightedAverage = (
         (externalAvg * externalSubmissions) +
         (localAvg * localSubmissions) +
         (geometryAvg * geometrySubmissions) +
-        (mathAvg * mathSubmissions)
+        (mathAvg * mathSubmissions) +
+        (worksheetAvg * worksheetSubmissions)
     ) / totalSubmissions;
 
     return Math.round(weightedAverage);
@@ -1329,6 +1406,9 @@ function renderQuizTable(quizzes) {
         } else if (quiz.quiz_type === 'math') {
             submissionText = quiz.total_submissions ? ' (' + quiz.total_submissions + ' submissions)' : '';
             quizTypeIndicator = '<span style="background: #6C63FF; color: white; padding: 2px 6px; border-radius: 12px; font-size: 0.75em; margin-left: 8px;">MATH' + submissionText + '</span>';
+        } else if (quiz.quiz_type === 'worksheet') {
+            submissionText = quiz.total_submissions ? ' (' + quiz.total_submissions + ' submissions)' : '';
+            quizTypeIndicator = '<span style="background: #7c3aed; color: white; padding: 2px 6px; border-radius: 12px; font-size: 0.75em; margin-left: 8px;">WORKSHEET' + submissionText + '</span>';
         }
         
         // Determine the correct quiz URL based on type
@@ -1337,6 +1417,8 @@ function renderQuizTable(quizzes) {
             quizUrl = '/geometry-quiz.html?id=' + quiz.id;
         } else if (quiz.quiz_type === 'math') {
             quizUrl = '/math-quiz.html?id=' + quiz.id;
+        } else if (quiz.quiz_type === 'worksheet') {
+            quizUrl = '/student-worksheet.html?id=' + quiz.id;
         } else {
             quizUrl = '/quiz.html?id=' + quiz.id;
         }

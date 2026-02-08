@@ -924,6 +924,135 @@
                 width: 95%;
             }
         }
+        /* Login Prompt Popup */
+        .login-prompt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+        }
+
+        .login-prompt-overlay.show {
+            display: flex;
+            animation: loginFadeIn 0.3s ease forwards;
+        }
+
+        @keyframes loginFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes loginBounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .login-prompt-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-prompt-overlay.show .login-prompt-card {
+            animation: loginBounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .login-prompt-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-prompt-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+        }
+
+        .login-prompt-text {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .login-prompt-features {
+            text-align: left;
+            background: linear-gradient(135deg, #f0f9ff, #ede9fe);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-prompt-features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .login-prompt-features li {
+            padding: 0.35rem 0;
+            color: #374151;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .login-prompt-features li i {
+            color: var(--primary-color);
+            font-size: 0.85rem;
+            width: 18px;
+            text-align: center;
+        }
+
+        .login-prompt-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .login-prompt-btn {
+            padding: 0.75rem 1.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-prompt-btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .login-prompt-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+        }
+
+        .login-prompt-btn-cancel {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .login-prompt-btn-cancel:hover {
+            background: #e5e7eb;
+        }
     </style>
 </head>
 <body>
@@ -2420,18 +2549,21 @@
            const linkElement = document.getElementById('shareableLink');
            const copyBtn = document.getElementById('copyLinkBtn');
            const copyBtnText = document.getElementById('copyBtnText');
-           
+
            // Copy to clipboard
            navigator.clipboard.writeText(linkElement.href || linkElement.textContent).then(() => {
                // Update button appearance
                copyBtn.classList.add('copied');
                copyBtnText.textContent = 'Copied!';
-               
+
                // Reset after 2 seconds
                setTimeout(() => {
                    copyBtn.classList.remove('copied');
                    copyBtnText.textContent = 'Copy Link';
                }, 2000);
+
+               // Show login prompt after 2.5s if user is not logged in
+               triggerLoginPromptIfNeeded();
            }).catch(err => {
                console.error('Failed to copy: ', err);
                // Fallback for older browsers
@@ -2441,14 +2573,33 @@
                textArea.select();
                document.execCommand('copy');
                document.body.removeChild(textArea);
-               
+
                copyBtn.classList.add('copied');
                copyBtnText.textContent = 'Copied!';
                setTimeout(() => {
                    copyBtn.classList.remove('copied');
                    copyBtnText.textContent = 'Copy Link';
                }, 2000);
+
+               // Show login prompt after 2.5s if user is not logged in
+               triggerLoginPromptIfNeeded();
            });
+       }
+
+       function triggerLoginPromptIfNeeded() {
+           var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+           if (token) return; // User is logged in, no prompt needed
+
+           setTimeout(function() {
+               // Double-check before showing
+               var tokenRecheck = localStorage.getItem('token') || sessionStorage.getItem('token');
+               if (tokenRecheck) return;
+
+               var overlay = document.getElementById('loginPromptOverlay');
+               if (overlay) {
+                   overlay.classList.add('show');
+               }
+           }, 2500);
        }
 
        function shareWorksheet() {
@@ -2626,5 +2777,58 @@ function toggleQRCode() {
            }
        });
    </script>
+
+    <!-- Login Prompt Popup for non-logged-in users (shown after copying worksheet link) -->
+    <div class="login-prompt-overlay" id="loginPromptOverlay">
+        <div class="login-prompt-card">
+            <div class="login-prompt-icon"><i class="fas fa-user-lock" style="color: var(--primary-color);"></i></div>
+            <div class="login-prompt-title">Sign in to unlock full access</div>
+            <div class="login-prompt-text">
+                Log in to access powerful tutor tools and track your students' progress.
+            </div>
+            <div class="login-prompt-features">
+                <ul>
+                    <li><i class="fas fa-chart-bar"></i> View student worksheet scores & performance reports</li>
+                    <li><i class="fas fa-chalkboard-teacher"></i> Lesson Plan Creator</li>
+                    <li><i class="fas fa-shapes"></i> Generate Geometry Shapes & Graphs</li>
+                    <li><i class="fas fa-clone"></i> Flashcard Creator</li>
+                </ul>
+            </div>
+            <div class="login-prompt-actions">
+                <button class="login-prompt-btn login-prompt-btn-cancel" id="loginPromptCancel">Cancel</button>
+                <button class="login-prompt-btn login-prompt-btn-primary" id="loginPromptLogin">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Login prompt popup - cancel/login/close handlers
+    (function() {
+        var overlay = document.getElementById('loginPromptOverlay');
+        if (!overlay) return;
+
+        var cancelBtn = document.getElementById('loginPromptCancel');
+        var loginBtn = document.getElementById('loginPromptLogin');
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+                overlay.classList.remove('show');
+            });
+        }
+
+        if (loginBtn) {
+            loginBtn.addEventListener('click', function() {
+                sessionStorage.setItem('redirectAfterLogin', window.location.href);
+                window.location.href = '/index.html';
+            });
+        }
+
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) overlay.classList.remove('show');
+        });
+    })();
+    </script>
 </body>
 </html>
