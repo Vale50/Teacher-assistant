@@ -2792,6 +2792,7 @@ function toggleQRCode() {
         var overlay = document.getElementById('loginPromptOverlay');
         var cancelBtn = document.getElementById('loginPromptCancel');
         var loginBtn = document.getElementById('loginPromptLogin');
+        var copyBtn = document.getElementById('copyLinkBtn');
 
         if (!overlay) return;
 
@@ -2811,22 +2812,31 @@ function toggleQRCode() {
             if (e.target === overlay) overlay.classList.remove('show');
         });
 
-        // Hook into the copyWorksheetLink function to trigger popup after copy
-        var _originalCopyWorksheetLink = window.copyWorksheetLink;
-        window.copyWorksheetLink = function() {
-            // Run the original copy function
-            if (typeof _originalCopyWorksheetLink === 'function') {
-                _originalCopyWorksheetLink();
-            }
+        // Listen for click on the Copy Link button directly
+        // This fires alongside the existing onclick="copyWorksheetLink()"
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                if (!isUserLoggedIn()) {
+                    setTimeout(function() {
+                        if (isUserLoggedIn()) return;
+                        overlay.classList.add('show');
+                    }, 2500);
+                }
+            });
+        }
 
-            // After 2.5 seconds, show login prompt if not logged in
-            if (!isUserLoggedIn()) {
-                setTimeout(function() {
-                    if (isUserLoggedIn()) return;
-                    overlay.classList.add('show');
-                }, 2500);
-            }
-        };
+        // Also listen for click on the Share button
+        var shareBtn = document.querySelector('.share-btn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', function() {
+                if (!isUserLoggedIn()) {
+                    setTimeout(function() {
+                        if (isUserLoggedIn()) return;
+                        overlay.classList.add('show');
+                    }, 2500);
+                }
+            });
+        }
     })();
     </script>
 </body>
