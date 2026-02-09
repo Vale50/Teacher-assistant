@@ -776,6 +776,9 @@
             const container = document.getElementById('dynamic-content');
             let html = '';
 
+            // Determine content type: 'calculation' or 'conceptual'
+            const isConceptual = lesson.content_type === 'conceptual';
+
             // 1. Quote
             if (lesson.quote && lesson.quote.trim()) {
                 html += `
@@ -800,11 +803,11 @@
                 `;
             }
 
-            // 3. Key Formulas
+            // 3. Key Formulas / Key Concepts
             if (lesson.key_formulas && lesson.key_formulas.length > 0) {
                 html += `
                     <div class="section">
-                        <h2>Key Formulas & Concepts</h2>
+                        <h2>${isConceptual ? 'Key Concepts' : 'Key Formulas & Concepts'}</h2>
                         <ul class="formulas-list">
                             ${lesson.key_formulas.map(formula =>
                                 `<li>${formatMathNotation(escapeHtml(formula))}</li>`
@@ -814,8 +817,8 @@
                 `;
             }
 
-            // 4. Step-by-Step Method
-            if (lesson.step_by_step && lesson.step_by_step.length > 0) {
+            // 4. Step-by-Step Method (only for calculation-based content)
+            if (!isConceptual && lesson.step_by_step && lesson.step_by_step.length > 0) {
                 html += `
                     <div class="section">
                         <h2>Step-by-Step Method</h2>
@@ -870,42 +873,56 @@
                 `;
             }
 
-            // 6. Worked Examples with step-by-step solutions
+            // 6. Worked Examples / Illustrative Examples
             if (lesson.worked_examples && lesson.worked_examples.length > 0) {
+                const examplesTitle = isConceptual ? 'Illustrative Examples' : 'Worked Examples';
                 html += `
                     <div class="section">
-                        <h2>Worked Examples</h2>
+                        <h2>${examplesTitle}</h2>
                         <div id="examples-container">
                             ${lesson.worked_examples.map((example, i) => {
                                 const exampleText = typeof example === 'string' ? example : JSON.stringify(example);
                                 const formattedContent = formatMathNotation(escapeHtml(exampleText)).replace(/\n/g, '<br>');
-                                return `
-                                    <div class="example-card">
-                                        <h3>Example ${i + 1}${i === 0 ? ' (Basic)' : ' (Advanced)'}</h3>
-                                        <div class="example-content">${formattedContent}</div>
-                                        <div class="example-steps" id="example-steps-${i}">
-                                            <h4>Step-by-Step Solution</h4>
-                                            <div class="step-loading" id="step-loading-${i}">Generating step-by-step solution...</div>
+                                if (isConceptual) {
+                                    // Conceptual: no step-by-step solution generation
+                                    return `
+                                        <div class="example-card">
+                                            <h3>Example ${i + 1}${i === 0 ? ' (Basic)' : ' (Advanced)'}</h3>
+                                            <div class="example-content">${formattedContent}</div>
                                         </div>
-                                    </div>
-                                `;
+                                    `;
+                                } else {
+                                    // Calculation: include step-by-step solution generation
+                                    return `
+                                        <div class="example-card">
+                                            <h3>Example ${i + 1}${i === 0 ? ' (Basic)' : ' (Advanced)'}</h3>
+                                            <div class="example-content">${formattedContent}</div>
+                                            <div class="example-steps" id="example-steps-${i}">
+                                                <h4>Step-by-Step Solution</h4>
+                                                <div class="step-loading" id="step-loading-${i}">Generating step-by-step solution...</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }
                             }).join('')}
                         </div>
                     </div>
                 `;
             }
 
-            // 7. Practice Problems
+            // 7. Practice Problems / Review Questions
             if (lesson.practice_problems && lesson.practice_problems.length > 0) {
+                const problemsTitle = isConceptual ? 'Review Questions' : 'Practice Problems';
+                const itemLabel = isConceptual ? 'Question' : 'Problem';
                 html += `
                     <div class="section">
-                        <h2>Practice Problems</h2>
+                        <h2>${problemsTitle}</h2>
                         <div>
                             ${lesson.practice_problems.map((problem, i) => {
                                 const formattedProblem = formatMathNotation(escapeHtml(problem)).replace(/\n/g, '<br>');
                                 return `
                                     <div class="problem-card">
-                                        <strong>Problem ${i + 1}:</strong> ${formattedProblem}
+                                        <strong>${itemLabel} ${i + 1}:</strong> ${formattedProblem}
                                     </div>
                                 `;
                             }).join('')}
@@ -974,8 +991,8 @@
                 MathJax.typesetPromise();
             }
 
-            // Generate step-by-step solutions for each example
-            if (lesson.worked_examples && lesson.worked_examples.length > 0) {
+            // Generate step-by-step solutions for each example (only for calculation-based content)
+            if (!isConceptual && lesson.worked_examples && lesson.worked_examples.length > 0) {
                 lesson.worked_examples.forEach((example, i) => {
                     generateStepsForExample(example, i, lesson.topic || '');
                 });

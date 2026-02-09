@@ -3159,13 +3159,14 @@ function categorizeTopic(topic) {
 // ===== 3. ENHANCED LESSON PLAN DISPLAY (REMOVES STEP NUMBERING) =====
 function displayEnhancedMathLessonPlan(lessonPlan) {
     const previewDiv = document.getElementById('lesson-plan-preview');
-    
+    const isConceptual = lessonPlan.content_type === 'conceptual';
+
     // Store lesson plan ID for editing
     if (lessonPlan.id) {
         window.currentLessonPlanId = lessonPlan.id;
         previewDiv.dataset.planId = lessonPlan.id;
     }
-    
+
     // Build HTML for the lesson plan with enhanced formatting
     let html = `
         <h2>${formatMathNotation(lessonPlan.title)}</h2>
@@ -3179,7 +3180,7 @@ function displayEnhancedMathLessonPlan(lessonPlan) {
             </div>
         </div>
     `;
-    
+
     // Add learning objectives
     if (lessonPlan.objectives) {
         html += `
@@ -3187,15 +3188,15 @@ function displayEnhancedMathLessonPlan(lessonPlan) {
                 <h3>🎯 Learning Objectives</h3>
                 <div class="preview-item">
                     <ul>
-                        ${Array.isArray(lessonPlan.objectives) 
-                          ? lessonPlan.objectives.map(obj => `<li>${formatMathNotation(obj)}</li>`).join('') 
+                        ${Array.isArray(lessonPlan.objectives)
+                          ? lessonPlan.objectives.map(obj => `<li>${formatMathNotation(obj)}</li>`).join('')
                           : `<li>${formatMathNotation(lessonPlan.objectives)}</li>`}
                     </ul>
                 </div>
             </div>
         `;
     }
-    
+
     // Add inspirational quote
     if (lessonPlan.quote) {
         html += `
@@ -3207,15 +3208,16 @@ function displayEnhancedMathLessonPlan(lessonPlan) {
             </div>
         `;
     }
-    
-    // Add key formulas
+
+    // Add key formulas / key concepts
     if (lessonPlan.key_formulas) {
+        const formulasTitle = isConceptual ? '📚 Key Concepts' : '🔢 Key Formulas';
         html += `
             <div class="preview-section">
-                <h3>🔢 Key Formulas</h3>
+                <h3>${formulasTitle}</h3>
                 <div class="preview-item">
-                    ${Array.isArray(lessonPlan.key_formulas) 
-                      ? lessonPlan.key_formulas.map(formula => 
+                    ${Array.isArray(lessonPlan.key_formulas)
+                      ? lessonPlan.key_formulas.map(formula =>
                           `<div class="math-formula">${formatMathNotation(formula)}</div>`
                         ).join('')
                       : `<div class="math-formula">${formatMathNotation(lessonPlan.key_formulas)}</div>`}
@@ -3223,9 +3225,9 @@ function displayEnhancedMathLessonPlan(lessonPlan) {
             </div>
         `;
     }
-    
-    // FIXED: Solution method WITHOUT step numbering
-    if (lessonPlan.solution_method) {
+
+    // Solution method (only for calculation-based content)
+    if (!isConceptual && lessonPlan.solution_method) {
         html += `
             <div class="preview-section">
                 <h3>📝 Solution Method</h3>
@@ -3237,15 +3239,16 @@ function displayEnhancedMathLessonPlan(lessonPlan) {
             </div>
         `;
     }
-    
-    // FIXED: Worked examples WITHOUT step numbering and with realistic content
+
+    // Worked examples / Illustrative examples
     if (lessonPlan.worked_examples) {
+        const examplesTitle = isConceptual ? '💡 Illustrative Examples' : '💡 Worked Examples';
         html += `
             <div class="preview-section">
-                <h3>💡 Worked Examples</h3>
+                <h3>${examplesTitle}</h3>
                 <div class="preview-item">
-                    ${Array.isArray(lessonPlan.worked_examples) 
-                      ? lessonPlan.worked_examples.map((example, index) => 
+                    ${Array.isArray(lessonPlan.worked_examples)
+                      ? lessonPlan.worked_examples.map((example, index) =>
                           `<div class="worked-example">
                             <h4>Example ${index + 1}</h4>
                             <div class="example-content">${formatWorkedExample(example)}</div>
@@ -3258,14 +3261,14 @@ function displayEnhancedMathLessonPlan(lessonPlan) {
             </div>
         `;
     }
-    
+
     // Add graphs with enhanced error handling
     if (lessonPlan.graphs && lessonPlan.graphs.length > 0) {
         html += `
             <div class="preview-section">
                 <h3>📊 Mathematical Graphs</h3>
                 <div class="preview-item">
-                    ${lessonPlan.graphs.map((graph, index) => 
+                    ${lessonPlan.graphs.map((graph, index) =>
                         `<div class="graph-container" id="graph-${index}">
                             <div class="graph-loading" id="loading-${index}">📊 Loading graph...</div>
                             <div class="graph-error" id="error-${index}" style="display: none;">
@@ -4743,32 +4746,33 @@ async function displayEnhancedMathLessonPlanNoFallback(lessonPlan) {
     previewDiv.innerHTML = html;
     previewDiv.classList.add('show');
     
-    // NOW handle worked examples with dynamic steps
-    if (lessonPlan.worked_examples) {
+    // NOW handle worked examples with dynamic steps (only for calculation-based content)
+    const isConceptual = lessonPlan.content_type === 'conceptual';
+    if (!isConceptual && lessonPlan.worked_examples) {
         try {
             console.log('Generating worked examples with dynamic steps...');
-            
+
             const topic = window.currentTopic || document.getElementById('topic')?.value || 'mathematics';
             const gradeLevel = document.getElementById('grade-level')?.value || 'high';
             const subject = document.querySelector('.subject-tab.active')?.dataset?.subject || 'mathematics';
-            
+
             // Store context for step generator
             window.currentTopic = topic;
-            
+
             // Find worked examples section in the displayed HTML
             const examplesSection = Array.from(previewDiv.querySelectorAll('.preview-section'))
                 .find(section => {
                     const h3 = section.querySelector('h3');
-                    return h3 && h3.textContent.includes('Worked Examples');
+                    return h3 && (h3.textContent.includes('Worked Examples') || h3.textContent.includes('Illustrative Examples'));
                 });
-            
+
             if (examplesSection) {
                 const examplesContent = examplesSection.querySelector('.preview-item');
-                
+
                 if (examplesContent) {
                     // Show loading state
                     examplesContent.innerHTML = '<div class="loading-examples">📝 Generating detailed step-by-step solutions...</div>';
-                    
+
                     // Generate examples with dynamic steps
                     const examplesHTML = await generateWorkedExamplesWithDynamicSteps(
                         lessonPlan.worked_examples,
@@ -4776,7 +4780,7 @@ async function displayEnhancedMathLessonPlanNoFallback(lessonPlan) {
                         gradeLevel,
                         subject
                     );
-                    
+
                     // Update with generated examples
                     examplesContent.innerHTML = examplesHTML;
                     console.log('✅ Successfully updated worked examples');
@@ -4784,14 +4788,14 @@ async function displayEnhancedMathLessonPlanNoFallback(lessonPlan) {
             }
         } catch (error) {
             console.error('Error generating dynamic examples:', error);
-            
+
             // Show network error for worked examples section
             const examplesSection = Array.from(previewDiv.querySelectorAll('.preview-section'))
                 .find(section => {
                     const h3 = section.querySelector('h3');
-                    return h3 && h3.textContent.includes('Worked Examples');
+                    return h3 && (h3.textContent.includes('Worked Examples') || h3.textContent.includes('Illustrative Examples'));
                 });
-            
+
             if (examplesSection) {
                 const examplesContent = examplesSection.querySelector('.preview-item');
                 if (examplesContent) {
@@ -4880,20 +4884,45 @@ function buildBasicLessonHTML(lessonPlan) {
     // Add YouTube Video section (after lesson notes, before examples)
     html += buildYouTubeSection(lessonPlan);
 
-    // Add placeholder for worked examples
+    // Add placeholder for worked examples / illustrative examples
     if (lessonPlan.worked_examples &&
         ((Array.isArray(lessonPlan.worked_examples) && lessonPlan.worked_examples.length > 0) ||
          (typeof lessonPlan.worked_examples === 'string' && lessonPlan.worked_examples.trim()))) {
-        html += `
-            <div class="preview-section">
-                <h3>💡 Worked Examples</h3>
-                <div class="preview-item">
-                    <div class="loading-examples" style="text-align: center; padding: 20px; color: #666;">
-                        📝 Generating step-by-step solutions...
+        const isConceptual = lessonPlan.content_type === 'conceptual';
+        const examplesTitle = isConceptual ? '💡 Illustrative Examples' : '💡 Worked Examples';
+
+        if (isConceptual) {
+            // For conceptual content, render examples directly without step-by-step generation
+            html += `
+                <div class="preview-section">
+                    <h3>${examplesTitle}</h3>
+                    <div class="preview-item">
+                        ${Array.isArray(lessonPlan.worked_examples)
+                          ? lessonPlan.worked_examples.map((example, index) =>
+                              `<div class="worked-example">
+                                <h4>Example ${index + 1}</h4>
+                                <div class="example-content">${formatWorkedExample(example)}</div>
+                              </div>`
+                            ).join('')
+                          : `<div class="worked-example">
+                              <div class="example-content">${formatWorkedExample(lessonPlan.worked_examples)}</div>
+                            </div>`}
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+        } else {
+            // For calculation content, show loading placeholder for step-by-step generation
+            html += `
+                <div class="preview-section">
+                    <h3>${examplesTitle}</h3>
+                    <div class="preview-item">
+                        <div class="loading-examples" style="text-align: center; padding: 20px; color: #666;">
+                            📝 Generating step-by-step solutions...
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
     }
 
     // Continue with other sections...
@@ -5145,6 +5174,8 @@ window.displayEnhancedMathLessonPlanWithDynamicSteps = displayEnhancedMathLesson
 
 // Add missing addBasicLessonSections function
 function addBasicLessonSections(lessonPlan, html) {
+    const isConceptual = lessonPlan.content_type === 'conceptual';
+
     // Add learning objectives
     if (lessonPlan.objectives) {
         html += `
@@ -5152,15 +5183,15 @@ function addBasicLessonSections(lessonPlan, html) {
                 <h3>🎯 Learning Objectives</h3>
                 <div class="preview-item">
                     <ul>
-                        ${Array.isArray(lessonPlan.objectives) 
-                          ? lessonPlan.objectives.map(obj => `<li>${formatMathNotation(obj)}</li>`).join('') 
+                        ${Array.isArray(lessonPlan.objectives)
+                          ? lessonPlan.objectives.map(obj => `<li>${formatMathNotation(obj)}</li>`).join('')
                           : `<li>${formatMathNotation(lessonPlan.objectives)}</li>`}
                     </ul>
                 </div>
             </div>
         `;
     }
-    
+
     // Add inspirational quote
     if (lessonPlan.quote) {
         html += `
@@ -5172,15 +5203,16 @@ function addBasicLessonSections(lessonPlan, html) {
             </div>
         `;
     }
-    
-    // Add key formulas
+
+    // Add key formulas / key concepts
     if (lessonPlan.key_formulas) {
+        const formulasTitle = isConceptual ? '📚 Key Concepts' : '🔢 Key Formulas';
         html += `
             <div class="preview-section">
-                <h3>🔢 Key Formulas</h3>
+                <h3>${formulasTitle}</h3>
                 <div class="preview-item">
-                    ${Array.isArray(lessonPlan.key_formulas) 
-                      ? lessonPlan.key_formulas.map(formula => 
+                    ${Array.isArray(lessonPlan.key_formulas)
+                      ? lessonPlan.key_formulas.map(formula =>
                           `<div class="math-formula">${formatMathNotation(formula)}</div>`
                         ).join('')
                       : `<div class="math-formula">${formatMathNotation(lessonPlan.key_formulas)}</div>`}
@@ -5188,9 +5220,9 @@ function addBasicLessonSections(lessonPlan, html) {
             </div>
         `;
     }
-    
-    // Add solution method
-    if (lessonPlan.solution_method) {
+
+    // Add solution method (only for calculation-based content)
+    if (!isConceptual && lessonPlan.solution_method) {
         html += `
             <div class="preview-section">
                 <h3>📝 Solution Method</h3>
@@ -5202,7 +5234,7 @@ function addBasicLessonSections(lessonPlan, html) {
             </div>
         `;
     }
-    
+
     return html;
 }
 
@@ -5228,18 +5260,21 @@ function addRemainingLessonSections(lessonPlan, html) {
         `;
     }
 
-    // Add practice problems (only if content exists)
+    // Add practice problems / review questions (only if content exists)
+    const isConceptual = lessonPlan.content_type === 'conceptual';
     if (lessonPlan.practice_problems &&
         ((Array.isArray(lessonPlan.practice_problems) && lessonPlan.practice_problems.length > 0) ||
          (typeof lessonPlan.practice_problems === 'string' && lessonPlan.practice_problems.trim()))) {
+        const problemsTitle = isConceptual ? '🎯 Review Questions' : '🎯 Practice Problems';
+        const itemLabel = isConceptual ? 'Question' : 'Problem';
         html += `
             <div class="preview-section">
-                <h3>🎯 Practice Problems</h3>
+                <h3>${problemsTitle}</h3>
                 <div class="practice-problems">
                     ${Array.isArray(lessonPlan.practice_problems)
                       ? lessonPlan.practice_problems.map((problem, index) =>
                           `<div class="problem">
-                            <strong>Problem ${index + 1}:</strong> ${formatMathNotation(problem)}
+                            <strong>${itemLabel} ${index + 1}:</strong> ${formatMathNotation(problem)}
                           </div>`
                         ).join('')
                       : `<div class="problem">${formatMathNotation(lessonPlan.practice_problems)}</div>`}
