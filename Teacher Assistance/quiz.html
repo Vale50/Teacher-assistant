@@ -194,6 +194,60 @@
              animation: pulse 0.5s infinite;
          }
  
+         /* Select All That Apply */
+         .select-all-hint {
+             font-size: 13px;
+             color: #6C63FF;
+             font-style: italic;
+             margin-bottom: 8px;
+             font-weight: 500;
+         }
+
+         .option-container.select-all-option {
+             position: relative;
+             cursor: pointer;
+             padding: 15px;
+             padding-left: 45px;
+             margin-bottom: 10px;
+             background: #fff;
+             border: 2px solid rgba(0,0,0,0.08);
+             border-radius: 8px;
+             transition: all 0.2s ease;
+         }
+
+         .option-container.select-all-option.selected {
+             background: rgba(108,99,255,0.1);
+             border-color: rgba(108,99,255,0.5);
+         }
+
+         .select-all-checkbox {
+             position: absolute;
+             left: 15px;
+             top: 50%;
+             transform: translateY(-50%);
+             width: 18px;
+             height: 18px;
+             border: 2px solid #ccc;
+             border-radius: 4px;
+             background: #fff;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             transition: all 0.2s ease;
+         }
+
+         .option-container.select-all-option.selected .select-all-checkbox {
+             background: #6C63FF;
+             border-color: #6C63FF;
+         }
+
+         .option-container.select-all-option.selected .select-all-checkbox::after {
+             content: '\2713';
+             color: white;
+             font-size: 13px;
+             font-weight: bold;
+         }
+
          /* Sound Control */
          .sound-toggle {
              background: rgba(255,255,255,0.2);
@@ -1820,21 +1874,39 @@ function setupStudentUI() {
         `;
 
         if (q.type === 'paragraph') {
-            html += `<textarea id="q${idx}-answer" class="paragraph-answer" 
+            html += `<textarea id="q${idx}-answer" class="paragraph-answer"
                      onchange="window.saveAnswer(${idx}, this.value)" rows="4">${window.userAnswers[idx] || ''}</textarea>`;
+        } else if (q.type === 'select_all' && q.options?.length) {
+            // Select All That Apply — render checkboxes
+            const selectedSet = Array.isArray(window.userAnswers[idx]) ? window.userAnswers[idx] : [];
+            html += `<div class="select-all-hint">Select all that apply</div>`;
+            q.options.forEach((opt, i) => {
+                const isSelected = selectedSet.includes(i);
+                html += `
+                    <div class="option-container select-all-option ${isSelected ? 'selected' : ''}"
+                         data-question="${idx}"
+                         data-option="${i}"
+                         data-type="select_all">
+                        <div class="select-all-checkbox"></div>
+                        <label style="cursor: pointer; display: block; position: relative; pointer-events: none;">
+                            ${opt.text}
+                        </label>
+                    </div>
+                `;
+            });
         } else if (q.options?.length) {
             q.options.forEach((opt, i) => {
                 const checked = window.userAnswers[idx] === i ? 'checked' : '';
                 const zIndex = 100 + i;
                 html += `
-                    <div class="option-container" 
+                    <div class="option-container"
                          style="position: relative; z-index: ${zIndex}; cursor: pointer; padding: 15px; margin-bottom: 10px; background: ${checked ? 'rgba(108,99,255,0.1)' : '#fff'}; border: 2px solid ${checked ? 'rgba(108,99,255,0.5)' : 'rgba(0,0,0,0.08)'}; border-radius: 8px;"
-                         data-question="${idx}" 
+                         data-question="${idx}"
                          data-option="${i}">
-                        <input type="radio" 
-                               id="q${idx}-opt${i}" 
-                               name="q${idx}" 
-                               value="${i}" 
+                        <input type="radio"
+                               id="q${idx}-opt${i}"
+                               name="q${idx}"
+                               value="${i}"
                                ${checked}
                                style="position: absolute; opacity: 0; width: 100%; height: 100%; top: 0; left: 0; cursor: pointer; z-index: 50;">
                         <label for="q${idx}-opt${i}" style="cursor: pointer; display: block; padding-left: 30px; position: relative; z-index: 5; pointer-events: none;">
@@ -1863,23 +1935,28 @@ function setupStudentUI() {
         // Add click handlers to all option containers
         document.querySelectorAll('.option-container').forEach(container => {
             container.style.cursor = 'pointer';
-            
+
             // Remove existing listeners to prevent duplicates
             const newContainer = container.cloneNode(true);
             container.parentNode.replaceChild(newContainer, container);
-            
+
             // Add fresh click listener
             newContainer.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 const qIdx = parseInt(this.getAttribute('data-question'));
                 const optIdx = parseInt(this.getAttribute('data-option'));
-                
-                console.log(`Clicked: Question ${qIdx + 1}, Option ${optIdx + 1}`);
-                
+                const isSelectAll = this.getAttribute('data-type') === 'select_all';
+
+                console.log(`Clicked: Question ${qIdx + 1}, Option ${optIdx + 1}, SelectAll: ${isSelectAll}`);
+
                 if (!isNaN(qIdx) && !isNaN(optIdx)) {
-                    window.selectOption(qIdx, optIdx);
+                    if (isSelectAll) {
+                        window.toggleSelectAllOption(qIdx, optIdx);
+                    } else {
+                        window.selectOption(qIdx, optIdx);
+                    }
                 }
             });
         });
@@ -1928,6 +2005,36 @@ function setupStudentUI() {
                     container.style.borderColor = 'rgba(0,0,0,0.08)';
                     container.style.borderWidth = '2px';
                 }
+            }
+        });
+    };
+
+    window.toggleSelectAllOption = function(qIdx, optIdx) {
+        console.log(`Toggle select-all: Q${qIdx + 1}, Option ${optIdx + 1}`);
+
+        // Initialize as array if needed
+        if (!Array.isArray(window.userAnswers[qIdx])) {
+            window.userAnswers[qIdx] = [];
+        }
+
+        const selected = window.userAnswers[qIdx];
+        const pos = selected.indexOf(optIdx);
+
+        if (pos === -1) {
+            selected.push(optIdx);
+        } else {
+            selected.splice(pos, 1);
+        }
+
+        console.log('Saved select-all answers:', window.userAnswers);
+
+        // Update visual state for all options in this question
+        document.querySelectorAll(`.option-container[data-question="${qIdx}"][data-type="select_all"]`).forEach(container => {
+            const oIdx = parseInt(container.getAttribute('data-option'));
+            if (selected.includes(oIdx)) {
+                container.classList.add('selected');
+            } else {
+                container.classList.remove('selected');
             }
         });
     };
@@ -1990,7 +2097,36 @@ window.submitQuiz = function() {
             return; // Skip scoring for paragraph questions
         }
 
-        // Handle multiple choice questions
+        // Handle select_all questions
+        if (q.type === 'select_all') {
+            const selectedIndices = Array.isArray(answer) ? answer : [];
+            const correctIndices = q.options
+                .map((opt, idx) => opt.isCorrect ? idx : -1)
+                .filter(idx => idx !== -1);
+
+            // Score: all correct selected AND no incorrect selected
+            const allCorrectSelected = correctIndices.every(idx => selectedIndices.includes(idx));
+            const noIncorrectSelected = selectedIndices.every(idx => q.options[idx]?.isCorrect);
+
+            if (allCorrectSelected && noIncorrectSelected && selectedIndices.length > 0) {
+                score++;
+            } else {
+                const userTexts = selectedIndices.map(idx => q.options[idx]?.text || '').filter(Boolean);
+                const correctTexts = correctIndices.map(idx => q.options[idx]?.text || '');
+                incorrect.push({
+                    questionIndex: i,
+                    question: q.text,
+                    questionType: 'select_all',
+                    userAnswer: userTexts.join(', ') || 'No answer',
+                    userAnswers: userTexts,
+                    correctAnswer: correctTexts.join(', '),
+                    correctAnswers: correctTexts
+                });
+            }
+            return;
+        }
+
+        // Handle multiple choice / true_false questions
         if (answer !== undefined && q.options?.[answer]?.isCorrect) {
             score++;
         } else if (answer !== undefined) {

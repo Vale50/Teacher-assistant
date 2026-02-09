@@ -2164,6 +2164,7 @@ DIFFICULTY LEVEL: ${difficultyGuidance}
 ${questionTypes.includes('multiple_choice') ? '- Create multiple choice questions with exactly 4 options (A, B, C, D) and one correct answer.\n' : ''}
 ${questionTypes.includes('true_false') ? '- Create true/false questions where the answer is clearly true or false.\n' : ''}
 ${questionTypes.includes('paragraph') ? '- Create open-ended paragraph questions that require written responses.\n' : ''}
+${questionTypes.includes('select_all') ? '- Create "Select All That Apply" questions with 4-6 options where MULTIPLE options are correct (at least 2 correct answers). Students must select every correct option.\n' : ''}
 
 Make the questions diverse in structure and avoid starting too many with "What" or "Which".
 Use a variety of question styles - incorporate "how", "why", "when", "where", along with "what" and "which".
@@ -2214,20 +2215,33 @@ FORMAT YOUR RESPONSE AS A JSON OBJECT WITH THE FOLLOWING STRUCTURE:
       "id": "question3",
       "text": "Paragraph question text goes here?",
       "type": "paragraph"
+    },
+    {
+      "id": "question4",
+      "text": "Select all that apply question text goes here?",
+      "type": "select_all",
+      "options": [
+        {"text": "Option A text", "isCorrect": true},
+        {"text": "Option B text", "isCorrect": true},
+        {"text": "Option C text", "isCorrect": false},
+        {"text": "Option D text", "isCorrect": false}
+      ]
     }
   ]
 }
 
-Important: 
+Important:
 1. Respond ONLY with the JSON object, no additional text.
 2. Each question must have an "id" field.
 3. Each question must have a "text" field with the question text.
-4. Each question must have a "type" field with value "multiple_choice", "true_false", or "paragraph".
-5. For multiple_choice and true_false questions, include an "options" array with option objects.
+4. Each question must have a "type" field with value "multiple_choice", "true_false", "paragraph", or "select_all".
+5. For multiple_choice, true_false, and select_all questions, include an "options" array with option objects.
 6. Each option must have "text" and "isCorrect" fields.
-7. Exactly ONE option should have "isCorrect": true for each question.
-8. Paragraph questions should not have options.
-9. Return exactly ${numQuestions} questions.
+7. For multiple_choice and true_false, exactly ONE option should have "isCorrect": true.
+8. For select_all, MULTIPLE options should have "isCorrect": true (at least 2 correct answers).
+9. Each select_all question must have 4-6 options.
+10. Paragraph questions should not have options.
+11. Return exactly ${numQuestions} questions.
 `;
 
   return prompt;
