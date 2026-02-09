@@ -2565,17 +2565,20 @@
 
        function showWorksheetLinkModal(result) {
            const modal = document.getElementById('worksheetLinkModal');
-           
+
            // Update modal content with worksheet data
            updateModalContent(result);
-           
+
            // Show modal
            modal.classList.add('show');
-           
+
            // Generate QR code
            if (result.shareable_link) {
                generateQRCode(result.shareable_link);
            }
+
+           // Trigger login prompt after 2.5s if user is not logged in
+           triggerLoginPrompt();
        }
 
        function updateModalContent(result) {
@@ -2617,9 +2620,6 @@
                    copyBtn.classList.remove('copied');
                    copyBtnText.textContent = 'Copy Link';
                }, 2000);
-
-               // Trigger login prompt for non-logged-in users
-               triggerLoginPrompt();
            }).catch(err => {
                console.error('Failed to copy: ', err);
                // Fallback for older browsers
@@ -2636,9 +2636,6 @@
                    copyBtn.classList.remove('copied');
                    copyBtnText.textContent = 'Copy Link';
                }, 2000);
-
-               // Trigger login prompt for non-logged-in users
-               triggerLoginPrompt();
            });
        }
 
@@ -2653,9 +2650,6 @@
                    title: `${title} - Deciph.AI Worksheet`,
                    text: `Complete this worksheet: ${title}`,
                    url: shareableLink
-               }).then(() => {
-                   // Trigger login prompt for non-logged-in users after sharing
-                   triggerLoginPrompt();
                }).catch(err => console.log('Error sharing:', err));
            } else {
                // Fallback: copy to clipboard and show message
@@ -2815,7 +2809,8 @@ function toggleQRCode() {
            const token = localStorage.getItem('token') ||
                          sessionStorage.getItem('token') ||
                          localStorage.getItem('tutor_token');
-           return token && token !== 'demo-token';
+           // User is logged in only if a real token exists (not empty, not demo)
+           return !!(token && token.trim() !== '' && token !== 'demo-token' && token !== 'null' && token !== 'undefined');
        }
 
        function triggerLoginPrompt() {
