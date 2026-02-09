@@ -1505,8 +1505,55 @@ button.toggle-feedback:hover {
         });
     }
 
+    // ============ TIMER ============
+
+    window.timeLeft = 0;
+    let timerInterval = null;
+
+    function startTimer(seconds) {
+        window.timeLeft = seconds;
+        updateTimerDisplay();
+
+        timerInterval = setInterval(() => {
+            window.timeLeft--;
+
+            if (window.timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                updateTimerDisplay();
+                alert('Time is up! Your quiz will be submitted now.');
+                window.submitQuiz();
+            } else {
+                updateTimerDisplay();
+
+                const timerEl = document.getElementById('timer');
+                // Warning at 1 minute
+                if (window.timeLeft === 60 && timerEl) {
+                    timerEl.classList.add('warning');
+                    const clickSound = document.getElementById('clickSound');
+                    if (clickSound) clickSound.play().catch(() => {});
+                }
+
+                // Danger at 30 seconds
+                if (window.timeLeft === 30 && timerEl) {
+                    timerEl.classList.add('danger');
+                    const errorSound = document.getElementById('errorSound');
+                    if (errorSound) errorSound.play().catch(() => {});
+                }
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const timerEl = document.getElementById('timer');
+        if (!timerEl) return;
+        const minutes = Math.floor(window.timeLeft / 60);
+        const remainingSeconds = window.timeLeft % 60;
+        timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
+
     // ============ INITIALIZATION ============
-    
+
    function init() {
      window.quizStartTime = Date.now();
     console.log('⏰ Quiz timer started');
@@ -1697,6 +1744,11 @@ function setupStudentUI() {
 
                 updateHeader(data);
                 displayQuiz(data);
+
+                // Start the countdown timer
+                if (data.time_limit) {
+                    startTimer(data.time_limit * 60);
+                }
             })
             .catch(err => {
                 console.error('❌ Load error:', err);
@@ -1901,6 +1953,12 @@ function setupStudentUI() {
 
 window.submitQuiz = function() {
     console.log('📤 Starting submission...');
+
+    // Stop the timer
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
 
     if (!window.quizData) {
         alert('Quiz data not loaded');
