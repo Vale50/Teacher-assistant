@@ -3251,11 +3251,11 @@ function displayEnhancedMathLessonPlan(lessonPlan) {
                       ? lessonPlan.worked_examples.map((example, index) =>
                           `<div class="worked-example">
                             <h4>Example ${index + 1}</h4>
-                            <div class="example-content">${formatWorkedExample(example)}</div>
+                            <div class="example-content">${formatExampleTextSync(example)}</div>
                           </div>`
                         ).join('')
                       : `<div class="worked-example">
-                          <div class="example-content">${formatWorkedExample(lessonPlan.worked_examples)}</div>
+                          <div class="example-content">${formatExampleTextSync(lessonPlan.worked_examples)}</div>
                         </div>`}
                 </div>
             </div>
@@ -3865,6 +3865,16 @@ window.selectMCOption = selectMCOption;
 window.saveParagraphAnswer = saveParagraphAnswer;
 
 // Update the formatSolutionMethod function to remove step numbering properly
+// Synchronous example text formatter - for use in template literals
+// (formatWorkedExample is async and returns Promise, can't be used in template strings)
+function formatExampleTextSync(example) {
+    if (!example) return '';
+    let cleaned = typeof example === 'string' ? example : JSON.stringify(example);
+    cleaned = cleaned.replace(/Example\s+\d+[:\s]*/gi, '');
+    cleaned = cleaned.replace(/\n/g, '<br>');
+    return formatMathNotation(cleaned);
+}
+
 function formatSolutionMethod(method) {
     if (!method) return '';
     
@@ -3915,9 +3925,9 @@ async function formatWorkedExampleNoFallback(example, index = 0) {
             
         } catch (error) {
             console.error(`Error generating dynamic steps for example ${index + 1}:`, error);
-            
-            // Return network error display instead of fallback
-            return createNetworkErrorExampleHTML(cleaned, error);
+
+            // Silently show example content without steps - steps will load on shared-lesson page
+            return `<div class="example-content">${formatMathNotation(cleaned)}</div>`;
         }
     }
     
@@ -4789,7 +4799,7 @@ async function displayEnhancedMathLessonPlanNoFallback(lessonPlan) {
         } catch (error) {
             console.error('Error generating dynamic examples:', error);
 
-            // Show network error for worked examples section
+            // Silently show examples without steps - steps will load on shared-lesson page
             const examplesSection = Array.from(previewDiv.querySelectorAll('.preview-section'))
                 .find(section => {
                     const h3 = section.querySelector('h3');
@@ -4799,22 +4809,17 @@ async function displayEnhancedMathLessonPlanNoFallback(lessonPlan) {
             if (examplesSection) {
                 const examplesContent = examplesSection.querySelector('.preview-item');
                 if (examplesContent) {
-                    examplesContent.innerHTML = `
-                        <div class="step-generation-network-error">
-                            <div class="network-error-container">
-                                <div class="network-error-icon">🌐</div>
-                                <div class="network-error-message">
-                                    Step-by-step solutions could not be loaded.<br>
-                                    ${error instanceof NetworkError ? error.message : 'Network error occurred. Please try again.'}
-                                </div>
-                                <div class="network-error-actions">
-                                    <button onclick="retryWorkedExamples()" class="retry-button">
-                                        🔄 Retry Loading Steps
-                                    </button>
-                                </div>
+                    // Just render examples without step-by-step, no error shown
+                    const examples = Array.isArray(lessonPlan.worked_examples) ? lessonPlan.worked_examples : [lessonPlan.worked_examples];
+                    examplesContent.innerHTML = examples.map((example, i) => {
+                        const cleaned = (typeof example === 'string' ? example : JSON.stringify(example)).replace(/\n/g, '<br>');
+                        return `
+                            <div class="worked-example">
+                                <h4>Example ${i + 1}</h4>
+                                <div class="example-content">${formatMathNotation(cleaned)}</div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    }).join('');
                 }
             }
         }
@@ -4893,6 +4898,7 @@ function buildBasicLessonHTML(lessonPlan) {
 
         if (isConceptual) {
             // For conceptual content, render examples directly without step-by-step generation
+            // Use formatExampleTextSync (NOT formatWorkedExample which is async and returns Promise)
             html += `
                 <div class="preview-section">
                     <h3>${examplesTitle}</h3>
@@ -4901,11 +4907,11 @@ function buildBasicLessonHTML(lessonPlan) {
                           ? lessonPlan.worked_examples.map((example, index) =>
                               `<div class="worked-example">
                                 <h4>Example ${index + 1}</h4>
-                                <div class="example-content">${formatWorkedExample(example)}</div>
+                                <div class="example-content">${formatExampleTextSync(example)}</div>
                               </div>`
                             ).join('')
                           : `<div class="worked-example">
-                              <div class="example-content">${formatWorkedExample(lessonPlan.worked_examples)}</div>
+                              <div class="example-content">${formatExampleTextSync(lessonPlan.worked_examples)}</div>
                             </div>`}
                     </div>
                 </div>
@@ -4951,13 +4957,13 @@ async function generateWorkedExamplesWithDynamicSteps(workedExamples, topic, gra
                     `;
                 } catch (exampleError) {
                     console.error(`Error processing example ${i + 1}:`, exampleError);
-                    
-                    // Show error for this specific example
+
+                    // Silently show example content without steps
+                    const cleanedExample = (typeof workedExamples[i] === 'string' ? workedExamples[i] : JSON.stringify(workedExamples[i])).replace(/\n/g, '<br>');
                     examplesHTML += `
                         <div class="worked-example">
                             <h4>Example ${i + 1}</h4>
-                            <div class="example-content">${formatMathNotation(workedExamples[i])}</div>
-                            ${createNetworkErrorExampleHTML(workedExamples[i], exampleError)}
+                            <div class="example-content">${formatMathNotation(cleanedExample)}</div>
                         </div>
                     `;
                 }
@@ -5034,16 +5040,7 @@ async function retryWorkedExamples() {
         }
     } catch (error) {
         console.error('Retry failed:', error);
-        examplesContent.innerHTML = `
-            <div class="step-generation-network-error">
-                <div class="network-error-container">
-                    <div class="network-error-icon">❌</div>
-                    <div class="network-error-message">
-                        Retry failed. Please refresh the page and try again.
-                    </div>
-                </div>
-            </div>
-        `;
+        // Silently keep whatever content is there - steps will load on shared-lesson page
     }
 }
 
