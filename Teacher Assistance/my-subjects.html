@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Subjects & Skills - Deciph.AI</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" type="image/svg+xml">
+    <style>
+        :root {
+            --primary-color: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --secondary-color: #10B981;
+            --accent-color: #F59E0B;
+            --text-color: #1F2937;
+            --light-bg: #F3F4F6;
+            --white: #FFFFFF;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: var(--gray-200);
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-description {
+            color: var(--gray-600);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            background: white;
+            color: var(--text-color);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        /* Subjects Grid */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+        }
+
+        .subject-header {
+            height: 120px;
+            background: linear-gradient(135deg, var(--subject-color, #4A90E2), var(--subject-color-dark, #357ABD));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .subject-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .subject-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subject-menu {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .subject-body {
+            padding: 1.5rem;
+        }
+
+        .subject-code {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .subject-description {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .subject-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .stat-number.pending {
+            color: #F59E0B;
+        }
+
+        .stat-number.completed {
+            color: #10B981;
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            gap: 1rem;
+        }
+
+        .spinner {
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-description {
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+        }
+
+        .empty-action {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .empty-action:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header-container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.25rem;
+            }
+
+            .subjects-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .student-info {
+                display: none;
+            }
+        }
+
+        /* Subject Color Variants */
+        .subject-card[data-color="purple"] {
+            --subject-color: #845EC2;
+            --subject-color-dark: #6B4E9E;
+        }
+
+        .subject-card[data-color="pink"] {
+            --subject-color: #D65DB1;
+            --subject-color-dark: #B04A8E;
+        }
+
+        .subject-card[data-color="teal"] {
+            --subject-color: #00C9A7;
+            --subject-color-dark: #00A085;
+        }
+
+        .subject-card[data-color="blue"] {
+            --subject-color: #4FACFE;
+            --subject-color-dark: #2B8AD8;
+        }
+
+        .subject-card[data-color="gold"] {
+            --subject-color: #F9A825;
+            --subject-color-dark: #D68910;
+        }
+
+        .subject-card[data-color="green"] {
+            --subject-color: #4D8076;
+            --subject-color-dark: #3A6058;
+        }
+
+        .subject-card[data-color="red"] {
+            --subject-color: #FF6F91;
+            --subject-color-dark: #E04868;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <a href="/student-dashboard" class="back-btn">
+                    <span>←</span>
+                    <span>Back to Dashboard</span>
+                </a>
+                <h1 class="page-title">My Subjects & Skills</h1>
+            </div>
+            <div class="header-right">
+                <div class="student-info">
+                    <div class="student-avatar" id="studentAvatar">S</div>
+                    <span class="student-name" id="studentName">Student</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <p class="page-description">Click on any subject to view tasks and assignments. View your assigned skills below.</p>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label class="filter-label">Filter:</label>
+                <select class="filter-select" id="filterStatus">
+                    <option value="all">All Subjects</option>
+                    <option value="active">With Pending Tasks</option>
+                    <option value="completed">All Completed</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Sort by:</label>
+                <select class="filter-select" id="sortBy">
+                    <option value="name">Name</option>
+                    <option value="pending">Most Pending</option>
+                    <option value="completed">Most Completed</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Subjects Grid -->
+        <div class="subjects-grid" id="subjectsGrid">
+            <!-- Loading State -->
+            <div class="loading-container" id="loadingState">
+                <div class="spinner"></div>
+                <p class="loading-text">Loading your subjects...</p>
+            </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="page-header" style="margin-top: 3rem;">
+            <h2 class="section-title" style="font-size: 1.75rem; margin-bottom: 0.5rem;">My Skills</h2>
+            <p class="page-description">Track your progress in different skill areas</p>
+        </div>
+
+        <!-- Skills Grid -->
+        <div class="subjects-grid" id="skillsGrid">
+            <!-- Loading State -->
+            <div class="loading-container" id="loadingSkillsState">
+                <div class="spinner"></div>
+                <p class="loading-text">Loading your skills...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Authentication helper
+        function getStudentToken() {
+            return localStorage.getItem('student_token');
+        }
+
+        async function authenticatedFetch(url, options = {}) {
+            const token = getStudentToken();
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
+
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            return fetch(url, { ...options, headers });
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStudentInfo();
+            loadSubjects();
+            loadSkills();
+            setupFilters();
+        });
+
+        // Load student info
+        function loadStudentInfo() {
+            const storedStudent = localStorage.getItem('student_user');
+            if (storedStudent) {
+                const student = JSON.parse(storedStudent);
+                document.getElementById('studentName').textContent = student.name || 'Student';
+                const initial = (student.name || 'S').charAt(0).toUpperCase();
+                document.getElementById('studentAvatar').textContent = initial;
+            }
+        }
+
+        // Load subjects
+        let allSubjects = [];
+
+        async function loadSubjects() {
+            try {
+                const response = await authenticatedFetch('https://seashell-app-onfk3.ondigitalocean.app/api/student/my-subjects');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    allSubjects = data.subjects || [];
+                    renderSubjects(allSubjects);
+                } else {
+                    throw new Error('Failed to load subjects');
+                }
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+                renderEmptyState();
+            }
+        }
+
+        // Render subjects
+        function renderSubjects(subjects) {
+            const grid = document.getElementById('subjectsGrid');
+
+            if (!subjects || subjects.length === 0) {
+                renderEmptyState();
+                return;
+            }
+
+            grid.innerHTML = subjects.map(subject => {
+                const subjectCode = subject.subject?.code || '';
+                const icon = getSubjectIcon(subjectCode);
+                const color = getSubjectColor(subject.icon_color);
+
+                return `
+                    <div class="subject-card" data-color="${color}"
+                         onclick="viewSubjectTasks('${subjectCode}', '${subject.display_name || ''}')">
+                        <div class="subject-header">
+                            <div class="subject-menu">
+                                <button class="menu-btn" onclick="event.stopPropagation()">⋯</button>
+                            </div>
+                            <div class="subject-icon">${icon}</div>
+                            <div class="subject-name">${subject.display_name || 'Subject'}</div>
+                        </div>
+                        <div class="subject-body">
+                            <div class="subject-code">${subjectCode}</div>
+                            <div class="subject-description">
+                                ${subject.display_description || subject.subject?.description || '1 YR 2025-26'}
+                            </div>
+                            <div class="subject-stats">
+                                <div class="stat">
+                                    <div class="stat-number pending">${subject.pending_tasks || 0}</div>
+                                    <div class="stat-label">Pending</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-number completed">${subject.completed_tasks || 0}</div>
+                                    <div class="stat-label">Completed</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-number">${subject.total_tasks || 0}</div>
+                                    <div class="stat-label">Total</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render empty state
+        function renderEmptyState() {
+            const grid = document.getElementById('subjectsGrid');
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📚</div>
+                    <h2 class="empty-title">No Subjects Assigned Yet</h2>
+                    <p class="empty-description">
+                        Your subjects will appear here once they are assigned by your teacher.
+                    </p>
+                    <a href="/student-dashboard" class="empty-action">Go to Dashboard</a>
+                </div>
+            `;
+        }
+
+        // Get subject icon
+        function getSubjectIcon(subjectCode) {
+            const icons = {
+                'mathematics': '🔢',
+                'english-language': '📖',
+                'business-studies': '💼',
+                'physics': '⚡',
+                'chemistry': '🧪',
+                'biology': '🔬',
+                'economics': '📊',
+                'technical-engineering': '⚙️',
+                'media-literacy': '🎬'
+            };
+            return icons[subjectCode] || '📚';
+        }
+
+        // Get subject color class
+        function getSubjectColor(hexColor) {
+            // Map hex colors to color classes
+            const colorMap = {
+                '#845EC2': 'purple',
+                '#D65DB1': 'pink',
+                '#FF6F91': 'red',
+                '#00C9A7': 'teal',
+                '#4D8076': 'green',
+                '#936B93': 'purple',
+                '#F9A825': 'gold',
+                '#5C7CFA': 'blue',
+                '#4FACFE': 'blue'
+            };
+            return colorMap[hexColor] || 'blue';
+        }
+
+        // View subject tasks
+        function viewSubjectTasks(subjectCode, subjectName) {
+            localStorage.setItem('subject_filter', subjectCode);
+            localStorage.setItem('subject_name', subjectName);
+            window.location.href = '/subject-task?subject=' + encodeURIComponent(subjectCode) + '&name=' + encodeURIComponent(subjectName);
+        }
+
+        // Load skills
+        let allSkills = [];
+
+        async function loadSkills() {
+            try {
+                const response = await authenticatedFetch('https://seashell-app-onfk3.ondigitalocean.app/api/student/my-skills');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    allSkills = data.skills || [];
+                    renderSkills(allSkills);
+                } else {
+                    throw new Error('Failed to load skills');
+                }
+            } catch (error) {
+                console.error('Error loading skills:', error);
+                renderEmptySkillsState();
+            } finally {
+                document.getElementById('loadingSkillsState')?.remove();
+            }
+        }
+
+        function renderSkills(skills) {
+            const skillsGrid = document.getElementById('skillsGrid');
+            document.getElementById('loadingSkillsState')?.remove();
+
+            if (!skills || skills.length === 0) {
+                renderEmptySkillsState();
+                return;
+            }
+
+            skillsGrid.innerHTML = skills.map(skill => {
+                const skillData = skill.skill || {};
+                const iconColor = skillData.icon_color || '#10B981';
+                const skillName = skill.custom_name || skillData.name || 'Skill';
+                const skillDesc = skill.custom_description || skillData.description || 'Track your progress in this skill area';
+                const progress = skill.progress_percentage || 0;
+                const proficiency = skill.proficiency_level || 'Beginner';
+                const category = skillData.category || 'general';
+                const skillCode = skillData.code || '';
+                const skillIcon = getSkillIcon(skillCode);
+
+                // Map icon color to a color class for consistency
+                const colorClass = getColorClassFromHex(iconColor);
+
+                return `
+                    <div class="subject-card" data-color="${colorClass}"
+                         onclick="viewSubjectTasks('${skillCode}', '${skillName}')"
+                         style="--subject-color: ${iconColor}; --subject-color-dark: ${adjustColorBrightness(iconColor, -20)};">
+                        <div class="subject-header">
+                            <div class="subject-menu">
+                                <button class="menu-btn" onclick="event.stopPropagation()">⋯</button>
+                            </div>
+                            <div class="subject-icon">${skillIcon}</div>
+                            <div class="subject-name">${skillName}</div>
+                        </div>
+                        <div class="subject-body">
+                            <div class="subject-code">${category.toUpperCase()}</div>
+                            <div class="subject-description">${skillDesc}</div>
+                            <div class="subject-stats">
+                                <div class="stat">
+                                    <div class="stat-number" style="color: ${iconColor};">${progress}</div>
+                                    <div class="stat-label">Progress %</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-number">${proficiency}</div>
+                                    <div class="stat-label">Level</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderEmptySkillsState() {
+            const skillsGrid = document.getElementById('skillsGrid');
+            skillsGrid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🎯</div>
+                    <h3 class="empty-title">No Skills Assigned Yet</h3>
+                    <p class="empty-description">Your skills will appear here once they are assigned by your teacher.</p>
+                </div>
+            `;
+        }
+
+        function getSkillIcon(skillCode) {
+            const icons = {
+                'graphics-design': '🎨',
+                'coding': '💻',
+                'ai-ml': '🤖',
+                'robotics': '🦾',
+                'video-editing': '🎬',
+                'digital-marketing': '📱',
+                'web-development': '🌐',
+                '3d-modeling': '🎲',
+                'data-science': '📊',
+                'ui-ux-design': '✨'
+            };
+            return icons[skillCode] || '🎯';
+        }
+
+        // Map hex color to predefined color class
+        function getColorClassFromHex(hexColor) {
+            const colorMap = {
+                '#845EC2': 'purple',
+                '#D65DB1': 'pink',
+                '#FF6F91': 'red',
+                '#00C9A7': 'teal',
+                '#4D8076': 'green',
+                '#936B93': 'purple',
+                '#F9A825': 'gold',
+                '#5C7CFA': 'blue',
+                '#4FACFE': 'blue',
+                '#10B981': 'green'
+            };
+            return colorMap[hexColor] || 'blue';
+        }
+
+        // Adjust color brightness (negative percent to darken)
+        function adjustColorBrightness(hex, percent) {
+            // Remove # if present
+            hex = hex.replace('#', '');
+
+            // Convert to RGB
+            let r = parseInt(hex.substring(0, 2), 16);
+            let g = parseInt(hex.substring(2, 4), 16);
+            let b = parseInt(hex.substring(4, 6), 16);
+
+            // Adjust brightness
+            r = Math.max(0, Math.min(255, r + (r * percent / 100)));
+            g = Math.max(0, Math.min(255, g + (g * percent / 100)));
+            b = Math.max(0, Math.min(255, b + (b * percent / 100)));
+
+            // Convert back to hex
+            const rr = Math.round(r).toString(16).padStart(2, '0');
+            const gg = Math.round(g).toString(16).padStart(2, '0');
+            const bb = Math.round(b).toString(16).padStart(2, '0');
+
+            return '#' + rr + gg + bb;
+        }
+
+        // Setup filters
+        function setupFilters() {
+            const filterStatus = document.getElementById('filterStatus');
+            const sortBy = document.getElementById('sortBy');
+
+            filterStatus.addEventListener('change', applyFilters);
+            sortBy.addEventListener('change', applyFilters);
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const filterStatus = document.getElementById('filterStatus').value;
+            const sortBy = document.getElementById('sortBy').value;
+
+            let filtered = [...allSubjects];
+
+            // Apply status filter
+            if (filterStatus === 'active') {
+                filtered = filtered.filter(s => (s.pending_tasks || 0) > 0);
+            } else if (filterStatus === 'completed') {
+                filtered = filtered.filter(s => (s.pending_tasks || 0) === 0 && (s.total_tasks || 0) > 0);
+            }
+
+            // Apply sorting
+            if (sortBy === 'name') {
+                filtered.sort((a, b) => (a.display_name || '').localeCompare(b.display_name || ''));
+            } else if (sortBy === 'pending') {
+                filtered.sort((a, b) => (b.pending_tasks || 0) - (a.pending_tasks || 0));
+            } else if (sortBy === 'completed') {
+                filtered.sort((a, b) => (b.completed_tasks || 0) - (a.completed_tasks || 0));
+            }
+
+            renderSubjects(filtered);
+        }
+    </script>
+</body>
+</html>

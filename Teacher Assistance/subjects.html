@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Subjects - Deciph.AI</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" type="image/svg+xml">
+    <style>
+        :root {
+            --primary-color: #00BFFF;
+            --primary-dark: #0099CC;
+            --secondary-color: #10B981;
+            --accent-color: #F59E0B;
+            --text-color: #1F2937;
+            --light-bg: #F3F4F6;
+            --white: #FFFFFF;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #00BFFF 0%, #0080FF 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        body[data-current-page="subjects"] {
+            /* Sidebar integration */
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--card-shadow);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .page-title {
+            font-size: 3rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .page-subtitle {
+            color: var(--gray-600);
+            font-size: 1.2rem;
+        }
+
+        /* Subjects Container */
+        .subjects-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .subjects-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .subjects-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .subjects-count {
+            color: var(--gray-600);
+            font-size: 1rem;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+        }
+
+        .subject-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .subject-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ffecd2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .subject-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .subject-image-placeholder {
+            font-size: 4rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subject-content {
+            padding: 1.5rem;
+        }
+
+        .subject-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.75rem;
+        }
+
+        .subject-description {
+            color: var(--gray-600);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .subject-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.875rem 1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Subject-specific gradients */
+        .subject-mathematics .subject-image { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        }
+        .subject-english .subject-image { 
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+        }
+        .subject-science .subject-image { 
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+        }
+        .subject-physics .subject-image { 
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); 
+        }
+        .subject-chemistry .subject-image { 
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); 
+        }
+        .subject-biology .subject-image { 
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); 
+        }
+        .subject-history .subject-image { 
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); 
+        }
+        .subject-geography .subject-image { 
+            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%); 
+        }
+        .subject-computer .subject-image { 
+            background: linear-gradient(135deg, #0c3483 0%, #a2b6df 100%); 
+        }
+        .subject-art .subject-image { 
+            background: linear-gradient(135deg, #ffeef8 0%, #f368e0 100%); 
+        }
+        .subject-music .subject-image { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        }
+        .subject-physical-education .subject-image { 
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); 
+        }
+        .subject-language .subject-image { 
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); 
+        }
+        .subject-economics .subject-image { 
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); 
+        }
+        .subject-civics .subject-image { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        }
+
+        /* Loading and Empty States */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-header {
+                padding: 2rem 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .subject-content {
+                padding: 1.25rem;
+            }
+
+            .action-btn {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .subjects-container {
+                padding: 2rem 1rem;
+            }
+
+            .subject-image {
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+<body data-current-page="subjects">
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <a href="#" class="logo">
+                <span>📚</span>
+                <span>My Subjects</span>
+            </a>
+        </div>
+        <div class="header-right">
+            <a href="/student-dashboard" class="back-btn">
+                <span>←</span>
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Choose Your Tool</h1>
+            <p class="page-subtitle">Select from our suite of educational tools designed to enhance the learning experience</p>
+        </div>
+
+        <!-- Subjects Container -->
+        <div class="subjects-container">
+            <div class="subjects-header">
+                <h2 class="subjects-title" id="subjectsTitle">Available Learning Tools</h2>
+                <p class="subjects-count" id="subjectsCount">Explore interactive educational content</p>
+            </div>
+            <div class="subjects-grid" id="subjectsGrid">
+                <!-- Subjects will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the sidebar script -->
+    <script src="sidebar.js"></script>
+    
+    <script>
+        // Comprehensive subjects database
+        const subjectsDatabase = [
+            {
+                id: 'mathematics',
+                name: 'Mathematics',
+                description: 'Create customized math quizzes with multiple choice, true/false, and problem-solving questions. Track student performance and identify learning gaps.',
+                imageUrl: 'https://images.unsplash.com/photo-1509869175650-a1d97972541a?w=500&h=300&fit=crop',
+                category: 'core'
+            },
+            {
+                id: 'english',
+                name: 'English Language Arts',
+                description: 'Plan comprehensive language lessons with reading, writing, grammar, and literature activities. Align with curriculum standards and track progress.',
+                imageUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&h=300&fit=crop',
+                category: 'core'
+            },
+            {
+                id: 'science',
+                name: 'Science Explorer',
+                description: 'Create interactive flashcards to help students memorize key scientific concepts, vocabulary, and facts. Perfect for review sessions and self-directed learning.',
+                imageUrl: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=500&h=300&fit=crop',
+                category: 'core'
+            },
+            {
+                id: 'physics',
+                name: 'Physics Lab',
+                description: 'Interactive physics simulations and experiments covering motion, forces, energy, waves, and fundamental laws of nature.',
+                imageUrl: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=500&h=300&fit=crop',
+                category: 'science'
+            },
+            {
+                id: 'chemistry',
+                name: 'Chemistry Workshop',
+                description: 'Virtual chemistry lab with molecular modeling, reaction simulations, and periodic table exploration tools.',
+                imageUrl: 'https://images.unsplash.com/photo-1554475901-4538ddfbccc2?w=500&h=300&fit=crop',
+                category: 'science'
+            },
+            {
+                id: 'biology',
+                name: 'Biology Discovery',
+                description: 'Explore living organisms, life processes, ecosystems, and genetics through interactive content and virtual dissections.',
+                imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=500&h=300&fit=crop',
+                category: 'science'
+            },
+            {
+                id: 'history',
+                name: 'History Timeline',
+                description: 'Journey through world history with interactive timelines, historical documents, and immersive cultural experiences.',
+                imageUrl: 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=500&h=300&fit=crop',
+                category: 'social'
+            },
+            {
+                id: 'geography',
+                name: 'World Explorer',
+                description: 'Interactive maps, country profiles, climate data, and cultural exploration tools for comprehensive geography learning.',
+                imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=500&h=300&fit=crop',
+                category: 'social'
+            },
+            {
+                id: 'computer',
+                name: 'Code Academy',
+                description: 'Learn programming languages, algorithms, and computational thinking through hands-on coding projects and challenges.',
+                imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&h=300&fit=crop',
+                category: 'technology'
+            },
+            {
+                id: 'art',
+                name: 'Digital Art Studio',
+                description: 'Create digital artwork, explore art history, and learn various artistic techniques through interactive tutorials.',
+                imageUrl: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=500&h=300&fit=crop',
+                category: 'arts'
+            },
+            {
+                id: 'music',
+                name: 'Music Composer',
+                description: 'Learn musical theory, compose melodies, and explore different instruments through interactive music creation tools.',
+                imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=300&fit=crop',
+                category: 'arts'
+            },
+            {
+                id: 'language',
+                name: 'Language Lab',
+                description: 'Master foreign languages with interactive lessons, pronunciation guides, and cultural immersion activities.',
+                imageUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&h=300&fit=crop',
+                category: 'language'
+            }
+        ];
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderSubjects();
+        });
+
+        function renderSubjects() {
+            const grid = document.getElementById('subjectsGrid');
+            grid.innerHTML = '';
+
+            subjectsDatabase.forEach(subject => {
+                const card = document.createElement('div');
+                card.className = `subject-card subject-${subject.id}`;
+                card.innerHTML = `
+                    <div class="subject-image">
+                        <div class="subject-image-placeholder">📚</div>
+                    </div>
+                    <div class="subject-content">
+                        <h3 class="subject-name">${subject.name}</h3>
+                        <p class="subject-description">${subject.description}</p>
+                        <div class="subject-actions">
+                            <button class="action-btn primary" onclick="startSubject('${subject.id}')">
+                                Get Started
+                            </button>
+                            <button class="action-btn secondary" onclick="previewSubject('${subject.id}')">
+                                Try Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add click handler for the entire card
+                card.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('action-btn')) {
+                        startSubject(subject.id);
+                    }
+                });
+
+                grid.appendChild(card);
+            });
+
+            // Update the subjects count
+            document.getElementById('subjectsCount').textContent = 
+                `${subjectsDatabase.length} educational tools available`;
+        }
+
+        function startSubject(subjectId) {
+            const subject = subjectsDatabase.find(s => s.id === subjectId);
+            if (subject) {
+                // Store the selected subject
+                sessionStorage.setItem('selectedSubject', JSON.stringify(subject));
+                
+                // Navigate to the subject's learning interface
+                window.location.href = `/learn/${subjectId}`;
+            }
+        }
+
+        function previewSubject(subjectId) {
+            const subject = subjectsDatabase.find(s => s.id === subjectId);
+            if (subject) {
+                // Open preview in a new tab/window
+                window.open(`/preview/${subjectId}`, '_blank');
+            }
+        }
+
+        // Add some visual enhancements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading animation
+            const loading = document.getElementById('loading');
+            loading.classList.add('show');
+            
+            setTimeout(() => {
+                loading.classList.remove('show');
+            }, 800);
+
+            // Add staggered animation to cards
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.subject-card');
+                cards.forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.6s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 900);
+        });
+
+        // Replace placeholder icons with subject-specific ones
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const subjects = {
+                    'mathematics': '🔢',
+                    'english': '📖',
+                    'science': '🔬',
+                    'physics': '⚡',
+                    'chemistry': '🧪',
+                    'biology': '🧬',
+                    'history': '📜',
+                    'geography': '🌍',
+                    'computer': '💻',
+                    'art': '🎨',
+                    'music': '🎵',
+                    'language': '🌐'
+                };
+
+                Object.keys(subjects).forEach(subjectId => {
+                    const placeholder = document.querySelector(`.subject-${subjectId} .subject-image-placeholder`);
+                    if (placeholder) {
+                        placeholder.textContent = subjects[subjectId];
+                    }
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deciph.AI Student Portal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>" type="image/svg+xml">
+    <!-- Google Sign-In API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root {
+            --primary-color: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --primary-gradient: linear-gradient(135deg, #8B5CF6, #6366F1);
+            --secondary-color: #F59E0B;
+            --accent-color: #10B981;
+            --text-color: #1F2937;
+            --light-bg: #F3F4F6;
+            --white: #FFFFFF;
+            --card-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.1), 0 10px 10px -5px rgba(139, 92, 246, 0.04);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --error-color: #EF4444;
+            --success-color: #10B981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .back-button:hover {
+            background: white;
+            transform: translateX(-5px);
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+            margin-right: 0.5rem;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .image-section {
+            flex: 0.38;
+            background: var(--primary-gradient);
+            padding: 1.5rem 1.2rem;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
+            overflow: visible;
+            min-width: 240px;
+        }
+        
+        .image-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7-7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'/%3E%3C/svg%3E");
+            opacity: 0.2;
+        }
+
+        /* Section divider */
+        .section-divider {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .section-divider::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+        }
+
+        /* Slideshow styles */
+        .slideshow {
+            height: auto;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .slideshow-wrapper {
+            position: relative;
+            height: 4rem;
+            width: 100%;
+            overflow: visible;
+            padding-right: 10px;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide h2 {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+
+        .welcome-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: visible;
+        }
+
+        /* Features slideshow */
+        .features-slideshow {
+            height: 200px;
+            margin-top: 1rem;
+            overflow: visible;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            max-width: 100%;
+            overflow: visible;
+        }
+
+        .feature.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .feature-icon {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+            word-break: keep-all;
+            white-space: nowrap;
+        }
+
+        .wink-emoji {
+            display: inline-block;
+            animation: wink 2s ease-in-out 1s;
+            margin-left: 4px;
+            position: relative;
+            z-index: 5;
+        }
+
+        @keyframes wink {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
+        .form-section {
+            flex: 1;
+            background: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .form-title {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .form-tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .form-tab.active {
+            color: var(--primary-color);
+        }
+        
+        .form-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .form-content {
+            position: relative;
+            min-height: 500px;
+            overflow: visible;
+        }
+        
+        .form {
+            position: absolute;
+            width: 100%;
+            transition: var(--transition);
+            opacity: 0;
+            transform: translateX(50px);
+            visibility: hidden;
+            max-height: 520px;
+            overflow-y: auto;
+        }
+        
+        /* Custom scrollbar for form */
+        .form::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .form::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .form::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        .form::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        .form.active {
+            opacity: 1;
+            transform: translateX(0);
+            visibility: visible;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.half-width {
+            display: inline-block;
+            width: 48%;
+            margin-right: 4%;
+        }
+
+        .form-group.half-width:nth-child(even) {
+            margin-right: 0;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+        
+        .forgot-password a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.1), 0 2px 4px -1px rgba(139, 92, 246, 0.06);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.1), 0 4px 6px -2px rgba(139, 92, 246, 0.05);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .social-login {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .social-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .social-text::before,
+        .social-text::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background-color: #e5e7eb;
+        }
+        
+        .social-text::before {
+            left: 0;
+        }
+        
+        .social-text::after {
+            right: 0;
+        }
+        
+        .social-login-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 14px;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            display: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e5e7eb;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .grade-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .grade-option {
+            padding: 0.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .grade-option:hover {
+            border-color: var(--primary-color);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .grade-option.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .grade-option input[type="radio"] {
+            display: none;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 900px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+            
+            .image-section {
+                padding: 2rem 1.5rem;
+            }
+            
+            .form-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-group.half-width {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .login-container {
+                margin: 0;
+                border-radius: 10px;
+                min-height: auto;
+            }
+            
+            .image-section, .form-section {
+                padding: 1.5rem;
+            }
+            
+            .welcome-title {
+                font-size: 1.2rem;
+            }
+
+            .slideshow-wrapper {
+                height: 3.5rem;
+            }
+            
+            .features-slideshow {
+                height: 160px;
+                margin-bottom: 20px;
+            }
+            
+            .form-content {
+                min-height: 520px;
+            }
+
+            .form-tabs {
+                margin-bottom: 1.5rem;
+            }
+
+            .form-tab {
+                padding: 0.75rem 0.5rem;
+            }
+            
+            .logo-container {
+                margin-bottom: 0.5rem;
+            }
+            
+            .feature-text {
+                font-size: 0.85rem;
+            }
+
+            .grade-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Progressive Onboarding Modal Styles */
+        .onboarding-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .onboarding-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .onboarding-modal {
+            background: white;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .onboarding-progress {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: var(--primary-color);
+            transform: scale(1.2);
+        }
+
+        .onboarding-step {
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .onboarding-step.active {
+            display: block;
+        }
+
+        .onboarding-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .onboarding-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .onboarding-title {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .onboarding-subtitle {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .onboarding-body {
+            margin-bottom: 2rem;
+        }
+
+        .onboarding-label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .onboarding-select,
+        .onboarding-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .onboarding-select:focus,
+        .onboarding-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .grade-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .grade-btn {
+            padding: 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: white;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .grade-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .grade-btn.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .onboarding-error {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            min-height: 1.25rem;
+        }
+
+        .onboarding-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .onboarding-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .onboarding-btn.primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .onboarding-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .onboarding-btn.secondary {
+            background: #e5e7eb;
+            color: var(--text-color);
+        }
+
+        .onboarding-btn.secondary:hover {
+            background: #d1d5db;
+        }
+
+        .onboarding-success {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: scaleUp 0.5s ease-out;
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .success-subtitle {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .grade-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+
+            .grade-btn {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .onboarding-modal {
+                padding: 1.5rem;
+            }
+
+            .onboarding-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="goBack()">
+        <span>←</span>
+        <span>Back to Selection</span>
+    </button>
+
+    <div class="login-container">
+        <div class="image-section">
+            <div class="logo-container">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">Student Portal</span>
+            </div>
+            
+            <!-- Welcome slideshow -->
+            <div class="slideshow welcome-slideshow">
+                <div class="slideshow-wrapper">
+                    <div class="slide active">
+                        <h2 class="welcome-title">Welcome Students!</h2>
+                    </div>
+                    <div class="slide">
+                        <h2 class="welcome-title">Learn through play <span class="wink-emoji">🎮</span></h2>
+                    </div>
+                    <div class="slide">
+                        <h2 class="welcome-title">Unlock your potential</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section divider -->
+            <div class="section-divider"></div>
+            
+            <!-- Features slideshow -->
+            <div class="features-slideshow">
+                <div class="feature" id="feature-1">
+                    <span class="feature-icon">🎮</span>
+                    <span class="feature-text">Gamified Learning</span>
+                </div>
+                <div class="feature" id="feature-2">
+                    <span class="feature-icon">📖</span>
+                    <span class="feature-text">Story-based Lessons</span>
+                </div>
+                <div class="feature" id="feature-3">
+                    <span class="feature-icon">🗣️</span>
+                    <span class="feature-text">Interactive Debates</span>
+                </div>
+                <div class="feature" id="feature-4">
+                    <span class="feature-icon">🏆</span>
+                    <span class="feature-text">Achievement System</span>
+                </div>
+                <div class="feature" id="feature-5">
+                    <span class="feature-icon">⭐</span>
+                    <span class="feature-text">Personalized Journey</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="logo-container">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">Deciph.AI</span>
+            </div>
+            
+            <div class="form-content">
+                <form class="form login-form active" id="loginForm">
+                    <h2 class="form-title">Welcome Back</h2>
+                    
+                    <div class="form-group">
+                        <label for="loginIdentifier" class="form-label">Email, Username, or Phone</label>
+                        <input type="text" id="loginIdentifier" class="form-input" placeholder="Enter your email, username, or phone number" autocomplete="email" required>
+                        <div class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword" class="form-label">Password</label>
+                        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" autocomplete="current-password" required>
+                        <div class="error-message"></div>
+                    </div>
+                    
+                    <div class="forgot-password">
+                        <a href="#" id="forgotPasswordLink">Forgot password?</a>
+                    </div>
+                    
+                    <div class="success-message" id="loginSuccessMessage"></div>
+                    <button type="submit" class="submit-btn">Login</button>
+                    
+                    <div class="social-login">
+                        <p class="social-text">Or login with</p>
+                        <div class="social-login-buttons">
+                            <div id="g_id_onload"
+                                 data-client_id="587123593268-765h8r0680mgtqvc3coko7dg66gqf7n2.apps.googleusercontent.com"
+                                 data-context="signin"
+                                 data-callback="handleGoogleSignIn"
+                                 data-auto_prompt="false">
+                            </div>
+                            <div class="g_id_signin"
+                                 data-type="standard"
+                                 data-size="large"
+                                 data-theme="outline"
+                                 data-text="signin_with"
+                                 data-shape="rectangular"
+                                 data-logo_alignment="center">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progressive Onboarding Modal -->
+    <div class="onboarding-overlay" id="onboardingOverlay">
+        <div class="onboarding-modal" id="onboardingModal">
+            <!-- Progress Indicator -->
+            <div class="onboarding-progress">
+                <span class="progress-dot active" data-step="1"></span>
+                <span class="progress-dot" data-step="2"></span>
+                <span class="progress-dot" data-step="3"></span>
+                <span class="progress-dot" data-step="4"></span>
+            </div>
+
+            <!-- Step 1: Age -->
+            <div class="onboarding-step active" data-step="1">
+                <div class="onboarding-header">
+                    <div class="onboarding-icon">🎓</div>
+                    <h2 class="onboarding-title">Welcome to Deciph.AI!</h2>
+                    <p class="onboarding-subtitle">Let's get to know you better</p>
+                </div>
+                <div class="onboarding-body">
+                    <label class="onboarding-label">How old are you?</label>
+                    <select id="onboardingAge" class="onboarding-select">
+                        <option value="" disabled selected>Select your age</option>
+                        <option value="5">5 years old</option>
+                        <option value="6">6 years old</option>
+                        <option value="7">7 years old</option>
+                        <option value="8">8 years old</option>
+                        <option value="9">9 years old</option>
+                        <option value="10">10 years old</option>
+                        <option value="11">11 years old</option>
+                        <option value="12">12 years old</option>
+                        <option value="13">13 years old</option>
+                        <option value="14">14 years old</option>
+                        <option value="15">15 years old</option>
+                        <option value="16">16 years old</option>
+                        <option value="17">17 years old</option>
+                        <option value="18">18 years old</option>
+                    </select>
+                    <div class="onboarding-error" id="ageError"></div>
+                </div>
+                <div class="onboarding-footer">
+                    <button class="onboarding-btn primary" onclick="nextOnboardingStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Full Name -->
+            <div class="onboarding-step" data-step="2">
+                <div class="onboarding-header">
+                    <div class="onboarding-icon">👤</div>
+                    <h2 class="onboarding-title">What's your name?</h2>
+                    <p class="onboarding-subtitle">Help us personalize your experience</p>
+                </div>
+                <div class="onboarding-body">
+                    <label class="onboarding-label">Full Name</label>
+                    <input type="text" id="onboardingName" class="onboarding-input" placeholder="Enter your full name">
+                    <div class="onboarding-error" id="nameError"></div>
+                </div>
+                <div class="onboarding-footer">
+                    <button class="onboarding-btn secondary" onclick="prevOnboardingStep()">← Back</button>
+                    <button class="onboarding-btn primary" onclick="nextOnboardingStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Grade Level -->
+            <div class="onboarding-step" data-step="3">
+                <div class="onboarding-header">
+                    <div class="onboarding-icon">📚</div>
+                    <h2 class="onboarding-title">Almost there!</h2>
+                    <p class="onboarding-subtitle">What grade are you in?</p>
+                </div>
+                <div class="onboarding-body">
+                    <div class="grade-grid">
+                        <button class="grade-btn" data-grade="K">K</button>
+                        <button class="grade-btn" data-grade="1">1st</button>
+                        <button class="grade-btn" data-grade="2">2nd</button>
+                        <button class="grade-btn" data-grade="3">3rd</button>
+                        <button class="grade-btn" data-grade="4">4th</button>
+                        <button class="grade-btn" data-grade="5">5th</button>
+                        <button class="grade-btn" data-grade="6">6th</button>
+                        <button class="grade-btn" data-grade="7">7th</button>
+                        <button class="grade-btn" data-grade="8">8th</button>
+                        <button class="grade-btn" data-grade="9">9th</button>
+                        <button class="grade-btn" data-grade="10">10th</button>
+                        <button class="grade-btn" data-grade="11">11th</button>
+                        <button class="grade-btn" data-grade="12">12th</button>
+                    </div>
+                    <div class="onboarding-error" id="gradeError"></div>
+                    <input type="hidden" id="onboardingGrade">
+                </div>
+                <div class="onboarding-footer">
+                    <button class="onboarding-btn secondary" onclick="prevOnboardingStep()">← Back</button>
+                    <button class="onboarding-btn primary" onclick="nextOnboardingStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 4: School Name -->
+            <div class="onboarding-step" data-step="4">
+                <div class="onboarding-header">
+                    <div class="onboarding-icon">🏫</div>
+                    <h2 class="onboarding-title">Last step!</h2>
+                    <p class="onboarding-subtitle">What school do you attend?</p>
+                </div>
+                <div class="onboarding-body">
+                    <input type="text" id="onboardingSchool" class="onboarding-input" placeholder="Enter your school name">
+                    <div class="onboarding-error" id="schoolError"></div>
+                </div>
+                <div class="onboarding-footer">
+                    <button class="onboarding-btn secondary" onclick="prevOnboardingStep()">← Back</button>
+                    <button class="onboarding-btn primary" onclick="completeOnboarding()">Finish ✓</button>
+                </div>
+            </div>
+
+            <!-- Success Animation -->
+            <div class="onboarding-step" data-step="success">
+                <div class="onboarding-success">
+                    <div class="success-icon">🎉</div>
+                    <h2 class="success-title">All Set!</h2>
+                    <p class="success-subtitle">Welcome to your learning journey</p>
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.form-tab');
+            const forms = document.querySelectorAll('.form');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update active form with animation
+                    forms.forEach(form => {
+                        form.classList.remove('active');
+                        if (form.classList.contains(`${target}-form`)) {
+                            setTimeout(() => {
+                                form.classList.add('active');
+                            }, 50);
+                        }
+                    });
+                    
+                    // Clear any error messages
+                    document.querySelectorAll('.error-message').forEach(err => {
+                        err.style.display = 'none';
+                    });
+                });
+            });
+
+            // Grade level selection
+            const gradeOptions = document.querySelectorAll('.grade-option');
+            gradeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    gradeOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    this.querySelector('input[type="radio"]').checked = true;
+                });
+            });
+            
+            // Welcome text slideshow
+            function animateWelcomeSlides() {
+                const slides = document.querySelectorAll('.welcome-slideshow .slide');
+                let currentSlide = 0;
+                
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, 3000);
+            }
+            
+            // Features animation - one by one
+            function animateFeatures() {
+                const features = document.querySelectorAll('.feature');
+                let currentFeature = 0;
+                
+                // First feature starts active
+                features[0].classList.add('active');
+                
+                setInterval(() => {
+                    features[currentFeature].classList.remove('active');
+                    currentFeature = (currentFeature + 1) % features.length;
+                    features[currentFeature].classList.add('active');
+                }, 2500);
+            }
+
+            // Start animations
+            animateWelcomeSlides();
+            animateFeatures();
+
+            // Check if user is already logged in (student version)
+            checkExistingToken();
+
+            // Login form submission
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Signing in...';
+
+                const identifier = document.getElementById('loginIdentifier').value.trim();
+                const password = document.getElementById('loginPassword').value;
+
+                try {
+                    const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/student/auth', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ identifier, password })
+                    });
+
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Server response was not JSON');
+                    }
+
+                    const data = await response.json();
+                    console.log("Student auth response:", data);
+
+                    if (response.ok && data.success) {
+                        handleAuthSuccess(data);
+                    } else {
+                        showError('loginIdentifier', data.error || 'Sign in failed');
+                    }
+                } catch (error) {
+                    console.error('Auth error:', error);
+                    showError('loginIdentifier', 'An error occurred. Please try again.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Sign In';
+                }
+            });
+
+            // Grade button selection in onboarding
+            const gradeButtons = document.querySelectorAll('.grade-btn');
+            gradeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    gradeButtons.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('onboardingGrade').value = this.dataset.grade;
+                    document.getElementById('gradeError').textContent = '';
+                });
+            });
+        });
+
+        // Navigation function
+        function goBack() {
+            window.location.href = '/student-dashboard'; // or wherever your service selector is
+        }
+
+        // Helper function to show error messages
+        function showError(fieldId, message) {
+            const errorDiv = document.getElementById(fieldId)
+                .parentElement
+                .querySelector('.error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Token storage and validation functions (adapted for students)
+        function storeToken(token) {
+            try {
+                localStorage.setItem('student_token', token);
+                console.log("Student token stored in localStorage");
+            } catch (e) {
+                console.warn('Could not store in localStorage:', e);
+            }
+            
+            try {
+                sessionStorage.setItem('student_token', token);
+                console.log("Student token stored in sessionStorage");
+            } catch (e) {
+                console.warn('Could not store in sessionStorage:', e);
+            }
+            
+            try {
+                const date = new Date();
+                date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000));
+                document.cookie = `student_token=${token}; expires=${date.toUTCString()}; path=/`;
+                console.log("Student token stored in cookie");
+            } catch (e) {
+                console.warn('Could not set cookie:', e);
+            }
+        }
+
+        function checkExistingToken() {
+            const justLoggedOut = sessionStorage.getItem('student_just_logged_out');
+            if (justLoggedOut) {
+                sessionStorage.removeItem('student_just_logged_out');
+                return;
+            }
+            
+            const token = localStorage.getItem('student_token') || 
+                        sessionStorage.getItem('student_token') || 
+                        getCookie('student_token');
+                            
+            if (token) {
+                fetch('https://seashell-app-onfk3.ondigitalocean.app/api/student/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/student-dashboard';
+                    } else {
+                        localStorage.removeItem('student_token');
+                        sessionStorage.removeItem('student_token');
+                        document.cookie = 'student_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error validating student token:', error);
+                });
+            }
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return { valid: false, message: 'Please enter a valid email address' };
+            }
+            
+            const disposableDomains = ['mailinator.com', 'tempmail.com', 'fakeinbox.com', 'guerrillamail.com', 'yopmail.com'];
+            const domain = email.split('@')[1];
+            
+            if (disposableDomains.includes(domain)) {
+                return { valid: false, message: 'Disposable email addresses are not allowed' };
+            }
+            
+            return { valid: true };
+        }
+
+        // Global variable to store auth token during onboarding
+        let onboardingToken = null;
+
+        function handleAuthSuccess(data) {
+            console.log("Student auth successful, handling token storage...");
+
+            if (!data.token) {
+                console.error("No token received from server!");
+                showError('loginIdentifier', 'Authentication failed. Please try again.');
+                return;
+            }
+
+            storeToken(data.token);
+
+            if (data.user) {
+                localStorage.setItem('student_user', JSON.stringify(data.user));
+
+                // Check if profile is complete
+                if (data.user.profile_complete) {
+                    // Profile complete - redirect to dashboard
+                    const successMsg = document.getElementById('loginSuccessMessage');
+                    if (successMsg) {
+                        successMsg.textContent = 'Sign in successful! Welcome back!';
+                        successMsg.style.display = 'block';
+                    }
+
+                    sessionStorage.setItem('studentNewLogin', 'true');
+
+                    setTimeout(() => {
+                        window.location.href = '/student-dashboard';
+                    }, 1000);
+                } else {
+                    // Profile incomplete - show onboarding
+                    onboardingToken = data.token;
+                    showOnboarding();
+                }
+            }
+        }
+
+        function showOnboarding() {
+            const overlay = document.getElementById('onboardingOverlay');
+            overlay.classList.add('active');
+        }
+
+        function hideOnboarding() {
+            const overlay = document.getElementById('onboardingOverlay');
+            overlay.classList.remove('active');
+        }
+
+        let currentOnboardingStep = 1;
+        const onboardingData = {};
+
+        function nextOnboardingStep() {
+            // Validate current step
+            if (currentOnboardingStep === 1) {
+                const age = document.getElementById('onboardingAge').value;
+                if (!age) {
+                    document.getElementById('ageError').textContent = 'Please select your age';
+                    return;
+                }
+                onboardingData.age = parseInt(age);
+                document.getElementById('ageError').textContent = '';
+            } else if (currentOnboardingStep === 2) {
+                const name = document.getElementById('onboardingName').value.trim();
+                if (!name || name.length < 2) {
+                    document.getElementById('nameError').textContent = 'Please enter your full name (min 2 characters)';
+                    return;
+                }
+                onboardingData.name = name;
+                document.getElementById('nameError').textContent = '';
+            } else if (currentOnboardingStep === 3) {
+                const grade = document.getElementById('onboardingGrade').value;
+                if (!grade) {
+                    document.getElementById('gradeError').textContent = 'Please select your grade level';
+                    return;
+                }
+                onboardingData.grade_level = grade;
+                document.getElementById('gradeError').textContent = '';
+            }
+
+            // Move to next step
+            currentOnboardingStep++;
+            updateOnboardingStep();
+        }
+
+        function prevOnboardingStep() {
+            currentOnboardingStep--;
+            updateOnboardingStep();
+        }
+
+        function updateOnboardingStep() {
+            const steps = document.querySelectorAll('.onboarding-step');
+            const progressDots = document.querySelectorAll('.progress-dot');
+
+            steps.forEach(step => step.classList.remove('active'));
+            progressDots.forEach(dot => dot.classList.remove('active'));
+
+            steps[currentOnboardingStep - 1].classList.add('active');
+
+            progressDots.forEach((dot, index) => {
+                if (index < currentOnboardingStep) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        async function completeOnboarding() {
+            // Validate school name
+            const school = document.getElementById('onboardingSchool').value.trim();
+            if (!school || school.length < 2) {
+                document.getElementById('schoolError').textContent = 'Please enter your school name (min 2 characters)';
+                return;
+            }
+            onboardingData.school_name = school;
+            document.getElementById('schoolError').textContent = '';
+
+            // Show success screen
+            currentOnboardingStep = 5;
+            updateOnboardingStep();
+
+            // Submit to backend
+            try {
+                const response = await fetch('https://seashell-app-onfk3.ondigitalocean.app/api/student/complete-profile', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${onboardingToken}`
+                    },
+                    body: JSON.stringify(onboardingData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Update stored user data
+                    localStorage.setItem('student_user', JSON.stringify(data.user));
+                    sessionStorage.setItem('studentNewLogin', 'true');
+
+                    // Redirect to dashboard after short delay
+                    setTimeout(() => {
+                        window.location.href = '/student-dashboard';
+                    }, 2000);
+                } else {
+                    alert('Failed to complete profile. Please try again.');
+                    currentOnboardingStep = 4;
+                    updateOnboardingStep();
+                }
+            } catch (error) {
+                console.error('Complete profile error:', error);
+                alert('An error occurred. Please try again.');
+                currentOnboardingStep = 4;
+                updateOnboardingStep();
+            }
+        }
+
+        // Google Sign-In handler
+        function handleGoogleSignIn(response) {
+            console.log("Google student sign-in response received:", response);
+
+            const credential = response.credential;
+
+            if (!credential) {
+                console.error("No credential found in Google response");
+                showError('loginIdentifier', 'Google authentication failed. Please try again.');
+                return;
+            }
+
+            fetch('https://seashell-app-onfk3.ondigitalocean.app/api/student/google-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    credential: credential
+                })
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Server response was not JSON');
+                }
+                return response.json().then(data => ({ status: response.status, body: data }));
+            })
+            .then(({ status, body }) => {
+                if (status === 200 && body.success) {
+                    handleAuthSuccess(body);
+                } else {
+                    showError('loginIdentifier', body.error || 'Google sign-in failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Google login error:', error);
+                showError('loginIdentifier', 'An error occurred during Google sign-in. Please try again.');
+            });
+        }
+
+        // Google Sign-Up handler (deprecated - now using auto-registration)
+        function handleGoogleSignUp(response) {
+            // Redirect to sign-in handler since we now auto-create accounts
+            handleGoogleSignIn(response);
+        }
+
+        // Forgot password modal (similar to tutor version but styled for students)
+        document.addEventListener('DOMContentLoaded', function() {
+            const forgotPasswordModal = document.createElement('div');
+            forgotPasswordModal.id = 'forgotPasswordModal';
+            forgotPasswordModal.className = 'modal';
+            forgotPasswordModal.style.display = 'none';
+            forgotPasswordModal.style.position = 'fixed';
+            forgotPasswordModal.style.zIndex = '1000';
+            forgotPasswordModal.style.left = '0';
+            forgotPasswordModal.style.top = '0';
+            forgotPasswordModal.style.width = '100%';
+            forgotPasswordModal.style.height = '100%';
+            forgotPasswordModal.style.overflow = 'auto';
+            forgotPasswordModal.style.backgroundColor = 'rgba(0,0,0,0.4)';
+            
+            forgotPasswordModal.innerHTML = `
+                <div class="modal-content" style="background-color: white; margin: 15% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    <span class="close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                    <h2 style="color: var(--primary-color); margin-bottom: 20px;">Reset Password</h2>
+                    <p>Enter your email address below and we'll send you a link to reset your password.</p>
+                    
+                    <form id="passwordResetForm">
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="resetEmail" class="form-label">Email</label>
+                            <input type="email" id="resetEmail" class="form-input" placeholder="Enter your email" required>
+                            <div class="error-message" id="resetEmailError" style="color: var(--error-color); font-size: 14px; margin-top: 4px; display: none;"></div>
+                        </div>
+                        
+                        <div class="success-message" id="resetSuccessMessage" style="color: var(--success-color); font-size: 14px; margin-bottom: 10px; display: none;"></div>
+                        
+                        <button type="submit" id="resetSubmitBtn" class="submit-btn" style="width: 100%; padding: 0.75rem; background: var(--primary-gradient); color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer;">Send Reset Link</button>
+                        
+                        <div id="resetLoading" class="loading" style="display: none; text-align: center; margin-top: 10px;"></div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(forgotPasswordModal);
+            
+            const modal = document.getElementById('forgotPasswordModal');
+            const closeBtn = modal.querySelector('.close');
+            const resetEmail = document.getElementById('resetEmail');
+            const resetEmailError = document.getElementById('resetEmailError');
+            const resetSuccessMessage = document.getElementById('resetSuccessMessage');
+            const resetSubmitBtn = document.getElementById('resetSubmitBtn');
+            const resetLoading = document.getElementById('resetLoading');
+            
+            const forgotPasswordLink = document.querySelector('.forgot-password a');
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                resetEmail.value = '';
+                resetEmailError.style.display = 'none';
+                resetSuccessMessage.style.display = 'none';
+                resetSubmitBtn.disabled = false;
+                resetLoading.style.display = 'none';
+                
+                modal.style.display = 'block';
+            });
+            
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            const passwordResetForm = document.getElementById('passwordResetForm');
+            passwordResetForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = resetEmail.value;
+                
+                if (!email) {
+                    resetEmailError.textContent = 'Email is required';
+                    resetEmailError.style.display = 'block';
+                    return;
+                }
+                
+                resetSubmitBtn.disabled = true;
+                resetSubmitBtn.textContent = 'Sending...';
+                resetLoading.style.display = 'block';
+                
+                fetch('https://seashell-app-onfk3.ondigitalocean.app/api/student/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resetSuccessMessage.textContent = data.message || 'If your email is registered, you will receive a password reset link';
+                    resetSuccessMessage.style.display = 'block';
+                    
+                    resetEmail.style.display = 'none';
+                    document.querySelector('label[for="resetEmail"]').style.display = 'none';
+                    resetSubmitBtn.style.display = 'none';
+                    
+                    resetSuccessMessage.innerHTML = `
+                        <p>If your email is registered, you will receive a password reset link shortly.</p>
+                        <p>Please check your inbox and follow the instructions in the email.</p>
+                    `;
+                })
+                .catch(error => {
+                    resetEmailError.textContent = 'An error occurred. Please try again.';
+                    resetEmailError.style.display = 'block';
+                })
+                .finally(() => {
+                    resetLoading.style.display = 'none';
+                    resetSubmitBtn.textContent = 'Send Reset Link';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

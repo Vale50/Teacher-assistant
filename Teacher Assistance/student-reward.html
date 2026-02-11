@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual A-Card System - Redesigned</title>
+    <style>
+        /* ===================================
+           PART 1: GLOBAL STYLES & RESET
+        =================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Color Palette */
+            --primary-bg: #F9FAFB;
+            --secondary-bg: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --accent-color: #667EEA;
+            --accent-dark: #764BA2;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --border-color: #E5E7EB;
+            --border-light: #F3F4F6;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08);
+            --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ===================================
+           PART 2: CARD SECTION
+        =================================== */
+        .card-section {
+            background: linear-gradient(135deg, #F9FAFB 0%, #FFFFFF 100%);
+            padding: 60px 20px 40px 20px;
+        }
+
+        .card-container {
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Color Picker */
+        .color-picker {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: var(--primary-bg);
+            border-radius: 12px;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-option.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .color-option.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .color-gold { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+        .color-green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .color-red { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%); }
+        .color-blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        /* Virtual Card 3D Container */
+        .acard-3d-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            margin: 0 auto 25px auto;
+            position: relative;
+        }
+
+        .acard-flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .acard-flipper.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .acard-front, .acard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: white;
+            overflow: hidden;
+        }
+
+        .acard-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .acard-back {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+            transform: rotateY(180deg);
+        }
+
+        /* Card Color Variants */
+        .acard-purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .acard-gold { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+        .acard-green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .acard-red { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%); }
+        .acard-blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        /* Card Front Elements */
+        .acard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .acard-logo {
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .acard-chip {
+            width: 40px;
+            height: 28px;
+            background: linear-gradient(45deg, #c9c9c9, #f0f0f0);
+            border-radius: 6px;
+            border: 1px solid #b0b0b0;
+            position: relative;
+        }
+
+        .acard-chip::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 15px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 2px;
+        }
+
+        .acard-number {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            margin: 25px 0;
+            font-family: 'Courier New', monospace;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .acard-balance-section {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .acard-balance-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .acard-balance-amount {
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            transition: filter 0.3s ease;
+        }
+
+        .balance-hidden .acard-balance-amount {
+            filter: blur(8px);
+        }
+
+        .balance-hidden .acard-balance-amount:hover {
+            filter: blur(0px);
+        }
+
+        .acard-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+        }
+
+        .acard-holder-label,
+        .acard-validity-label {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .acard-holder-name,
+        .acard-expiry {
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Card Back Elements */
+        .acard-back-stripe {
+            background: #333;
+            height: 50px;
+            margin: 0 -25px 20px -25px;
+        }
+
+        .acard-signature-panel {
+            background: #fff;
+            height: 40px;
+            margin: 0 20px 20px 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            color: #333;
+            font-style: italic;
+        }
+
+        .acard-cvv-section {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: right;
+            margin-top: auto;
+        }
+
+        .acard-cvv-label {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .acard-cvv {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        /* Card Controls */
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .card-control-btn {
+            background: var(--secondary-bg);
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+            font-size: 0.95rem;
+        }
+
+        .card-control-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* ===================================
+           PART 3: STATS BAR
+        =================================== */
+        .stats-bar {
+            background: white;
+            padding: 30px 20px;
+            box-shadow: var(--shadow-sm);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #F9FAFB, #FFFFFF);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        /* ===================================
+           PART 4: REWARDS MODAL
+        =================================== */
+        .rewards-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .rewards-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .rewards-modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .rewards-modal.active .rewards-modal-content {
+            transform: scale(1);
+        }
+
+        .rewards-modal-header {
+            padding: 30px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .rewards-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            padding-right: 40px;
+        }
+
+        .rewards-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--border-light);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .close-modal-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+
+        .rewards-tabs {
+            display: flex;
+            padding: 0 30px;
+            background: var(--primary-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .rewards-tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .rewards-tab:hover {
+            color: var(--accent-color);
+        }
+
+        .rewards-tab.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+            background: white;
+        }
+
+        .rewards-body {
+            padding: 30px;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===================================
+           PART 5: FORM STYLING
+        =================================== */
+        .withdrawal-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #9CA3AF;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-hint {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            display: block;
+            font-size: 0.85rem;
+        }
+
+        .location-fields {
+            display: none;
+        }
+
+        .location-fields.active {
+            display: block;
+        }
+
+        .bank-info {
+            background: linear-gradient(135deg, #EEF2FF, #E0E7FF);
+            border: 2px solid #818CF8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .bank-info-title {
+            font-weight: 700;
+            color: #4F46E5;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .bank-info p {
+            color: #4338CA;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667EEA, #764BA2);
+            color: white !important;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ===================================
+           PART 6: GIFT ITEMS
+        =================================== */
+        .gift-items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .gift-item {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .gift-item:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .gift-item.selected {
+            border-color: var(--accent-color);
+            background: rgba(102, 126, 234, 0.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .gift-item-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 0 auto 1rem;
+            display: block;
+        }
+
+        .gift-item-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+        }
+
+        .gift-item-price {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .gift-item-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        #selectedGiftInfo {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        #selectedGiftInfo.active {
+            display: block;
+        }
+
+        /* ===================================
+           PART 7: SUCCESS & STATUS MESSAGES
+        =================================== */
+        .success-message,
+        .error-message {
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--error);
+        }
+
+        .success-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-title {
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .success-subtitle {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .withdrawal-status {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--warning);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .withdrawal-status.approved {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+        }
+
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-message {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* ===================================
+           PART 8: MOBILE RESPONSIVE
+        =================================== */
+        @media (max-width: 768px) {
+            /* Card Section */
+            .card-section {
+                padding: 30px 15px;
+            }
+
+            .card-container {
+                padding: 20px;
+                box-shadow: var(--shadow-md);
+            }
+
+            .acard-3d-container {
+                max-width: 340px;
+                height: 210px;
+            }
+
+            .acard-front, .acard-back {
+                padding: 18px;
+            }
+
+            .acard-number {
+                font-size: 18px;
+                letter-spacing: 2px;
+                margin: 20px 0;
+            }
+
+            .acard-logo {
+                font-size: 22px;
+            }
+
+            .acard-balance-amount {
+                font-size: 24px;
+            }
+
+            .color-picker {
+                gap: 10px;
+                padding: 12px;
+            }
+
+            .color-option {
+                width: 36px;
+                height: 36px;
+            }
+
+            /* Card Controls */
+            .card-controls {
+                gap: 8px;
+                flex-direction: column;
+            }
+
+            .card-control-btn {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 0.95rem;
+            }
+
+            /* Stats Bar */
+            .stats-bar {
+                padding: 20px 15px;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            /* Rewards Modal */
+            .rewards-modal {
+                padding: 10px;
+            }
+
+            .rewards-modal-content {
+                max-height: 95vh;
+                border-radius: 16px;
+            }
+
+            .rewards-modal-header {
+                padding: 20px;
+            }
+
+            .rewards-title {
+                font-size: 1.3rem;
+            }
+
+            .close-modal-btn {
+                width: 36px;
+                height: 36px;
+                top: 15px;
+                right: 15px;
+                font-size: 1.25rem;
+            }
+
+            .rewards-tabs {
+                flex-direction: row;
+                padding: 0 15px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .rewards-tab {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+
+            .rewards-body {
+                padding: 20px 15px;
+            }
+
+            /* Forms */
+            .withdrawal-form {
+                max-width: 100%;
+            }
+
+            .form-input,
+            .form-select {
+                padding: 14px;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+
+            .submit-btn {
+                padding: 16px;
+                font-size: 1rem;
+            }
+
+            .bank-info {
+                padding: 16px;
+            }
+
+            /* Gift Items */
+            .gift-items-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .gift-item {
+                padding: 20px;
+            }
+
+            .gift-item-image {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .card-section {
+                padding: 20px 10px;
+            }
+
+            .card-container {
+                padding: 15px;
+            }
+
+            .acard-3d-container {
+                max-width: 300px;
+                height: 190px;
+            }
+
+            .acard-number {
+                font-size: 16px;
+            }
+
+            .acard-logo {
+                font-size: 20px;
+            }
+
+            .acard-balance-amount {
+                font-size: 20px;
+            }
+
+            .rewards-title {
+                font-size: 1.1rem;
+            }
+
+            .rewards-subtitle {
+                font-size: 0.85rem;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* ===================================
+           PART 9: ANIMATIONS
+        =================================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes cardGlow {
+            0% { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4); }
+            100% { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); }
+        }
+
+        .acard-front:hover,
+        .acard-back:hover {
+            animation: cardGlow 2s infinite;
+        }
+
+        /* ===================================
+           PART 10: UTILITY CLASSES
+        =================================== */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <!-- ===================================
+         CARD SECTION
+    =================================== -->
+    <div class="card-section">
+        <div class="card-container">
+            <!-- Color Picker -->
+            <div class="color-picker">
+                <div class="color-option color-purple active" data-color="purple" title="Purple"></div>
+                <div class="color-option color-gold" data-color="gold" title="Gold"></div>
+                <div class="color-option color-green" data-color="green" title="Green"></div>
+                <div class="color-option color-red" data-color="red" title="Red"></div>
+                <div class="color-option color-blue" data-color="blue" title="Blue"></div>
+            </div>
+
+            <!-- Virtual Card -->
+            <div class="acard-3d-container">
+                <div class="acard-flipper" id="acardFlipper">
+                    <!-- Front of Card -->
+                    <div class="acard-front acard-purple" id="acardFront">
+                        <div class="acard-header">
+                            <div class="acard-logo">₳ DECIPH.AI</div>
+                            <div class="acard-chip"></div>
+                        </div>
+                        
+                        <div class="acard-number" id="acardNumber">**** **** **** 1234</div>
+                        
+                        <div class="acard-balance-section" id="balanceSection">
+                            <div class="acard-balance-label">Available Balance</div>
+                            <div class="acard-balance-amount" id="cardBalance">₳0.00</div>
+                        </div>
+                        
+                        <div class="acard-details">
+                            <div class="acard-holder">
+                                <div class="acard-holder-label">Card Holder</div>
+                                <div class="acard-holder-name" id="cardHolderName">STUDENT NAME</div>
+                            </div>
+                            <div class="acard-validity">
+                                <div class="acard-validity-label">Valid Thru</div>
+                                <div class="acard-expiry" id="cardExpiry">12/27</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back of Card -->
+                    <div class="acard-back" id="acardBack">
+                        <div class="acard-back-stripe"></div>
+                        
+                        <div class="acard-signature-panel">
+                            <span id="cardSignature">Student Signature</span>
+                        </div>
+                        
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div style="color: white; font-size: 12px; line-height: 1.6;">
+                                This card is property of Deciph.AI Educational Platform. 
+                                Use for educational rewards and approved purchases only. 
+                                Report lost or stolen cards immediately.
+                            </div>
+                            
+                            <div class="acard-cvv-section">
+                                <div class="acard-cvv-label">CVV</div>
+                                <div class="acard-cvv" id="cardCVV">123</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Controls -->
+            <div class="card-controls">
+                <button class="card-control-btn" onclick="flipCard()">
+                    🔄 Flip Card
+                </button>
+                <button class="card-control-btn" onclick="toggleBalance()" id="balanceToggle">
+                    👁️ Hide Balance
+                </button>
+                <button class="card-control-btn" onclick="showRewards()">
+                    🎁 Claim Rewards
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================
+         STATS BAR
+    =================================== -->
+    <div class="stats-bar">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-label">Available Balance</div>
+                <div class="stat-value" id="statBalance">₳0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pending Rewards</div>
+                <div class="stat-value" id="statPending">₳0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Earned</div>
+                <div class="stat-value" id="statTotal">₳0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================
+         REWARDS MODAL
+    =================================== -->
+    <div class="rewards-modal" id="rewardsModal">
+        <div class="rewards-modal-content">
+            <!-- Modal Header -->
+            <div class="rewards-modal-header">
+                <button class="close-modal-btn" onclick="closeRewardsModal()">×</button>
+                <h2 class="rewards-title">🎁 Claim Your Rewards</h2>
+                <p class="rewards-subtitle">Convert your A-Card balance into cash or educational gifts</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="rewards-tabs">
+                <button class="rewards-tab active" onclick="switchTab('cash')">💰 Cash Withdrawal</button>
+                <button class="rewards-tab" onclick="switchTab('gifts')">🎁 Educational Gifts</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="rewards-body">
+                <!-- Cash Withdrawal Tab -->
+                <div id="cashTab" class="tab-content active">
+                    <form class="withdrawal-form" id="cashWithdrawalForm">
+                        <div class="form-group">
+                            <label class="form-label">Withdrawal Amount (₳)</label>
+                            <input 
+                                type="number" 
+                                class="form-input" 
+                                id="withdrawAmount" 
+                                step="0.01" 
+                                min="1" 
+                                max="1000" 
+                                placeholder="Enter amount to withdraw"
+                                required
+                            >
+                            <small class="form-hint">
+                                Minimum: ₳1.00 | Maximum: ₳1000.00 | Available: <span id="availableBalance">₳0.00</span>
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Your Location</label>
+                            <select class="form-select" id="userLocation" required>
+                                <option value="">Select your location</option>
+                                <option value="usa">United States</option>
+                                <option value="uk">United Kingdom</option>
+                                <option value="nigeria">Nigeria</option>
+                            </select>
+                        </div>
+
+                        <!-- USA Fields -->
+                        <div class="location-fields" id="usaFields">
+                            <div class="bank-info">
+                                <div class="bank-info-title">🏦 US Bank Account Information</div>
+                                <p>Please provide your US bank account details for ACH transfer</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Full Name (as on bank account)</label>
+                                <input type="text" class="form-input" id="usaFullName" placeholder="John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Bank Name</label>
+                                <input type="text" class="form-input" id="usaBankName" placeholder="Bank of America">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Account Number</label>
+                                <input type="text" class="form-input" id="usaAccountNumber" placeholder="1234567890">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Routing Number</label>
+                                <input type="text" class="form-input" id="usaRoutingNumber" placeholder="021000021">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Account Type</label>
+                                <select class="form-select" id="usaAccountType">
+                                    <option value="checking">Checking</option>
+                                    <option value="savings">Savings</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- UK Fields -->
+                        <div class="location-fields" id="ukFields">
+                            <div class="bank-info">
+                                <div class="bank-info-title">🏦 UK Bank Account Information</div>
+                                <p>Please provide your UK bank account details for bank transfer</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Full Name (as on bank account)</label>
+                                <input type="text" class="form-input" id="ukFullName" placeholder="John Smith">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sort Code</label>
+                                <input type="text" class="form-input" id="ukSortCode" placeholder="12-34-56" maxlength="8">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Account Number</label>
+                                <input type="text" class="form-input" id="ukAccountNumber" placeholder="12345678" maxlength="8">
+                            </div>
+                        </div>
+
+                        <!-- Nigeria Fields -->
+                        <div class="location-fields" id="nigeriaFields">
+                            <div class="bank-info">
+                                <div class="bank-info-title">🏦 Nigerian Bank Account Information</div>
+                                <p>Please provide your Nigerian bank account details for transfer</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Full Name (as on bank account)</label>
+                                <input type="text" class="form-input" id="nigeriaFullName" placeholder="John Adebayo">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Bank Name</label>
+                                <select class="form-select" id="nigeriaBankName">
+                                    <option value="">Select your bank</option>
+                                    <option value="access">Access Bank</option>
+                                    <option value="gtbank">GTBank</option>
+                                    <option value="zenith">Zenith Bank</option>
+                                    <option value="uba">UBA</option>
+                                    <option value="firstbank">First Bank</option>
+                                    <option value="union">Union Bank</option>
+                                    <option value="wema">Wema Bank</option>
+                                    <option value="sterling">Sterling Bank</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Account Number</label>
+                                <input type="text" class="form-input" id="nigeriaAccountNumber" placeholder="1234567890" maxlength="10">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            💰 Submit Cash Withdrawal Request
+                        </button>
+                    </form>
+
+                    <!-- Success Message -->
+                    <div id="cashSuccessMessage" class="hidden">
+                        <div class="success-message">
+                            <div class="success-icon">✅</div>
+                            <div class="success-title">Withdrawal Request Submitted!</div>
+                            <div class="success-subtitle">
+                                Your cash withdrawal request will be processed within 48 hours. 
+                                You'll receive a notification once approved.
+                            </div>
+                            <div class="withdrawal-status" id="cashWithdrawalStatus">
+                                <div class="status-icon">⏳</div>
+                                <div class="status-title">Pending Approval</div>
+                                <div class="status-message">Your request is being reviewed by our admin team</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Educational Gifts Tab -->
+                <div id="giftsTab" class="tab-content">
+                    <div class="gift-items-grid">
+                        <div class="gift-item" data-price="25.00" onclick="selectGift(this, 'Scientific Calculator')">
+                            <img src="https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=300&h=300&fit=crop" alt="Scientific Calculator" class="gift-item-image">
+                            <div class="gift-item-title">Scientific Calculator</div>
+                            <div class="gift-item-price">₳25.00</div>
+                            <div class="gift-item-description">Advanced scientific calculator perfect for math and science studies</div>
+                        </div>
+
+                        <div class="gift-item" data-price="45.00" onclick="selectGift(this, 'Educational Book Set')">
+                            <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=300&fit=crop" alt="Educational Books" class="gift-item-image">
+                            <div class="gift-item-title">Educational Book Set</div>
+                            <div class="gift-item-price">₳45.00</div>
+                            <div class="gift-item-description">Comprehensive collection of educational books for enhanced learning</div>
+                        </div>
+
+                        <div class="gift-item" data-price="75.00" onclick="selectGift(this, 'Digital Tablet')">
+                            <img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=300&fit=crop" alt="Digital Tablet" class="gift-item-image">
+                            <div class="gift-item-title">Educational Tablet</div>
+                            <div class="gift-item-price">₳75.00</div>
+                            <div class="gift-item-description">Digital tablet loaded with educational apps and e-books</div>
+                        </div>
+
+                        <div class="gift-item" data-price="35.00" onclick="selectGift(this, 'Art Supply Kit')">
+                            <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=300&h=300&fit=crop" alt="Art Supplies" class="gift-item-image">
+                            <div class="gift-item-title">Art Supply Kit</div>
+                            <div class="gift-item-price">₳35.00</div>
+                            <div class="gift-item-description">Complete art kit with pencils, colors, and drawing materials</div>
+                        </div>
+
+                        <div class="gift-item" data-price="55.00" onclick="selectGift(this, 'Science Experiment Kit')">
+                            <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=300&h=300&fit=crop" alt="Science Kit" class="gift-item-image">
+                            <div class="gift-item-title">Science Experiment Kit</div>
+                            <div class="gift-item-price">₳55.00</div>
+                            <div class="gift-item-description">Hands-on science experiments for curious young minds</div>
+                        </div>
+                    </div>
+
+                    <div id="selectedGiftInfo">
+                        <div class="bank-info">
+                            <div class="bank-info-title">🎁 Selected Gift</div>
+                            <p id="selectedGiftDetails">Please select a gift item above</p>
+                        </div>
+                        
+                        <form class="withdrawal-form" id="giftWithdrawalForm">
+                            <div class="form-group">
+                                <label class="form-label">Delivery Address</label>
+                                <textarea class="form-input" id="deliveryAddress" rows="3" placeholder="Enter your complete delivery address..." required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-input" id="phoneNumber" placeholder="Enter your phone number" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Special Instructions (Optional)</label>
+                                <textarea class="form-input" id="specialInstructions" rows="2" placeholder="Any special delivery instructions..."></textarea>
+                            </div>
+
+                            <button type="submit" class="submit-btn">
+                                🎁 Request Selected Gift
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div id="giftSuccessMessage" class="hidden">
+                        <div class="success-message">
+                            <div class="success-icon">🎁</div>
+                            <div class="success-title">Gift Request Submitted!</div>
+                            <div class="success-subtitle">
+                                Your gift request will be processed and delivered within 48 hours. 
+                                You'll receive tracking information once shipped.
+                            </div>
+                            <div class="withdrawal-status" id="giftWithdrawalStatus">
+                                <div class="status-icon">⏳</div>
+                                <div class="status-title">Pending Approval</div>
+                                <div class="status-message">Your gift request is being processed by our admin team</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================
+         JAVASCRIPT
+    =================================== -->
+    <script>
+        // Global variables
+        let currentStudent = JSON.parse(localStorage.getItem('student_user') || '{}');
+        let isBalanceHidden = false;
+        let cardFlipped = false;
+        let selectedGift = null;
+        let pendingWithdrawals = JSON.parse(localStorage.getItem('pendingWithdrawals') || '[]');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVirtualCard();
+            loadPendingWithdrawals();
+            setupEventListeners();
+        });
+
+        function initializeVirtualCard() {
+            if (currentStudent.name) {
+                updateCardDetails();
+                generateCardNumber();
+                updateBalance();
+            } else {
+                // Demo data
+                currentStudent = {
+                    name: 'John Student',
+                    acard_balance: 120.50,
+                    created_at: new Date(),
+                    id: 1
+                };
+                updateCardDetails();
+                generateCardNumber();
+                updateBalance();
+            }
+        }
+
+        function setupEventListeners() {
+            // Color picker
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    changeCardColor(this.dataset.color);
+                });
+            });
+
+            // Form submissions
+            document.getElementById('cashWithdrawalForm').addEventListener('submit', handleCashWithdrawal);
+            document.getElementById('giftWithdrawalForm').addEventListener('submit', handleGiftRequest);
+
+            // Location change
+            document.getElementById('userLocation').addEventListener('change', showLocationFields);
+
+            // Auto-format sort code for UK
+            const ukSortCode = document.getElementById('ukSortCode');
+            if (ukSortCode) {
+                ukSortCode.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + '-' + value.substring(2);
+                    }
+                    if (value.length >= 5) {
+                        value = value.substring(0, 5) + '-' + value.substring(5, 7);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // Close modal on ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeRewardsModal();
+                }
+            });
+
+            // Close modal on outside click
+            document.getElementById('rewardsModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeRewardsModal();
+                }
+            });
+        }
+
+        function updateCardDetails() {
+            const holderName = currentStudent.name.toUpperCase().substring(0, 20);
+            document.getElementById('cardHolderName').textContent = holderName;
+            document.getElementById('cardSignature').textContent = currentStudent.name;
+            
+            const createdDate = currentStudent.created_at ? new Date(currentStudent.created_at) : new Date();
+            const expiryDate = new Date(createdDate);
+            expiryDate.setMonth(expiryDate.getMonth() + 30);
+            
+            const month = (expiryDate.getMonth() + 1).toString().padStart(2, '0');
+            const year = expiryDate.getFullYear().toString().slice(-2);
+            document.getElementById('cardExpiry').textContent = `${month}/${year}`;
+        }
+
+        function generateCardNumber() {
+            const name = currentStudent.name || 'Student';
+            const id = currentStudent.id || 1;
+            
+            let hash = 0;
+            const hashInput = `${name}${id}`;
+            for (let i = 0; i < hashInput.length; i++) {
+                const char = hashInput.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            
+            const baseNumber = Math.abs(hash).toString().padStart(12, '0').substring(0, 12);
+            const formattedNumber = `**** **** **** ${baseNumber.slice(-4)}`;
+            document.getElementById('acardNumber').textContent = formattedNumber;
+            
+            const cvv = Math.abs(hash).toString().slice(-3).padStart(3, '0');
+            document.getElementById('cardCVV').textContent = cvv;
+        }
+
+        function updateBalance() {
+            const balance = currentStudent.acard_balance || 0;
+            document.getElementById('cardBalance').textContent = `₳${balance.toFixed(2)}`;
+            document.getElementById('availableBalance').textContent = `₳${balance.toFixed(2)}`;
+            document.getElementById('statBalance').textContent = `₳${balance.toFixed(2)}`;
+            document.getElementById('statTotal').textContent = `₳${balance.toFixed(2)}`;
+            
+            const withdrawInput = document.getElementById('withdrawAmount');
+            if (withdrawInput) {
+                withdrawInput.max = balance.toFixed(2);
+            }
+        }
+
+        function flipCard() {
+            const flipper = document.getElementById('acardFlipper');
+            cardFlipped = !cardFlipped;
+            flipper.classList.toggle('flipped', cardFlipped);
+        }
+
+        function toggleBalance() {
+            const balanceSection = document.getElementById('balanceSection');
+            const toggleBtn = document.getElementById('balanceToggle');
+            
+            isBalanceHidden = !isBalanceHidden;
+            
+            if (isBalanceHidden) {
+                balanceSection.classList.add('balance-hidden');
+                toggleBtn.textContent = '👁️ Show Balance';
+            } else {
+                balanceSection.classList.remove('balance-hidden');
+                toggleBtn.textContent = '👁️ Hide Balance';
+            }
+        }
+
+        function changeCardColor(color) {
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
+            document.querySelector(`.color-option[data-color="${color}"]`).classList.add('active');
+            
+            const front = document.getElementById('acardFront');
+            front.className = `acard-front acard-${color}`;
+            
+            localStorage.setItem('preferredCardColor', color);
+        }
+
+        function showRewards() {
+            const modal = document.getElementById('rewardsModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRewardsModal() {
+            const modal = document.getElementById('rewardsModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function switchTab(tab) {
+            // Update tabs
+            document.querySelectorAll('.rewards-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            if (tab === 'cash') {
+                document.getElementById('cashTab').classList.add('active');
+            } else {
+                document.getElementById('giftsTab').classList.add('active');
+            }
+        }
+
+        function showLocationFields() {
+            const location = document.getElementById('userLocation').value;
+            
+            document.querySelectorAll('.location-fields').forEach(field => {
+                field.classList.remove('active');
+            });
+            
+            if (location) {
+                document.getElementById(`${location}Fields`).classList.add('active');
+            }
+        }
+
+        function selectGift(element, giftName) {
+            document.querySelectorAll('.gift-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            
+            const price = parseFloat(element.dataset.price);
+            const balance = currentStudent.acard_balance || 0;
+            
+            selectedGift = {
+                name: giftName,
+                price: price,
+                element: element
+            };
+            
+            const giftInfo = document.getElementById('selectedGiftInfo');
+            const giftDetails = document.getElementById('selectedGiftDetails');
+            const submitBtn = document.querySelector('#giftWithdrawalForm .submit-btn');
+            
+            if (balance >= selectedGift.price) {
+                giftDetails.innerHTML = `
+                    <strong>${giftName}</strong> - ₳${price.toFixed(2)}<br>
+                    <span style="color: var(--success);">✅ You have sufficient balance for this item</span>
+                `;
+                submitBtn.disabled = false;
+            } else {
+                giftDetails.innerHTML = `
+                    <strong>${giftName}</strong> - ₳${price.toFixed(2)}<br>
+                    <span style="color: var(--error);">❌ Insufficient balance. You need ₳${(selectedGift.price - balance).toFixed(2)} more</span>
+                `;
+                submitBtn.disabled = true;
+            }
+            
+            giftInfo.classList.add('active');
+        }
+
+        async function handleCashWithdrawal(e) {
+            e.preventDefault();
+            
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const location = document.getElementById('userLocation').value;
+            const balance = currentStudent.acard_balance || 0;
+            
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid withdrawal amount');
+                return;
+            }
+            
+            if (amount > balance) {
+                alert('Insufficient balance for this withdrawal');
+                return;
+            }
+            
+            if (!location) {
+                alert('Please select your location');
+                return;
+            }
+            
+            const withdrawalData = {
+                type: 'cash',
+                amount: amount,
+                location: location,
+                student_id: currentStudent.id,
+                student_name: currentStudent.name,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (location === 'usa') {
+                withdrawalData.bankDetails = {
+                    fullName: document.getElementById('usaFullName').value,
+                    bankName: document.getElementById('usaBankName').value,
+                    accountNumber: document.getElementById('usaAccountNumber').value,
+                    routingNumber: document.getElementById('usaRoutingNumber').value,
+                    accountType: document.getElementById('usaAccountType').value
+                };
+            } else if (location === 'uk') {
+                withdrawalData.bankDetails = {
+                    fullName: document.getElementById('ukFullName').value,
+                    sortCode: document.getElementById('ukSortCode').value,
+                    accountNumber: document.getElementById('ukAccountNumber').value
+                };
+            } else if (location === 'nigeria') {
+                withdrawalData.bankDetails = {
+                    fullName: document.getElementById('nigeriaFullName').value,
+                    bankName: document.getElementById('nigeriaBankName').value,
+                    accountNumber: document.getElementById('nigeriaAccountNumber').value
+                };
+            }
+            
+            const requiredFields = Object.values(withdrawalData.bankDetails || {});
+            if (requiredFields.some(field => !field || field.trim() === '')) {
+                alert('Please fill in all required bank details');
+                return;
+            }
+            
+            try {
+                // Simulate successful submission
+                currentStudent.acard_balance -= amount;
+                updateBalance();
+                
+                storePendingWithdrawal(withdrawalData);
+                
+                document.getElementById('cashWithdrawalForm').classList.add('hidden');
+                document.getElementById('cashSuccessMessage').classList.remove('hidden');
+                
+                setTimeout(() => {
+                    document.getElementById('cashWithdrawalForm').reset();
+                    showLocationFields();
+                }, 3000);
+            } catch (error) {
+                console.error('Withdrawal request error:', error);
+                alert('Failed to submit withdrawal request. Please try again.');
+            }
+        }
+
+        async function handleGiftRequest(e) {
+            e.preventDefault();
+            
+            if (!selectedGift) {
+                alert('Please select a gift item first');
+                return;
+            }
+            
+            const deliveryAddress = document.getElementById('deliveryAddress').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const specialInstructions = document.getElementById('specialInstructions').value.trim();
+            
+            if (!deliveryAddress || !phoneNumber) {
+                alert('Please provide delivery address and phone number');
+                return;
+            }
+            
+            const balance = currentStudent.acard_balance || 0;
+            if (selectedGift.price > balance) {
+                alert('Insufficient balance for this gift');
+                return;
+            }
+            
+            const giftData = {
+                type: 'gift',
+                gift_name: selectedGift.name,
+                amount: selectedGift.price,
+                delivery_address: deliveryAddress,
+                phone_number: phoneNumber,
+                special_instructions: specialInstructions,
+                student_id: currentStudent.id,
+                student_name: currentStudent.name,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                // Simulate successful submission
+                currentStudent.acard_balance -= selectedGift.price;
+                updateBalance();
+                
+                storePendingWithdrawal(giftData);
+                
+                document.querySelector('#giftsTab .gift-items-grid').classList.add('hidden');
+                document.getElementById('selectedGiftInfo').classList.add('hidden');
+                document.getElementById('giftSuccessMessage').classList.remove('hidden');
+                
+                setTimeout(() => {
+                    document.getElementById('giftWithdrawalForm').reset();
+                    document.querySelectorAll('.gift-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    selectedGift = null;
+                }, 3000);
+            } catch (error) {
+                console.error('Gift request error:', error);
+                alert('Failed to submit gift request. Please try again.');
+            }
+        }
+
+        function storePendingWithdrawal(withdrawalData) {
+            pendingWithdrawals.push({
+                ...withdrawalData,
+                id: Date.now(),
+                status: 'pending'
+            });
+            localStorage.setItem('pendingWithdrawals', JSON.stringify(pendingWithdrawals));
+        }
+
+        function loadPendingWithdrawals() {
+            pendingWithdrawals = JSON.parse(localStorage.getItem('pendingWithdrawals') || '[]');
+        }
+
+        // Load saved preferences
+        const savedColor = localStorage.getItem('preferredCardColor');
+        if (savedColor) {
+            changeCardColor(savedColor);
+        }
+    </script>
+</body>
+</html>
