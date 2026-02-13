@@ -25593,9 +25593,9 @@ The quiz should include the following question types:
             
         if 'paragraph' in question_types:
             prompt += "- Paragraph questions that require written responses\n"
-            
-        if 'paragraph' in question_types:
-            prompt += "- Select All That Apply questions where multiple options can be correct\n"
+
+        if 'select_all' in question_types:
+            prompt += "- Select All That Apply questions with 4-6 options where MULTIPLE options can be correct (at least 2 correct answers)\n"
 
         prompt += "\nQuality requirements:\n"
         prompt += "- Make the questions diverse and conversational - don't just start with \"What\" or \"Which\"\n"
@@ -25635,17 +25635,30 @@ Format your response as a JSON object with this exact structure:
       "id": "3",
       "text": "Paragraph question text goes here?",
       "type": "paragraph"
+    },
+    {
+      "id": "4",
+      "text": "Select all that apply question text goes here?",
+      "type": "select_all",
+      "options": [
+        {"text": "Option A text", "isCorrect": true},
+        {"text": "Option B text", "isCorrect": true},
+        {"text": "Option C text", "isCorrect": false},
+        {"text": "Option D text", "isCorrect": false}
+      ]
     }
   ]
 }
 
-IMPORTANT: 
+IMPORTANT:
 1. Return ONLY the JSON object - do not include any additional text, explanations, or markdown formatting
 2. Ensure the response is valid JSON
 3. Each question must have a unique ID
 4. Each multiple_choice question must have exactly 4 options
 5. Each true_false question must have exactly 2 options (True and False)
-6. Each question must have exactly ONE correct answer (isCorrect: true)
+6. For multiple_choice and true_false questions, exactly ONE option should have isCorrect: true
+7. For select_all questions, MULTIPLE options should have isCorrect: true (at least 2)
+8. Each select_all question must have 4-6 options
 """
 
         # Add the original format examples as a fallback
