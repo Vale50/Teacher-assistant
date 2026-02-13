@@ -5,520 +5,1111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Decipher Learning Platform</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        /* =============================================
+           DESIGN SYSTEM & VARIABLES
+           ============================================= */
         :root {
-            --primary-color: #00bfff;
-            --primary-dark: #00bfff;
-            --secondary-color: #10B981;
-            --accent-color: #F59E0B;
-            --text-color: #1F2937;
-            --light-bg: #F3F4F6;
-            --white: #FFFFFF;
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --transition: all 0.3s ease;
+            --primary: #4F46E5;
+            --primary-light: #818CF8;
+            --primary-dark: #3730A3;
+            --primary-glow: rgba(79, 70, 229, 0.35);
+            --secondary: #10B981;
+            --secondary-light: #34D399;
+            --accent: #F59E0B;
+            --accent-light: #FCD34D;
+            --surface: #FFFFFF;
+            --surface-elevated: #FFFFFF;
+            --bg: #F8FAFC;
+            --bg-subtle: #F1F5F9;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            --border: #E2E8F0;
+            --border-light: #F1F5F9;
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 50px -12px rgba(0,0,0,0.12);
+            --shadow-glow: 0 0 40px var(--primary-glow);
+            --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.25s ease;
+            --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        
-        * {
+
+        /* =============================================
+           BASE & RESET
+           ============================================= */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        
+
+        html { scroll-behavior: smooth; }
+
         body {
-            background-color: var(--light-bg);
-            color: var(--text-color);
+            font-family: var(--font-sans);
+            background-color: var(--bg);
+            color: var(--text-primary);
             line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
+
+        a { text-decoration: none; color: inherit; }
+        img { max-width: 100%; display: block; }
+        button { font-family: inherit; }
+
+        /* =============================================
+           SCROLL-REVEAL ANIMATIONS
+           ============================================= */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+
+        /* =============================================
+           HEADER
+           ============================================= */
         header {
-            background-color: var(--white);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-light);
+            transition: box-shadow var(--transition-base);
         }
-        
+
+        header.scrolled {
+            box-shadow: 0 1px 20px rgba(0,0,0,0.06);
+        }
+
         .header-container {
+            max-width: 1280px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
+            padding: 0.875rem 2rem;
         }
-        
+
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
             text-decoration: none;
+            position: relative;
+        }
+
+        .logo-mark {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            animation: logoBreath 4s ease-in-out infinite;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .logo-icon {
-            font-size: 1.8rem;
+
+        .logo-mark::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+            animation: logoShine 3s ease-in-out infinite;
         }
-        
-        .user-menu {
+
+        @keyframes logoBreath {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+
+        @keyframes logoShine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.025em;
+        }
+
+        .logo-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--secondary);
+            border-radius: 50%;
+            margin-left: 2px;
+            animation: logoDot 2s ease-in-out infinite;
+        }
+
+        @keyframes logoDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.7); }
+        }
+
+        .nav-links {
             display: flex;
-            align-items: center;
-            gap: 1.5rem;
+            gap: 0.25rem;
         }
-        
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(79, 70, 229, 0.06);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: rgba(79, 70, 229, 0.08);
+            font-weight: 600;
+        }
+
+        .user-menu { position: relative; }
+
         .user-info {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.625rem;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: var(--transition);
+            padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            transition: all var(--transition-fast);
+            background: var(--surface);
         }
-        
+
         .user-info:hover {
-            background-color: var(--light-bg);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
         }
-        
+
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            background-color: var(--primary-color);
-            color: var(--white);
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
+            font-size: 0.875rem;
         }
-        
+
         .user-name {
             font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
         }
-        
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-        
-        .nav-link {
-            color: var(--text-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            padding: 0.5rem 0;
-            border-bottom: 2px solid transparent;
-        }
-        .subscription-widget {
-      width: 100%;
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background: #f8f9fa;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
 
-    .widget-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      border-bottom: 1px solid #e9ecef;
-      padding-bottom: 10px;
-    }
+        .user-chevron {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            transition: transform var(--transition-fast);
+        }
 
-    .widget-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #4361ee;
-      margin: 0;
-    }
-
-    .widget-content {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .subscription-status {
-      padding: 15px;
-      border-radius: 8px;
-      background: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .status-trial {
-      border-left: 4px solid #ff9800;
-    }
-
-    .status-active {
-      border-left: 4px solid #4caf50;
-    }
-
-    .status-inactive {
-      border-left: 4px solid #f44336;
-    }
-
-    .subscription-options {
-      padding: 15px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .days-remaining {
-      font-size: 24px;
-      font-weight: bold;
-      color: #ff9800;
-      margin: 10px 0;
-    }
-
-    .days-remaining.urgent {
-      color: #f44336;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.8; }
-      100% { opacity: 1; }
-    }
-
-    .widget-actions {
-      display: flex;
-      justify-content: center;
-      margin-top: 15px;
-    }
-
-    .subscribe-btn {
-      display: inline-block;
-      padding: 10px 20px;
-      background: linear-gradient(135deg, #4361ee, #3a0ca3);
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: all 0.3s ease;
-    }
-
-    .subscribe-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    @media (max-width: 768px) {
-      .subscription-widget {
-        margin: 15px 10px;
-        padding: 15px;
-      }
-    }
-        .nav-link:hover {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-        }
-        
-        .hero {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: var(--white);
-            padding: 4rem 0;
-            margin-bottom: 3rem;
-            border-radius: 0 0 1rem 1rem;
-        }
-        
-        .hero-container {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-            padding: 0 2rem;
-        }
-        
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-        
-        .feature-card {
-            background-color: var(--white);
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        .feature-image {
-            height: 180px;
-            background-size: cover;
-            background-position: center;
-        }
-        .flashcard-creator-img {
-          background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80');
-       }
-        .quiz-creator-img {
-            background-image: url('https://images.unsplash.com/photo-1532619187608-e5375cab36aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-        }
-        
-        .video-quiz-img {
-            background-image: url('https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80');
-        }
-        
-        .lesson-planner-img {
-            background-image: url('https://images.unsplash.com/photo-1517842645767-c639042777db?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-        }
-        
-        .feature-content {
-            padding: 1.5rem;
-        }
-        
-        .feature-content h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--primary-color);
-        }
-        
-        .feature-content p {
-            margin-bottom: 1.5rem;
-            color: var(--text-color);
-            opacity: 0.8;
-        }
-        
-        .btn {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-        
-        .btn-outline:hover {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-        
-        .btn-secondary {
-            background-color: var(--secondary-color);
-        }
-        
-        .btn-secondary:hover {
-            background-color: #0ea271;
-        }
-        
-        .coming-soon-badge {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: var(--white);
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            margin-left: 0.5rem;
-            vertical-align: middle;
-        }
-        
-        .how-it-works {
-            background-color: var(--white);
-            padding: 3rem 0;
-            margin-bottom: 3rem;
-            border-radius: 1rem;
-            box-shadow: var(--card-shadow);
-        }
-        
-        .section-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .section-header h2 {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-        
-        .section-header p {
-            max-width: 600px;
-            margin: 0 auto;
-            opacity: 0.8;
-        }
-        
-        .steps {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
-            padding: 0 2rem;
-        }
-        
-        .step {
-            flex-basis: 300px;
-            text-align: center;
-        }
-        
-        .step-number {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            background-color: var(--primary-color);
-            color: var(--white);
-            border-radius: 50%;
-            font-weight: 600;
-            line-height: 40px;
-            margin-bottom: 1rem;
-        }
-        
-        .step h3 {
-            margin-bottom: 0.5rem;
-        }
-        
-        footer {
-            background-color: var(--primary-dark);
-            color: var(--white);
-            padding: 2rem 0;
-            margin-top: 3rem;
-        }
-        
-        .footer-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-        }
-        
-        .footer-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-        
-        .footer-link {
-            color: var(--white);
-            text-decoration: none;
-            opacity: 0.8;
-            transition: var(--transition);
-        }
-        
-        .footer-link:hover {
-            opacity: 1;
-        }
-        
         .dropdown-menu {
             position: absolute;
-            top: 60px;
-            right: 2rem;
-            background-color: var(--white);
-            border-radius: 0.5rem;
-            box-shadow: var(--card-shadow);
-            width: 200px;
-            z-index: 100;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+            width: 220px;
+            z-index: 200;
             overflow: hidden;
             display: none;
+            opacity: 0;
+            transform: translateY(-8px) scale(0.96);
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
-        
+
         .dropdown-menu.active {
             display: block;
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
-        
+
+        .dropdown-header {
+            padding: 1rem 1rem 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .dropdown-header-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .dropdown-header-email {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
         .dropdown-item {
             padding: 0.75rem 1rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            text-decoration: none;
-            color: var(--text-color);
-            transition: var(--transition);
-        }
-        
-        .dropdown-item:hover {
-            background-color: var(--light-bg);
-        }
-        
-        .dropdown-item i {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-        }
-        
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .header-container {
-                flex-direction: column;
-                gap: 1rem;
-                padding: 1rem;
-            }
-            
-            .nav-links {
-                margin-top: 1rem;
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .user-menu {
-                margin-top: 1rem;
-            }
-            
-            .hero {
-                padding: 2rem 0;
-            }
-            
-            .hero h1 {
-                font-size: 2rem;
-            }
-            
-            .footer-container {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-            
-            .footer-links {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
         }
 
-    </style>
-    <style>
-        /* Onboarding Overlay */
+        .dropdown-item:hover {
+            background: var(--bg-subtle);
+            color: var(--primary);
+        }
+
+        .dropdown-item i, .dropdown-item .dd-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-light);
+            margin: 0.25rem 0;
+        }
+
+        .dropdown-item.danger { color: #EF4444; }
+        .dropdown-item.danger:hover { background: #FEF2F2; }
+
+        /* =============================================
+           HERO SECTION
+           ============================================= */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(160deg, #1E1B4B 0%, #312E81 30%, #4338CA 60%, #4F46E5 100%);
+            padding: 6rem 2rem 7rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 600px 400px at 20% 50%, rgba(99, 102, 241, 0.3), transparent),
+                radial-gradient(ellipse 500px 300px at 80% 30%, rgba(139, 92, 246, 0.2), transparent),
+                radial-gradient(ellipse 400px 300px at 60% 80%, rgba(16, 185, 129, 0.1), transparent);
+            animation: heroGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes heroGlow {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        /* Animated grid pattern */
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        /* Floating orbs */
+        .hero-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: orbFloat 12s ease-in-out infinite;
+        }
+        .hero-orb-1 {
+            width: 300px; height: 300px;
+            background: #818CF8;
+            top: -100px; right: 10%;
+            animation-delay: 0s;
+        }
+        .hero-orb-2 {
+            width: 200px; height: 200px;
+            background: #34D399;
+            bottom: -50px; left: 15%;
+            animation-delay: -4s;
+        }
+        .hero-orb-3 {
+            width: 150px; height: 150px;
+            background: #F59E0B;
+            top: 30%; left: 5%;
+            animation-delay: -8s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -20px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            animation: badgePulse 3s ease-in-out infinite;
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary-light);
+            border-radius: 50%;
+            animation: dotBlink 2s ease-in-out infinite;
+        }
+
+        @keyframes dotBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(129, 140, 248, 0); }
+            50% { box-shadow: 0 0 0 6px rgba(129, 140, 248, 0.1); }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: white;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-gradient-text {
+            background: linear-gradient(135deg, #A5B4FC, #C4B5FD, #FDE68A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.75);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            background: white;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all var(--transition-slow);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn-hero-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all var(--transition-slow);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Hero stats bar */
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 4rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+            margin-bottom: 0.375rem;
+        }
+
+        .hero-stat-label {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.55);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* =============================================
+           SECTION CONTAINERS
+           ============================================= */
+        .section {
+            padding: 5rem 2rem;
+        }
+
+        .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-label-line {
+            width: 24px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* =============================================
+           PRODUCT CARDS
+           ============================================= */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.75rem;
+        }
+
+        .product-card {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all var(--transition-slow);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-xl);
+            padding: 1px;
+            background: linear-gradient(135deg, transparent 40%, var(--card-accent, var(--primary-light)) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity var(--transition-slow);
+        }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl);
+            border-color: transparent;
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        .product-card-header {
+            position: relative;
+            padding: 2rem 2rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+        }
+
+        .product-icon-wrap {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-icon-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+        }
+
+        .product-card-header-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .product-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.3rem 0.7rem;
+            border-radius: 100px;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-popular {
+            background: #EEF2FF;
+            color: var(--primary);
+        }
+
+        .badge-new {
+            background: #ECFDF5;
+            color: #059669;
+        }
+
+        .badge-featured {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .product-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+
+        .product-card-body {
+            padding: 1rem 2rem 1.75rem;
+        }
+
+        .product-description {
+            font-size: 0.925rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            margin-bottom: 1.25rem;
+        }
+
+        .product-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .product-feature-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            flex-shrink: 0;
+        }
+
+        .product-card-footer {
+            padding: 0 2rem 2rem;
+        }
+
+        .btn-product {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-product i {
+            font-size: 0.8rem;
+            transition: transform var(--transition-fast);
+        }
+
+        .btn-product:hover i {
+            transform: translateX(3px);
+        }
+
+        /* Card color themes */
+        .card-quiz { --card-accent: #818CF8; }
+        .card-quiz .product-icon-wrap { background: linear-gradient(135deg, #4F46E5, #818CF8); color: white; }
+        .card-quiz .product-feature-icon { background: #EEF2FF; color: #4F46E5; }
+        .card-quiz .btn-product { background: #4F46E5; color: white; }
+        .card-quiz .btn-product:hover { background: #4338CA; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.35); }
+
+        .card-lesson { --card-accent: #F472B6; }
+        .card-lesson .product-icon-wrap { background: linear-gradient(135deg, #EC4899, #F472B6); color: white; }
+        .card-lesson .product-feature-icon { background: #FDF2F8; color: #EC4899; }
+        .card-lesson .btn-product { background: #EC4899; color: white; }
+        .card-lesson .btn-product:hover { background: #DB2777; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.35); }
+
+        .card-flashcard { --card-accent: #34D399; }
+        .card-flashcard .product-icon-wrap { background: linear-gradient(135deg, #10B981, #34D399); color: white; }
+        .card-flashcard .product-feature-icon { background: #ECFDF5; color: #10B981; }
+        .card-flashcard .btn-product { background: #10B981; color: white; }
+        .card-flashcard .btn-product:hover { background: #059669; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35); }
+
+        .card-worksheet { --card-accent: #FBBF24; }
+        .card-worksheet .product-icon-wrap { background: linear-gradient(135deg, #F59E0B, #FBBF24); color: white; }
+        .card-worksheet .product-feature-icon { background: #FFFBEB; color: #F59E0B; }
+        .card-worksheet .btn-product { background: #F59E0B; color: white; }
+        .card-worksheet .btn-product:hover { background: #D97706; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35); }
+
+        /* =============================================
+           HOW IT WORKS
+           ============================================= */
+        .how-it-works-section {
+            background: var(--surface);
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            position: relative;
+        }
+
+        /* Connector line */
+        .steps-grid::before {
+            content: '';
+            position: absolute;
+            top: 44px;
+            left: calc(12.5% + 24px);
+            right: calc(12.5% + 24px);
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-light), var(--secondary-light), var(--accent-light), var(--primary-light));
+            z-index: 0;
+        }
+
+        .step-card {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1.25rem;
+            position: relative;
+            animation: stepPulse 3s ease-in-out infinite;
+        }
+
+        .step-card:nth-child(1) .step-number { background: linear-gradient(135deg, var(--primary), var(--primary-light)); animation-delay: 0s; }
+        .step-card:nth-child(2) .step-number { background: linear-gradient(135deg, #10B981, #34D399); animation-delay: 0.5s; }
+        .step-card:nth-child(3) .step-number { background: linear-gradient(135deg, #F59E0B, #FBBF24); animation-delay: 1s; }
+        .step-card:nth-child(4) .step-number { background: linear-gradient(135deg, #EC4899, #F472B6); animation-delay: 1.5s; }
+
+        @keyframes stepPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.15); }
+            50% { box-shadow: 0 0 0 12px rgba(79, 70, 229, 0); }
+        }
+
+        .step-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 240px;
+            margin: 0 auto;
+        }
+
+        /* =============================================
+           SUBSCRIPTION / CTA SECTION
+           ============================================= */
+        .cta-section {
+            background: linear-gradient(160deg, #1E1B4B, #312E81, #4338CA);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle 300px at 30% 50%, rgba(99, 102, 241, 0.25), transparent),
+                radial-gradient(circle 200px at 70% 50%, rgba(139, 92, 246, 0.2), transparent);
+        }
+
+        .cta-inner {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 2.5rem;
+            line-height: 1.65;
+        }
+
+        .subscription-widget {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .widget-header { display: none !important; }
+
+        .widget-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #stripe-button-container {
+            text-align: center;
+            padding: 0.5rem 0;
+        }
+
+        /* =============================================
+           FOOTER
+           ============================================= */
+        footer {
+            background: var(--text-primary);
+            color: rgba(255,255,255,0.7);
+            padding: 3rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .footer-text {
+            font-size: 0.875rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-link {
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.5);
+            transition: color var(--transition-fast);
+        }
+
+        .footer-link:hover {
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* =============================================
+           SETTINGS MODAL (preserved)
+           ============================================= */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 5000;
+            overflow: auto;
+            backdrop-filter: blur(4px);
+        }
+
+        .settings-modal-content {
+            background-color: white;
+            margin: 8% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 560px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .settings-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-modal-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .close-settings {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: background var(--transition-fast);
+        }
+
+        .close-settings:hover {
+            background: var(--bg-subtle);
+        }
+
+        .settings-field {
+            margin-bottom: 1.25rem;
+        }
+
+        .settings-field label {
+            display: block;
+            margin-bottom: 0.375rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .settings-field input,
+        .settings-field select {
+            width: 100%;
+            padding: 0.7rem 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            background: var(--surface);
+        }
+
+        .settings-field input:focus,
+        .settings-field select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .settings-field .hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .btn-save:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        /* =============================================
+           ONBOARDING (preserved structure)
+           ============================================= */
         .onboarding-overlay {
             position: fixed;
             top: 0;
@@ -534,7 +1125,7 @@
             z-index: 9999;
             animation: fadeIn 0.3s ease-out;
         }
-    
+
         .onboarding-card {
             background-color: white;
             border-radius: 1rem;
@@ -544,7 +1135,7 @@
             overflow: hidden;
             position: relative;
         }
-    
+
         .header-gradient {
             height: 8rem;
             display: flex;
@@ -552,18 +1143,16 @@
             justify-content: center;
             color: white;
         }
-    
-        .header-icon {
-            font-size: 3rem;
-        }
-    
+
+        .header-icon { font-size: 3rem; }
+
         .slide-content {
             padding: 2rem;
             padding-top: 2.5rem;
             position: relative;
             margin-top: -4rem;
         }
-    
+
         .icon-container {
             background-color: white;
             padding: 1rem;
@@ -572,384 +1161,609 @@
             margin: 0 auto 1.5rem auto;
             width: max-content;
         }
-    
+
         .slide-icon {
             width: 7rem;
             height: 7rem;
-            color: #2563eb; /* blue-600 */
+            color: #2563eb;
         }
-    
+
         .slide-title {
             font-size: 1.5rem;
             font-weight: 700;
             text-align: center;
-            color: #1f2937; /* gray-800 */
+            color: #1f2937;
             margin-bottom: 1rem;
         }
-    
+
         .slide-description {
             text-align: center;
-            color: #4b5563; /* gray-600 */
+            color: #4b5563;
             margin-bottom: 2rem;
             line-height: 1.5;
         }
-    
+
         .progress-indicator {
             display: flex;
             justify-content: center;
             gap: 0.5rem;
             margin-bottom: 2rem;
         }
-    
+
         .progress-dot {
             height: 0.5rem;
             width: 0.5rem;
             border-radius: 9999px;
-            background-color: #d1d5db; /* gray-300 */
+            background-color: #d1d5db;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
             padding: 0;
         }
-    
+
         .progress-dot.active {
             width: 2rem;
-            background-color: #3b82f6; /* blue-500 */
+            background-color: #3b82f6;
         }
-    
+
         .action-buttons {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-    
+
         .navigation-btn {
             padding: 0.5rem;
             border-radius: 9999px;
             border: none;
             background: transparent;
             cursor: pointer;
-            color: #374151; /* gray-700 */
+            color: #374151;
         }
-    
+
         .navigation-btn:disabled {
-            color: #9ca3af; /* gray-400 */
+            color: #9ca3af;
             cursor: not-allowed;
         }
-    
-        .navigation-btn:not(:disabled):hover {
-            background-color: #f3f4f6; /* gray-100 */
-        }
-    
-        .navigation-btn svg {
-            width: 1.5rem;
-            height: 1.5rem;
-        }
-    
-        .button-group {
-            display: flex;
-            gap: 1rem;
-        }
-    
+
+        .navigation-btn:not(:disabled):hover { background-color: #f3f4f6; }
+        .navigation-btn svg { width: 1.5rem; height: 1.5rem; }
+
+        .button-group { display: flex; gap: 1rem; }
+
         .skip-btn {
             padding: 0.5rem 1rem;
-            color: #6b7280; /* gray-500 */
+            color: #6b7280;
             background: transparent;
             border: none;
             font-size: 0.875rem;
             cursor: pointer;
         }
-    
-        .skip-btn:hover {
-            color: #374151; /* gray-700 */
-        }
-    
+
+        .skip-btn:hover { color: #374151; }
+
         .next-btn {
             padding: 0.625rem 1.5rem;
-            background-color: #2563eb; /* blue-600 */
+            background-color: #2563eb;
             color: white;
             border: none;
             border-radius: 0.5rem;
             font-weight: 500;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1), 0 2px 4px -1px rgba(37, 99, 235, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
             cursor: pointer;
             transition: all 0.2s ease;
         }
-    
+
         .next-btn:hover {
-            background-color: #1d4ed8; /* blue-700 */
-            box-shadow: 0 6px 10px -1px rgba(37, 99, 235, 0.1), 0 2px 6px -1px rgba(37, 99, 235, 0.06);
+            background-color: #1d4ed8;
             transform: translateY(-1px);
         }
-    
-        /* Slide-specific gradients */
-        .gradient-welcome { background-image: linear-gradient(135deg, #3b82f6, #7c3aed); } /* blue to purple */
-        .gradient-quizzes { background-image: linear-gradient(135deg, #10b981, #0d9488); } /* green to teal */
-        .gradient-tracking { background-image: linear-gradient(135deg, #f97316, #dc2626); } /* orange to red */
-        .gradient-lessons { background-image: linear-gradient(135deg, #ec4899, #8b5cf6); } /* pink to purple */
-        .gradient-complete { background-image: linear-gradient(135deg, #2563eb, #4f46e5); } /* blue to indigo */
-    
-        /* Animation */
+
+        .gradient-welcome { background-image: linear-gradient(135deg, #3b82f6, #7c3aed); }
+        .gradient-quizzes { background-image: linear-gradient(135deg, #10b981, #0d9488); }
+        .gradient-tracking { background-image: linear-gradient(135deg, #f97316, #dc2626); }
+        .gradient-lessons { background-image: linear-gradient(135deg, #ec4899, #8b5cf6); }
+        .gradient-complete { background-image: linear-gradient(135deg, #2563eb, #4f46e5); }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-    
-        /* Responsive adjustments */
+
+        /* =============================================
+           RESPONSIVE
+           ============================================= */
+        @media (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0.75rem 1.25rem;
+            }
+
+            .nav-links { display: none; }
+
+            .hero {
+                padding: 4rem 1.5rem 5rem;
+            }
+
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-stats {
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
+
+            .hero-stat-value {
+                font-size: 1.4rem;
+            }
+
+            .section {
+                padding: 3.5rem 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .steps-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+
+            .steps-grid::before { display: none; }
+
+            .footer-container {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1.25rem;
+            }
+
+            .cta-title { font-size: 1.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 1.85rem; }
+            .hero-actions { flex-direction: column; align-items: center; }
+            .hero-stats { gap: 1.5rem; }
+            .steps-grid { grid-template-columns: 1fr; }
+            .product-card-header, .product-card-body, .product-card-footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+
         @media (max-width: 640px) {
             .onboarding-card {
                 width: 90%;
                 max-height: 90vh;
                 overflow-y: auto;
             }
-            
-            .slide-icon {
-                width: 5rem;
-                height: 5rem;
-            }
-            
-            .header-gradient {
-                height: 6rem;
-            }
-            
-            .slide-content {
-                padding: 1.5rem;
-            }
-            
-            .button-group {
-                gap: 0.5rem;
-            }
-            
-            .next-btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.875rem;
-            }
+
+            .slide-icon { width: 5rem; height: 5rem; }
+            .header-gradient { height: 6rem; }
+            .slide-content { padding: 1.5rem; }
+            .button-group { gap: 0.5rem; }
+            .next-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
         }
     </style>
-    
 </head>
 <body>
+
+    <!-- =============================================
+         HEADER
+         ============================================= -->
     <header>
         <div class="header-container">
             <a href="#" class="logo">
-                <span class="logo-icon">📚</span>
-                <span>Decipher Learning</span>
+                <div class="logo-mark"><i class="fas fa-graduation-cap"></i></div>
+                <span class="logo-text">Deciph<span style="-webkit-text-fill-color: var(--primary-dark);">.</span>AI</span>
+                <span class="logo-dot"></span>
             </a>
-            
+
             <nav class="nav-links">
-                <a href="#" class="nav-link">Home</a>
+                <a href="#" class="nav-link active">Home</a>
                 <a href="#" class="nav-link">Dashboard</a>
                 <a href="#" class="nav-link">Performance</a>
             </nav>
-            
+
             <div class="user-menu">
                 <div class="user-info" id="userInfoDropdown">
                     <div class="user-avatar" id="userAvatar">U</div>
                     <span class="user-name" id="userName">Username</span>
+                    <i class="fas fa-chevron-down user-chevron"></i>
                 </div>
-                
+
                 <div class="dropdown-menu" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-header-name" id="dropdownName">Username</div>
+                    </div>
                     <a href="https://deciph.ai.deciphersacad.online/profile.html" class="dropdown-item">
-                        <i>👤</i> My Profile
+                        <span class="dd-icon"><i class="fas fa-user"></i></span> My Profile
                     </a>
                     <a href="https://deciph.ai.deciphersacad.online/performance.html" class="dropdown-item">
-                        <i>📊</i> Performance
+                        <span class="dd-icon"><i class="fas fa-chart-line"></i></span> Performance
                     </a>
                     <a href="/profile.html" class="dropdown-item">
-                        <i>⚙️</i> Settings
+                        <span class="dd-icon"><i class="fas fa-gear"></i></span> Settings
                     </a>
-                    <a href="/index.html" class="dropdown-item" id="logoutBtn">
-                        <i>🚪</i> Logout
+                    <div class="dropdown-divider"></div>
+                    <a href="/index.html" class="dropdown-item danger" id="logoutBtn">
+                        <span class="dd-icon"><i class="fas fa-right-from-bracket"></i></span> Log Out
                     </a>
                 </div>
             </div>
         </div>
     </header>
+
+    <!-- =============================================
+         HERO
+         ============================================= -->
     <div class="main-content">
     <section class="hero">
-        <div class="hero-container">
-            <h1>Welcome to Decipher Learning Platform</h1>
-            <p>Create engaging quizzes, analyze student performance, and identify learning gaps to enhance educational outcomes.</p>
-            <a href="#features" class="btn" style="background-color: #10B981; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
-                Explore Features
-            </a>
-                    </div>
-    </section>
-    <section class="container" id="features">
-        <div class="section-header">
-            <h2>Choose Your Tool</h2>
-            <p>Select from our suite of educational tools designed to enhance the learning experience</p>
-        </div>
-        
-        <div class="features">
-            <div class="feature-card" onclick="window.location.href='/quiz-creator'">
-                <div class="feature-image quiz-creator-img"></div>
-                <div class="feature-content">
-                    <h2>Quiz Creator</h2>
-                    <p>Create customized quizzes with multiple choice, true/false, and paragraph questions. Track student performance and identify learning gaps.</p>
-                    <a href="https://deciph.ai.deciphersacad.online/quiz-creator" class="btn">Get Started</a>
-                </div>
-            </div>
-            
-            <div class="feature-card" onclick="window.location.href='#'">
-                <div class="feature-image lesson-planner-img"></div>
-                <div class="feature-content">
-                    <h2>Lesson-Planner</h2>
-                    <p>Plan comprehensive lessons with objectives, activities, and assessments. Align with curriculum standards and track progress.</p>
-                    <a href="https://deciph.ai.deciphersacad.online/stem-plan" class="btn">Try Now</a>
-                </div>
-            </div>
-           
-            <div class="feature-card" onclick="window.location.href='/flashcard-creator'">
-                <div class="feature-image flashcard-creator-img"></div>
-                <div class="feature-content">
-                    <h2>Flashcard Creator</h2>
-                    <p>Create interactive flashcards to help students memorize key concepts, vocabulary, and facts. Perfect for review sessions and self-directed learning.</p>
-                    <a href="https://deciph.ai.deciphersacad.online/flashcard-creator" class="btn btn-outline">Create Flashcards</a>
-                </div>
-            </div> 
-           
-            
-            <div class="feature-card">
-                <div class="feature-image video-quiz-img"></div>
-                <div class="feature-content">
-                    <h2>Worksheet Creator <span class="coming-soon-badge"></span></h2>
-                    <p>Combine the power of visual learning with assessment. Create quizzes based on educational videos and track comprehension.</p>
-                    <a href="https://deciph.ai.deciphersacad.online/create-worksheet" class="btn btn-outline">Create Worksheet</a>
-                </div>
-            </div>
-        </div>
-    </section> 
-           
-           
- 
+        <div class="hero-grid"></div>
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-orb hero-orb-3"></div>
 
-    <section class="how-it-works container">
-        <div class="section-header">
-            <h2>How It Works</h2>
-            <p>Our platform is designed to be intuitive and effective</p>
-        </div>
-        
-        <div class="steps">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>Create Quizzes</h3>
-                <p>Design customized assessments with various question types tailored to your specific subject matter and educational level.</p>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                AI-Powered Education Platform
             </div>
-            
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>Share with Students</h3>
-                <p>Distribute quizzes to your students with a simple link. No account creation required for students.</p>
+
+            <h1>Teach Smarter with <span class="hero-gradient-text">Deciph.AI</span></h1>
+
+            <p>Create engaging assessments, build comprehensive lesson plans, and track student progress — all powered by intelligent tools designed for modern educators.</p>
+
+            <div class="hero-actions">
+                <a href="#features" class="btn-hero-primary">
+                    Explore Tools <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#how-it-works" class="btn-hero-secondary">
+                    <i class="fas fa-play-circle"></i> See How It Works
+                </a>
             </div>
-            
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>Analyze Results</h3>
-                <p>Review detailed performance metrics to identify knowledge gaps and areas for improvement.</p>
-            </div>
-            
-            <div class="step">
-                <div class="step-number">4</div>
-                <h3>Adapt Teaching</h3>
-                <p>Use insights from the performance analysis to customize your teaching approach and focus on areas that need attention.</p>
+
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">10K+</div>
+                    <div class="hero-stat-label">Quizzes Created</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">5K+</div>
+                    <div class="hero-stat-label">Educators</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">50K+</div>
+                    <div class="hero-stat-label">Students Reached</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">98%</div>
+                    <div class="hero-stat-label">Satisfaction</div>
+                </div>
             </div>
         </div>
     </section>
-         <!-- Add the subscription widget here -->
-        
-        <!-- Replace the subscription widget section with this simplified version -->
-<div class="subscription-widget">
-    <!-- This title will be hidden by JavaScript -->
-    <div class="widget-header" style="display: none;">
-      <h3 class="widget-title">Your Subscription Status</h3>
-      <button id="refresh-subscription" style="display: none;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-        </svg>
-      </button>
-    </div>
-  
-    <!-- This will be cleared by JavaScript -->
-    <div class="widget-content" id="subscription-content"></div>
-    
-    <!-- This is where the Stripe button will be shown -->
-    <div id="stripe-button-container" style="display: block; text-align: center; padding: 20px;">
-      <script async src="https://js.stripe.com/v3/buy-button.js"></script>
-      <stripe-buy-button
-        buy-button-id="buy_btn_1QzjCWDzaE07qply7fuswPwn"
-        publishable-key="pk_live_51Qv2LcDzaE07qplyqkNiy74cQxVfnJtTIfZKBKnJN9tYb1XhEHqVokvfJc8me3mw9f8VG0rVRfEQ22dohGIXKtxe00HyVbW4FV"
-      >
-      </stripe-buy-button>
-    </div>
-  </div>
-      
-        
-          <!-- This is where the Stripe button will be added -->
-          <div id="stripe-button-container" style="display: none;">
-            <script async src="https://js.stripe.com/v3/buy-button.js"></script>
-            <stripe-buy-button
-              buy-button-id="buy_btn_1QzjCWDzaE07qply7fuswPwn"
-              publishable-key="pk_live_51Qv2LcDzaE07qplyqkNiy74cQxVfnJtTIfZKBKnJN9tYb1XhEHqVokvfJc8me3mw9f8VG0rVRfEQ22dohGIXKtxe00HyVbW4FV"
-            >
-            </stripe-buy-button>
-          </div>
+
+    <!-- =============================================
+         PRODUCT CARDS
+         ============================================= -->
+    <section class="section" id="features">
+        <div class="section-inner">
+            <div class="section-header reveal">
+                <div class="section-label">
+                    <span class="section-label-line"></span>
+                    Our Tools
+                    <span class="section-label-line"></span>
+                </div>
+                <h2 class="section-title">Everything You Need to Teach</h2>
+                <p class="section-subtitle">A complete suite of AI-powered tools built to save you time and engage your students like never before.</p>
+            </div>
+
+            <div class="products-grid">
+                <!-- Quiz Creator -->
+                <div class="product-card card-quiz reveal reveal-delay-1" onclick="window.location.href='/quiz-creator'">
+                    <div class="product-card-header">
+                        <div class="product-icon-wrap">
+                            <i class="fas fa-clipboard-question"></i>
+                        </div>
+                        <div class="product-card-header-text">
+                            <div class="product-badge badge-popular"><i class="fas fa-fire" style="font-size:0.6rem"></i> Most Popular</div>
+                            <h3 class="product-title">Quiz Creator</h3>
+                        </div>
+                    </div>
+                    <div class="product-card-body">
+                        <p class="product-description">Design customized assessments with AI assistance. Create multiple choice, true/false, and paragraph questions — then share with students via a simple link.</p>
+                        <ul class="product-features">
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                AI-generated questions from any topic
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Multiple question types & formats
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Real-time student performance tracking
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Instant sharing via link — no student signup
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="product-card-footer">
+                        <button class="btn-product" onclick="event.stopPropagation(); window.location.href='https://deciph.ai.deciphersacad.online/quiz-creator'">
+                            Get Started <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lesson Planner -->
+                <div class="product-card card-lesson reveal reveal-delay-2" onclick="window.location.href='#'">
+                    <div class="product-card-header">
+                        <div class="product-icon-wrap">
+                            <i class="fas fa-book-open-reader"></i>
+                        </div>
+                        <div class="product-card-header-text">
+                            <div class="product-badge badge-featured"><i class="fas fa-star" style="font-size:0.6rem"></i> Featured</div>
+                            <h3 class="product-title">Lesson Planner</h3>
+                        </div>
+                    </div>
+                    <div class="product-card-body">
+                        <p class="product-description">Plan comprehensive, standards-aligned lessons with clear objectives, structured activities, and embedded assessments — powered by AI to save you hours of prep work.</p>
+                        <ul class="product-features">
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Curriculum-aligned lesson generation
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Structured objectives & activities
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Differentiation strategies included
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Export & share with colleagues
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="product-card-footer">
+                        <button class="btn-product" onclick="event.stopPropagation(); window.location.href='https://deciph.ai.deciphersacad.online/stem-plan'">
+                            Try Now <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Flashcard Creator -->
+                <div class="product-card card-flashcard reveal reveal-delay-3" onclick="window.location.href='/flashcard-creator'">
+                    <div class="product-card-header">
+                        <div class="product-icon-wrap">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="product-card-header-text">
+                            <div class="product-badge badge-new"><i class="fas fa-sparkles" style="font-size:0.6rem"></i> New</div>
+                            <h3 class="product-title">Flashcard Creator</h3>
+                        </div>
+                    </div>
+                    <div class="product-card-body">
+                        <p class="product-description">Create interactive flashcard decks that help students memorize key concepts, vocabulary, and facts. Perfect for review sessions and self-directed study.</p>
+                        <ul class="product-features">
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                AI-assisted card generation
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Spaced repetition learning mode
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Visual & text-based cards
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Student self-study friendly
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="product-card-footer">
+                        <button class="btn-product" onclick="event.stopPropagation(); window.location.href='https://deciph.ai.deciphersacad.online/flashcard-creator'">
+                            Create Flashcards <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Worksheet Creator -->
+                <div class="product-card card-worksheet reveal reveal-delay-4" onclick="window.location.href='/create-worksheet'">
+                    <div class="product-card-header">
+                        <div class="product-icon-wrap">
+                            <i class="fas fa-file-lines"></i>
+                        </div>
+                        <div class="product-card-header-text">
+                            <h3 class="product-title">Worksheet Creator</h3>
+                        </div>
+                    </div>
+                    <div class="product-card-body">
+                        <p class="product-description">Combine the power of visual media with structured assessment. Create worksheets with images, videos, and diverse question types for richer learning experiences.</p>
+                        <ul class="product-features">
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Image & video embedded questions
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Auto-grading & instant feedback
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Timer & auto-navigation modes
+                            </li>
+                            <li class="product-feature">
+                                <span class="product-feature-icon"><i class="fas fa-check"></i></span>
+                                Shareable student-friendly links
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="product-card-footer">
+                        <button class="btn-product" onclick="event.stopPropagation(); window.location.href='https://deciph.ai.deciphersacad.online/create-worksheet'">
+                            Create Worksheet <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- Settings Tab Container (Hidden by default) -->
-<div class="settings-modal" id="settingsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; overflow: auto;">
-    <div class="settings-modal-content" style="background-color: white; margin: 10% auto; padding: 20px; width: 80%; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-      <div class="settings-modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2>Settings</h2>
-        <span class="close-settings" style="font-size: 24px; cursor: pointer;">&times;</span>
-      </div>
-      
-      <div class="tab-content" id="settings-tab">
-        <div class="content-container">
-          <h2 class="section-title">
-              <span>⚙️</span> Account Settings
-          </h2>
-          
-          <form id="profileForm">
-              <div style="margin-bottom: 1.5rem;">
-                  <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Full Name</label>
-                  <input type="text" id="inputName" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
-              </div>
-              
-              <div style="margin-bottom: 1.5rem;">
-                  <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email Address</label>
-                  <input type="email" id="inputEmail" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;" disabled>
-                  <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">Email address cannot be changed</p>
-              </div>
-              
-              <div style="margin-bottom: 1.5rem;">
-                  <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Country</label>
-                  <select id="inputCountry" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
-                      <option value="United States">United States</option>
-                      <option value="United Kingdom">United Kingdom</option>
-                      <option value="Canada">Canada</option>
-                      <option value="Australia">Australia</option>
-                      <option value="Germany">Germany</option>
-                      <option value="France">France</option>
-                      <option value="Japan">Japan</option>
-                      <option value="China">China</option>
-                      <option value="India">India</option>
-                      <option value="Brazil">Brazil</option>
-                  </select>
-              </div>
-              
-              <div style="text-align: right;">
-                  <button type="submit" class="btn" style="background-color: var(--primary-color);">Save Changes</button>
-              </div>
-          </form>
+    </section>
+
+    <!-- =============================================
+         HOW IT WORKS
+         ============================================= -->
+    <section class="section how-it-works-section" id="how-it-works">
+        <div class="section-inner">
+            <div class="section-header reveal">
+                <div class="section-label">
+                    <span class="section-label-line"></span>
+                    Simple Workflow
+                    <span class="section-label-line"></span>
+                </div>
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">Our platform is designed to be intuitive and effective — get started in minutes, not hours.</p>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card reveal reveal-delay-1">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Create Content</h3>
+                    <p class="step-desc">Design quizzes, flashcards, worksheets, or lesson plans tailored to your subject and grade level.</p>
+                </div>
+                <div class="step-card reveal reveal-delay-2">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Share Instantly</h3>
+                    <p class="step-desc">Distribute to students with a single link. No account creation required for learners.</p>
+                </div>
+                <div class="step-card reveal reveal-delay-3">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Analyze Results</h3>
+                    <p class="step-desc">Review detailed metrics and AI-powered insights to identify knowledge gaps and strengths.</p>
+                </div>
+                <div class="step-card reveal reveal-delay-4">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Adapt & Improve</h3>
+                    <p class="step-desc">Use data-driven insights to refine your teaching approach and focus where it matters most.</p>
+                </div>
+            </div>
         </div>
-      </div>
+    </section>
+
+    <!-- =============================================
+         SUBSCRIPTION / CTA
+         ============================================= -->
+    <section class="section cta-section">
+        <div class="section-inner">
+            <div class="cta-inner reveal">
+                <h2 class="cta-title">Ready to Transform Your Teaching?</h2>
+                <p class="cta-subtitle">Join thousands of educators using Deciph.AI to create better learning experiences. Start your free trial today.</p>
+
+                <div class="subscription-widget">
+                    <div class="widget-header" style="display: none;">
+                        <h3 class="widget-title">Your Subscription Status</h3>
+                        <button id="refresh-subscription" style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="widget-content" id="subscription-content"></div>
+
+                    <div id="stripe-button-container" style="display: block; text-align: center; padding: 20px;">
+                        <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+                        <stripe-buy-button
+                            buy-button-id="buy_btn_1QzjCWDzaE07qply7fuswPwn"
+                            publishable-key="pk_live_51Qv2LcDzaE07qplyqkNiy74cQxVfnJtTIfZKBKnJN9tYb1XhEHqVokvfJc8me3mw9f8VG0rVRfEQ22dohGIXKtxe00HyVbW4FV"
+                        >
+                        </stripe-buy-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     </div>
-  </div>
+
+    <!-- =============================================
+         SETTINGS MODAL (preserved)
+         ============================================= -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-modal-content">
+            <div class="settings-modal-header">
+                <h2><i class="fas fa-gear" style="margin-right:0.5rem; color:var(--primary)"></i> Account Settings</h2>
+                <span class="close-settings">&times;</span>
+            </div>
+            <form id="profileForm">
+                <div class="settings-field">
+                    <label for="inputName">Full Name</label>
+                    <input type="text" id="inputName">
+                </div>
+                <div class="settings-field">
+                    <label for="inputEmail">Email Address</label>
+                    <input type="email" id="inputEmail" disabled>
+                    <p class="hint">Email address cannot be changed</p>
+                </div>
+                <div class="settings-field">
+                    <label for="inputCountry">Country</label>
+                    <select id="inputCountry">
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Germany">Germany</option>
+                        <option value="France">France</option>
+                        <option value="Japan">Japan</option>
+                        <option value="China">China</option>
+                        <option value="India">India</option>
+                        <option value="Brazil">Brazil</option>
+                    </select>
+                </div>
+                <div style="text-align: right;">
+                    <button type="submit" class="btn-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =============================================
+         FOOTER
+         ============================================= -->
     <footer>
         <div class="footer-container">
-            <p>&copy; 2025 Decipher Learning Platform. All rights reserved.</p>
-            
+            <div class="footer-brand">
+                <div class="footer-logo"><i class="fas fa-graduation-cap" style="color:white;font-size:0.8rem"></i></div>
+                <span class="footer-text">&copy; 2025 Deciph.AI &mdash; All rights reserved.</span>
+            </div>
             <div class="footer-links">
                 <a href="#" class="footer-link">Privacy Policy</a>
                 <a href="#" class="footer-link">Terms of Service</a>
@@ -957,675 +1771,494 @@
             </div>
         </div>
     </footer>
-    
+
+    <!-- =============================================
+         SCRIPTS
+         ============================================= -->
     <script>
-       document.addEventListener('DOMContentLoaded', function() {
-    // ⭐ LOOP DETECTION: Check if we're in a redirect loop
-    const loopCheck = sessionStorage.getItem('welcome_loop_check');
-    const now = Date.now();
-
-    if (loopCheck) {
-        const loopData = JSON.parse(loopCheck);
-        const timeDiff = now - loopData.timestamp;
-
-        // If we've been here within the last 3 seconds, we're in a loop
-        if (timeDiff < 3000) {
-            loopData.count = (loopData.count || 0) + 1;
-
-            // If we've looped more than 3 times in 3 seconds, stop
-            if (loopData.count > 3) {
-                console.error('⚠️ WELCOME PAGE LOOP DETECTED - Stopping automatic redirects');
-                sessionStorage.removeItem('welcome_loop_check');
-                sessionStorage.removeItem('auth_loop_check');
-
-                // Clear all tokens and stay on login page
-                clearAllTokens();
-                window.location.href = '/index.html';
-                return;
+    // =============================================
+    // SCROLL REVEAL OBSERVER
+    // =============================================
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
             }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-            loopData.timestamp = now;
-            sessionStorage.setItem('welcome_loop_check', JSON.stringify(loopData));
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // =============================================
+    // HEADER SCROLL EFFECT
+    // =============================================
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        header.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
+
+    // =============================================
+    // MAIN APP LOGIC
+    // =============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Loop detection
+        const loopCheck = sessionStorage.getItem('welcome_loop_check');
+        const now = Date.now();
+
+        if (loopCheck) {
+            const loopData = JSON.parse(loopCheck);
+            const timeDiff = now - loopData.timestamp;
+
+            if (timeDiff < 3000) {
+                loopData.count = (loopData.count || 0) + 1;
+
+                if (loopData.count > 3) {
+                    console.error('Welcome page loop detected - stopping redirects');
+                    sessionStorage.removeItem('welcome_loop_check');
+                    sessionStorage.removeItem('auth_loop_check');
+                    clearAllTokens();
+                    window.location.href = '/index.html';
+                    return;
+                }
+
+                loopData.timestamp = now;
+                sessionStorage.setItem('welcome_loop_check', JSON.stringify(loopData));
+            } else {
+                sessionStorage.setItem('welcome_loop_check', JSON.stringify({ count: 1, timestamp: now }));
+            }
         } else {
-            // More than 3 seconds have passed, reset the counter
             sessionStorage.setItem('welcome_loop_check', JSON.stringify({ count: 1, timestamp: now }));
         }
-    } else {
-        // First check, start tracking
-        sessionStorage.setItem('welcome_loop_check', JSON.stringify({ count: 1, timestamp: now }));
-    }
 
-    // Helper function to get cookie
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
-    }
-
-    // Check if user is logged in - check all storage locations
-    const token = localStorage.getItem('token') ||
-                  sessionStorage.getItem('token') ||
-                  getCookie('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-
-    if (!token) {
-        // No token, redirect to login
-        sessionStorage.removeItem('welcome_loop_check');
-        window.location.href = '/index.html';
-        return;
-    }
-
-    // Token exists, clear loop check
-    sessionStorage.removeItem('welcome_loop_check');
-    
-    // Display user name and avatar initial
-    const userName = document.getElementById('userName');
-    const userAvatar = document.getElementById('userAvatar');
-    
-    if (user.name) {
-        userName.textContent = user.name;
-        userAvatar.textContent = user.name.charAt(0).toUpperCase();
-    }
-    
-    // Toggle dropdown menu
-    const userInfoDropdown = document.getElementById('userInfoDropdown');
-    const userDropdown = document.getElementById('userDropdown');
-    
-    userInfoDropdown.addEventListener('click', function() {
-        userDropdown.classList.toggle('active');
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!userInfoDropdown.contains(event.target) && !userDropdown.contains(event.target)) {
-            userDropdown.classList.remove('active');
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
         }
-    });
-    
-    // Logout functionality
-    const logoutBtn = document.getElementById('logoutBtn');
-    logoutBtn.addEventListener('click', function(e) {
-        e.preventDefault();
 
-        // Set a flag to indicate we just logged out
-        sessionStorage.setItem('just_logged_out', 'true');
+        const token = localStorage.getItem('token') ||
+                      sessionStorage.getItem('token') ||
+                      getCookie('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-        // Clear loop checks
+        if (!token) {
+            sessionStorage.removeItem('welcome_loop_check');
+            window.location.href = '/index.html';
+            return;
+        }
+
         sessionStorage.removeItem('welcome_loop_check');
-        sessionStorage.removeItem('auth_loop_check');
 
-        // Clear all tokens using helper function
-        clearAllTokens();
+        // Display user name and avatar
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const dropdownName = document.getElementById('dropdownName');
 
-        // Clear user data
-        localStorage.removeItem('user');
+        if (user.name) {
+            userName.textContent = user.name;
+            userAvatar.textContent = user.name.charAt(0).toUpperCase();
+            if (dropdownName) dropdownName.textContent = user.name;
+        }
 
-        // Redirect to login page
-        window.location.href = '/index.html';
+        // Toggle dropdown menu
+        const userInfoDropdown = document.getElementById('userInfoDropdown');
+        const userDropdown = document.getElementById('userDropdown');
+
+        userInfoDropdown.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!userInfoDropdown.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.remove('active');
+            }
+        });
+
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            sessionStorage.setItem('just_logged_out', 'true');
+            sessionStorage.removeItem('welcome_loop_check');
+            sessionStorage.removeItem('auth_loop_check');
+            clearAllTokens();
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+        });
+
+        // Subscription
+        loadSubscriptionWidget();
+
+        document.getElementById('refresh-subscription').addEventListener('click', function() {
+            loadSubscriptionWidget(true);
+        });
     });
 
-    // Load subscription widget
-    loadSubscriptionWidget();
-    
-    // Refresh button event listener
-    document.getElementById('refresh-subscription').addEventListener('click', function() {
-        loadSubscriptionWidget(true);
-    });
-});
-
-// Replace the loadSubscriptionWidget function with this simpler version
-// that only shows the buy button
-function loadSubscriptionWidget() {
-    // Get the subscription content area
-    const contentArea = document.getElementById('subscription-content');
-    
-    // Clear any existing content
-    contentArea.innerHTML = '';
-    
-    // Hide the widget header that contains the "Your Subscription Status" text
-    document.querySelector('.widget-header').style.display = 'none';
-    
-    // Show only the buy button
-    const stripeButtonContainer = document.getElementById('stripe-button-container');
-    stripeButtonContainer.style.display = 'block';
-    
-    // Center the button and add some padding
-    stripeButtonContainer.style.textAlign = 'center';
-    stripeButtonContainer.style.padding = '20px';
-}
-
-// Modify the showStripeButton function to be simpler
-function showStripeButton() {
-    // Just do nothing - we don't need this function anymore since
-    // we're showing the button directly
-    // Or you can make it show the button in a larger size
-    const stripeButton = document.querySelector('stripe-buy-button');
-    if (stripeButton) {
-        stripeButton.style.transform = 'scale(1.1)';
+    function loadSubscriptionWidget() {
+        const contentArea = document.getElementById('subscription-content');
+        contentArea.innerHTML = '';
+        const widgetHeader = document.querySelector('.widget-header');
+        if (widgetHeader) widgetHeader.style.display = 'none';
+        const stripeButtonContainer = document.getElementById('stripe-button-container');
+        stripeButtonContainer.style.display = 'block';
+        stripeButtonContainer.style.textAlign = 'center';
+        stripeButtonContainer.style.padding = '20px';
     }
-}
 
-// Helper function to clear all tokens from all storage locations
-function clearAllTokens() {
-    try {
-        localStorage.removeItem('token');
-        sessionStorage.removeItem('token');
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        console.log('All tokens cleared');
-    } catch (e) {
-        console.error('Error clearing tokens:', e);
+    function showStripeButton() {
+        const stripeButton = document.querySelector('stripe-buy-button');
+        if (stripeButton) {
+            stripeButton.style.transform = 'scale(1.1)';
+        }
     }
-}
 
-function showStripeButton() {
-    // Create a modal to contain the Stripe button
-    const modal = document.createElement('div');
-    modal.id = 'stripe-modal';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
-    modal.style.display = 'flex';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
-    modal.style.zIndex = '9999';
-    
-    const buttonContainer = document.getElementById('stripe-button-container');
-    const stripeButton = buttonContainer.querySelector('stripe-buy-button');
-    
-    modal.innerHTML = `
-        <div style="background: white; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; text-align: center;">
-            <h2 style="color: #4361ee; margin-bottom: 20px;">Start your Free Trial Plan</h2>
-            <p style="margin-bottom: 20px;">Select a plan that works best for you and enjoy uninterrupted access to all premium features.</p>
-            
-            <div id="modal-stripe-container" style="margin-bottom: 25px;">
-                <!-- The Stripe button will be moved here -->
-            </div>
-            
-            <button id="close-modal" style="background: #e9ecef; color: #495057; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-weight: bold;">
-                Maybe Later
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Move the Stripe button into the modal
-    const modalContainer = document.getElementById('modal-stripe-container');
-    modalContainer.appendChild(stripeButton.cloneNode(true));
-    
-    // Close button closes the modal
-    document.getElementById('close-modal').addEventListener('click', () => {
-        modal.remove();
-        // Put the original button back
-        buttonContainer.appendChild(stripeButton);
-    });
-}
+    function clearAllTokens() {
+        try {
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        } catch (e) {
+            console.error('Error clearing tokens:', e);
+        }
+    }
     </script>
+
     <script>
-        // ===== Onboarding Configuration & Initialization =====
-        
-        // Slide data for the carousel
-        // ===== Onboarding Configuration & Initialization =====
+    // =============================================
+    // ONBOARDING CAROUSEL
+    // =============================================
+    const onboardingSlides = [
+        {
+            title: "Welcome to Decipher Learning",
+            description: "Your all-in-one platform for creating engaging educational content and assessments.",
+            icon: "📚",
+            color: "gradient-welcome",
+            image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 21l-8-9h16l-8 9z"></path>
+                      <path d="M12 21V5"></path>
+                      <path d="M8 3h8"></path>
+                      <path d="M8 7h8"></path>
+                    </svg>`
+        },
+        {
+            title: "Create Custom Quizzes",
+            description: "Build interactive quizzes with multiple choice, true/false, and written response questions. Share with students via a simple link.",
+            icon: "📝",
+            color: "gradient-quizzes",
+            image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <path d="M7 7h10"></path>
+                      <path d="M7 12h10"></path>
+                      <circle cx="7" cy="17" r="1"></circle>
+                      <circle cx="12" cy="17" r="1"></circle>
+                      <circle cx="17" cy="17" r="1"></circle>
+                    </svg>`
+        },
+        {
+            title: "Track Student Performance",
+            description: "Analyze detailed results to identify knowledge gaps and improve teaching strategies.",
+            icon: "📊",
+            color: "gradient-tracking",
+            image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6"></path>
+                      <path d="M16 16l1-3 1 3"></path>
+                      <path d="M17 13v6"></path>
+                      <path d="M21 16l-1-3-1 3"></path>
+                      <path d="M21 19v-6"></path>
+                    </svg>`
+        },
+        {
+            title: "Design Comprehensive Lesson Plans",
+            description: "Craft structured lesson plans with learning objectives, activities, and assessments that align with curriculum standards.",
+            icon: "📋",
+            color: "gradient-lessons",
+            image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                      <path d="M9 14h6"></path>
+                      <path d="M9 10h6"></path>
+                      <path d="M9 18h6"></path>
+                    </svg>`
+        },
+        {
+            title: "You're All Set!",
+            description: "Start creating quizzes and lesson plans to enhance your teaching experience.",
+            icon: "🚀",
+            color: "gradient-complete",
+            image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 2L11 13"></path>
+                      <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+                    </svg>`
+        }
+    ];
 
-// Slide data for the carousel
-const onboardingSlides = [
-    {
-        title: "Welcome to Decipher Learning",
-        description: "Your all-in-one platform for creating engaging educational content and assessments.",
-        icon: "📚",
-        color: "gradient-welcome",
-        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 21l-8-9h16l-8 9z"></path>
-                  <path d="M12 21V5"></path>
-                  <path d="M8 3h8"></path>
-                  <path d="M8 7h8"></path>
-                </svg>`
-    },
-    {
-        title: "Create Custom Quizzes",
-        description: "Build interactive quizzes with multiple choice, true/false, and written response questions. Share with students via a simple link.",
-        icon: "📝",
-        color: "gradient-quizzes",
-        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <path d="M7 7h10"></path>
-                  <path d="M7 12h10"></path>
-                  <circle cx="7" cy="17" r="1"></circle>
-                  <circle cx="12" cy="17" r="1"></circle>
-                  <circle cx="17" cy="17" r="1"></circle>
-                </svg>`
-    },
-    {
-        title: "Track Student Performance",
-        description: "Analyze detailed results to identify knowledge gaps and improve teaching strategies.",
-        icon: "📊",
-        color: "gradient-tracking",
-        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6"></path>
-                  <path d="M16 16l1-3 1 3"></path>
-                  <path d="M17 13v6"></path>
-                  <path d="M21 16l-1-3-1 3"></path>
-                  <path d="M21 19v-6"></path>
-                </svg>`
-    },
-    {
-        title: "Design Comprehensive Lesson Plans",
-        description: "Craft structured lesson plans with learning objectives, activities, and assessments that align with curriculum standards.",
-        icon: "📋",
-        color: "gradient-lessons",
-        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                  <path d="M9 14h6"></path>
-                  <path d="M9 10h6"></path>
-                  <path d="M9 18h6"></path>
-                </svg>`
-    },
-    {
-        title: "You're All Set!",
-        description: "Start creating quizzes and lesson plans to enhance your teaching experience.",
-        icon: "🚀",
-        color: "gradient-complete",
-        image: `<svg xmlns="http://www.w3.org/2000/svg" class="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 2L11 13"></path>
-                  <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
-                </svg>`
-    }
-];
+    let currentSlide = 0;
 
-// Current slide index
-let currentSlide = 0;
-
-// Create onboarding overlay
-function initializeOnboarding() {
-    console.log("Initializing onboarding...");
-    
-    // Inject onboarding HTML if it doesn't exist
-    if (!document.getElementById('onboardingCarousel')) {
-        const onboardingHTML = `
-        <div id="onboardingCarousel" class="onboarding-overlay" style="display: none;">
-            <div class="onboarding-card">
-                <button class="close-btn" onclick="dismissOnboarding()" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-                <div id="slideContainer">
-                    <!-- Content will be filled by JavaScript -->
+    function initializeOnboarding() {
+        if (!document.getElementById('onboardingCarousel')) {
+            const onboardingHTML = `
+            <div id="onboardingCarousel" class="onboarding-overlay" style="display: none;">
+                <div class="onboarding-card">
+                    <button class="close-btn" onclick="dismissOnboarding()" aria-label="Close" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(255,255,255,0.8);border:none;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div id="slideContainer"></div>
                 </div>
-            </div>
-        </div>`;
-        
-        // Append to body
-        document.body.insertAdjacentHTML('beforeend', onboardingHTML);
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', onboardingHTML);
+        }
+
+        renderSlide(currentSlide);
+
+        const carousel = document.getElementById('onboardingCarousel');
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        carousel.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        carousel.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 50) nextSlide();
+            else if (touchEndX > touchStartX + 50) previousSlide();
+        });
+
+        window.setTimeout(checkFirstTimeLoginStatus, 500);
     }
-    
-    // Render first slide
-    renderSlide(currentSlide);
-    
-    // Handle swipe gestures on mobile
-    const carousel = document.getElementById('onboardingCarousel');
-    let touchStartX = 0;
-    let touchEndX = 0;
-    
-    carousel.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-    });
-    
-    carousel.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
-    
-    function handleSwipe() {
-        if (touchEndX < touchStartX - 50) {
-            // Swipe left (next)
-            nextSlide();
-        } else if (touchEndX > touchStartX + 50) {
-            // Swipe right (previous)
-            previousSlide();
+
+    function checkFirstTimeLoginStatus() {
+        const isNewLogin = sessionStorage.getItem('newLogin') === 'true';
+        const onboardingComplete = localStorage.getItem('onboardingComplete') === 'true';
+        const justCreatedAccount = sessionStorage.getItem('accountJustCreated') === 'true';
+
+        if ((isNewLogin || justCreatedAccount) && !onboardingComplete) {
+            setTimeout(showOnboarding, 300);
+            sessionStorage.removeItem('newLogin');
+            sessionStorage.removeItem('accountJustCreated');
         }
     }
-    
-    // Check if this is a new user who just logged in
-    window.setTimeout(checkFirstTimeLoginStatus, 500); // Delay to ensure DOM is ready
-}
 
-// Check if this is a first-time login
-function checkFirstTimeLoginStatus() {
-    console.log("Checking first-time login status...");
-    
-    // Check multiple conditions to determine if onboarding should show
-    const isNewLogin = sessionStorage.getItem('newLogin') === 'true';
-    const onboardingComplete = localStorage.getItem('onboardingComplete') === 'true';
-    const firstLoginTime = localStorage.getItem('firstLoginTime');
-    const justCreatedAccount = sessionStorage.getItem('accountJustCreated') === 'true';
-    
-    console.log("New login:", isNewLogin);
-    console.log("Onboarding complete:", onboardingComplete);
-    console.log("First login time:", firstLoginTime);
-    
-    // If this is a new login and they haven't seen onboarding yet, show it
-    if ((isNewLogin || justCreatedAccount) && !onboardingComplete) {
-        console.log("Showing onboarding for new user!");
-        // Show onboarding with a slight delay to ensure elements are properly loaded
-        setTimeout(showOnboarding, 300);
-        
-        // Clear the new login flag
-        sessionStorage.removeItem('newLogin');
-        sessionStorage.removeItem('accountJustCreated');
-    }
-}
+    function renderSlide(index) {
+        const slide = onboardingSlides[index];
+        const slideContainer = document.getElementById('slideContainer');
 
-// Render a specific slide
-function renderSlide(index) {
-    const slide = onboardingSlides[index];
-    const slideContainer = document.getElementById('slideContainer');
-    
-    // Create slide HTML
-    const slideHTML = `
-        <!-- Color Header -->
-        <div class="header-gradient ${slide.color}">
-            <div class="header-icon">${slide.icon}</div>
-        </div>
-        
-        <!-- Slide Content -->
-        <div class="slide-content">
-            <div class="icon-container">
-                ${slide.image}
+        slideContainer.innerHTML = `
+            <div class="header-gradient ${slide.color}">
+                <div class="header-icon">${slide.icon}</div>
             </div>
-            
-            <h2 class="slide-title">${slide.title}</h2>
-            <p class="slide-description">${slide.description}</p>
-            
-            <!-- Progress Indicator -->
-            <div class="progress-indicator">
-                ${onboardingSlides.map((_, i) => `
-                    <button class="progress-dot ${i === index ? 'active' : ''}" 
-                            onclick="goToSlide(${i})" 
-                            aria-label="Go to slide ${i + 1}">
+            <div class="slide-content">
+                <div class="icon-container">
+                    ${slide.image}
+                </div>
+                <h2 class="slide-title">${slide.title}</h2>
+                <p class="slide-description">${slide.description}</p>
+                <div class="progress-indicator">
+                    ${onboardingSlides.map((_, i) => `
+                        <button class="progress-dot ${i === index ? 'active' : ''}"
+                                onclick="goToSlide(${i})"
+                                aria-label="Go to slide ${i + 1}">
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="action-buttons">
+                    <button onclick="previousSlide()"
+                            class="navigation-btn prev-btn"
+                            ${index === 0 ? 'disabled' : ''}
+                            aria-label="Previous slide">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 19l-7-7 7-7"></path>
+                        </svg>
                     </button>
-                `).join('')}
-            </div>
-            
-            <!-- Navigation buttons -->
-            <div class="action-buttons">
-                <button onclick="previousSlide()" 
-                        class="navigation-btn prev-btn" 
-                        ${index === 0 ? 'disabled' : ''} 
-                        aria-label="Previous slide">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                </button>
-                
-                <div class="button-group">
-                    <button onclick="dismissOnboarding()" class="skip-btn">
-                        Skip tutorial
-                    </button>
-                    
-                    <button onclick="${index === onboardingSlides.length - 1 ? 'dismissOnboarding()' : 'nextSlide()'}" class="next-btn">
-                        ${index === onboardingSlides.length - 1 ? 'Get Started' : 'Next'}
+                    <div class="button-group">
+                        <button onclick="dismissOnboarding()" class="skip-btn">
+                            Skip tutorial
+                        </button>
+                        <button onclick="${index === onboardingSlides.length - 1 ? 'dismissOnboarding()' : 'nextSlide()'}" class="next-btn">
+                            ${index === onboardingSlides.length - 1 ? 'Get Started' : 'Next'}
+                        </button>
+                    </div>
+                    <button onclick="nextSlide()"
+                            class="navigation-btn next-btn"
+                            ${index === onboardingSlides.length - 1 ? 'disabled' : ''}
+                            aria-label="Next slide">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 5l7 7-7 7"></path>
+                        </svg>
                     </button>
                 </div>
-                
-                <button onclick="nextSlide()" 
-                        class="navigation-btn next-btn" 
-                        ${index === onboardingSlides.length - 1 ? 'disabled' : ''} 
-                        aria-label="Next slide">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </button>
             </div>
-        </div>
-    `;
-    
-    // Update slide container
-    slideContainer.innerHTML = slideHTML;
-}
+        `;
+    }
 
-// Navigation functions
-function nextSlide() {
-    if (currentSlide < onboardingSlides.length - 1) {
-        currentSlide++;
+    function nextSlide() {
+        if (currentSlide < onboardingSlides.length - 1) {
+            currentSlide++;
+            renderSlide(currentSlide);
+        } else {
+            dismissOnboarding();
+        }
+    }
+
+    function previousSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            renderSlide(currentSlide);
+        }
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
         renderSlide(currentSlide);
+    }
+
+    function showOnboarding() {
+        const carousel = document.getElementById('onboardingCarousel');
+        if (carousel) {
+            carousel.style.display = 'flex';
+            const mainContent = document.querySelector('.main-content');
+            const header = document.querySelector('header');
+            if (mainContent) mainContent.style.filter = 'blur(8px)';
+            if (header) header.style.filter = 'blur(8px)';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function dismissOnboarding() {
+        const carousel = document.getElementById('onboardingCarousel');
+        if (carousel) {
+            carousel.style.display = 'none';
+            const mainContent = document.querySelector('.main-content');
+            const header = document.querySelector('header');
+            if (mainContent) mainContent.style.filter = 'none';
+            if (header) header.style.filter = 'none';
+            document.body.style.overflow = '';
+            localStorage.setItem('onboardingComplete', 'true');
+        }
+    }
+
+    window.nextSlide = nextSlide;
+    window.previousSlide = previousSlide;
+    window.goToSlide = goToSlide;
+    window.showOnboarding = showOnboarding;
+    window.dismissOnboarding = dismissOnboarding;
+
+    if (document.readyState === "loading") {
+        document.addEventListener('DOMContentLoaded', initializeOnboarding);
     } else {
-        dismissOnboarding();
+        initializeOnboarding();
     }
-}
 
-function previousSlide() {
-    if (currentSlide > 0) {
-        currentSlide--;
-        renderSlide(currentSlide);
-    }
-}
+    // Force onboarding for new users
+    (function() {
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const isNewLogin = sessionStorage.getItem('newLogin') === 'true';
+                const hasSeenOnboarding = localStorage.getItem('onboardingComplete') === 'true';
 
-function goToSlide(index) {
-    currentSlide = index;
-    renderSlide(currentSlide);
-}
-
-// Show/dismiss onboarding
-function showOnboarding() {
-    console.log("Showing onboarding carousel...");
-    const carousel = document.getElementById('onboardingCarousel');
-    if (carousel) {
-        carousel.style.display = 'flex';
-        
-        // Apply blur to the main content (if elements exist)
-        const mainContent = document.querySelector('main');
-        const header = document.querySelector('header');
-        
-        if (mainContent) mainContent.style.filter = 'blur(8px)';
-        if (header) header.style.filter = 'blur(8px)';
-        
-        // Disable scrolling on the body
-        document.body.style.overflow = 'hidden';
-    } else {
-        console.error("Carousel element not found!");
-    }
-}
-
-function dismissOnboarding() {
-    console.log("Dismissing onboarding carousel...");
-    const carousel = document.getElementById('onboardingCarousel');
-    if (carousel) {
-        carousel.style.display = 'none';
-        
-        // Remove blur from main content (if elements exist)
-        const mainContent = document.querySelector('main');
-        const header = document.querySelector('header');
-        
-        if (mainContent) mainContent.style.filter = 'none';
-        if (header) header.style.filter = 'none';
-        
-        // Enable scrolling on the body
-        document.body.style.overflow = '';
-        
-        // Mark onboarding as completed
-        localStorage.setItem('onboardingComplete', 'true');
-    }
-}
-
-// Make functions accessible globally
-window.nextSlide = nextSlide;
-window.previousSlide = previousSlide;
-window.goToSlide = goToSlide;
-window.showOnboarding = showOnboarding;
-window.dismissOnboarding = dismissOnboarding;
-
-// Initialize when the DOM is loaded
-if (document.readyState === "loading") {
-    document.addEventListener('DOMContentLoaded', initializeOnboarding);
-} else {
-    // DOM already loaded, initialize now
-    initializeOnboarding();
-}
-    
-            // This script forces the onboarding to show for new users
-            (function() {
-                // Make sure the page is fully loaded
-                window.addEventListener('load', function() {
-                    console.log("Window fully loaded, checking for onboarding...");
-                    
-                    // Give everything a moment to settle
-                    setTimeout(function() {
-                        // Check login status directly from localStorage/sessionStorage
-                        const isNewLogin = sessionStorage.getItem('newLogin') === 'true';
-                        const hasSeenOnboarding = localStorage.getItem('onboardingComplete') === 'true';
-                        
-                        console.log("New login check:", isNewLogin);
-                        console.log("Has seen onboarding:", hasSeenOnboarding);
-                        
-                        // If this is a new login and user hasn't seen onboarding
-                        if (isNewLogin && !hasSeenOnboarding) {
-                            console.log("New user detected! Showing onboarding...");
-                            
-                            // Create the onboarding carousel if it doesn't exist
-                            if (!document.getElementById('onboardingCarousel')) {
-                                console.log("Creating onboarding carousel element...");
-                                
-                                // Create carousel HTML (simplified version)
-                                const carouselHTML = `
-                                <div id="onboardingCarousel" class="onboarding-overlay">
-                                    <div class="onboarding-card">
-                                        <div class="header-gradient gradient-welcome">
-                                            <div class="header-icon">📚</div>
-                                        </div>
-                                        <div class="slide-content">
-                                            <h2 class="slide-title">Welcome to Decipher Learning</h2>
-                                            <p class="slide-description">Your all-in-one platform for creating engaging educational content and assessments.</p>
-                                            <div class="action-buttons">
-                                                <button onclick="document.getElementById('onboardingCarousel').style.display='none'; localStorage.setItem('onboardingComplete', 'true');" 
-                                                        class="next-btn" style="margin: 0 auto;">
-                                                    Get Started
-                                                </button>
-                                            </div>
-                                        </div>
+                if (isNewLogin && !hasSeenOnboarding) {
+                    if (!document.getElementById('onboardingCarousel')) {
+                        const carouselHTML = `
+                        <div id="onboardingCarousel" class="onboarding-overlay">
+                            <div class="onboarding-card">
+                                <div class="header-gradient gradient-welcome">
+                                    <div class="header-icon">📚</div>
+                                </div>
+                                <div class="slide-content">
+                                    <h2 class="slide-title">Welcome to Decipher Learning</h2>
+                                    <p class="slide-description">Your all-in-one platform for creating engaging educational content and assessments.</p>
+                                    <div class="action-buttons">
+                                        <button onclick="document.getElementById('onboardingCarousel').style.display='none'; localStorage.setItem('onboardingComplete', 'true');"
+                                                class="next-btn" style="margin: 0 auto;">
+                                            Get Started
+                                        </button>
                                     </div>
-                                </div>`;
-                                
-                                // Append to body
-                                document.body.insertAdjacentHTML('beforeend', carouselHTML);
-                            }
-                            
-                            // Force display the carousel
-                            const carousel = document.getElementById('onboardingCarousel');
-                            if (carousel) {
-                                console.log("Displaying onboarding carousel");
-                                carousel.style.display = 'flex';
-                                document.body.style.overflow = 'hidden'; // Prevent scrolling
-                            } else {
-                                console.error("Failed to find carousel element after creation!");
-                            }
-                            
-                            // Clear the new login flag
-                            sessionStorage.removeItem('newLogin');
-                        } else {
-                            console.log("Not showing onboarding: either not a new login or already seen");
-                        }
-                    }, 1000); // Delay execution by 1 second
-                });
-            })();
+                                </div>
+                            </div>
+                        </div>`;
+                        document.body.insertAdjacentHTML('beforeend', carouselHTML);
+                    }
 
-            // Fix dropdown toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const userInfoDropdown = document.getElementById('userInfoDropdown');
-  const userDropdown = document.getElementById('userDropdown');
-  
-  userInfoDropdown.addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    userDropdown.classList.toggle('active');
-  });
-  
-  // Close dropdown when clicking elsewhere
-  document.addEventListener('click', function(event) {
-    if (!userInfoDropdown.contains(event.target)) {
-      userDropdown.classList.remove('active');
-    }
-  });
-});
+                    const carousel = document.getElementById('onboardingCarousel');
+                    if (carousel) {
+                        carousel.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                    }
+                    sessionStorage.removeItem('newLogin');
+                }
+            }, 1000);
+        });
+    })();
+    </script>
 
-// Settings modal functionality
-document.addEventListener('DOMContentLoaded', function() {
-  // Get the settings link from dropdown
-  const settingsLink = document.querySelector('a[href="/profile.html"]');
-  const settingsModal = document.getElementById('settingsModal');
-  const closeSettings = document.querySelector('.close-settings');
-  
-  // Open settings modal when settings is clicked
-  if (settingsLink) {
-    settingsLink.addEventListener('click', function(e) {
-      e.preventDefault();
-      settingsModal.style.display = 'block';
-      document.body.style.overflow = 'hidden'; // Prevent scrolling
-      
-      // Load user data
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      document.getElementById('inputName').value = user.name || '';
-      document.getElementById('inputEmail').value = user.email || '';
-      document.getElementById('inputCountry').value = user.country || 'United States';
-    });
-  }
-  
-  // Close settings modal
-  if (closeSettings) {
-    closeSettings.addEventListener('click', function() {
-      settingsModal.style.display = 'none';
-      document.body.style.overflow = ''; // Enable scrolling
-    });
-  }
-  
-  // Close modal when clicking outside
-  window.addEventListener('click', function(event) {
-    if (event.target === settingsModal) {
-      settingsModal.style.display = 'none';
-      document.body.style.overflow = ''; // Enable scrolling
-    }
-  });
-  
-  // Save profile form
-  const profileForm = document.getElementById('profileForm');
-  if (profileForm) {
-    profileForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Get current user data
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      
-      // Update with form data
-      user.name = document.getElementById('inputName').value;
-      user.country = document.getElementById('inputCountry').value;
-      
-      // Save back to localStorage
-      localStorage.setItem('user', JSON.stringify(user));
-      
-      // Update display name in header
-      const userName = document.getElementById('userName');
-      const userAvatar = document.getElementById('userAvatar');
-      if (userName && user.name) {
-        userName.textContent = user.name;
-        userAvatar.textContent = user.name.charAt(0).toUpperCase();
-      }
-      
-      // Show success message
-      alert('Settings saved successfully!');
-      
-      // Close the modal
-      settingsModal.style.display = 'none';
-      document.body.style.overflow = ''; // Enable scrolling
-    });
-  }
-});
+    <script>
+    // =============================================
+    // SETTINGS MODAL
+    // =============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const settingsLink = document.querySelector('a[href="/profile.html"]');
+        const settingsModal = document.getElementById('settingsModal');
+        const closeSettings = document.querySelector('.close-settings');
 
-            </script>
+        if (settingsLink) {
+            settingsLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                settingsModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                document.getElementById('inputName').value = user.name || '';
+                document.getElementById('inputEmail').value = user.email || '';
+                document.getElementById('inputCountry').value = user.country || 'United States';
+            });
+        }
+
+        if (closeSettings) {
+            closeSettings.addEventListener('click', function() {
+                settingsModal.style.display = 'none';
+                document.body.style.overflow = '';
+            });
+        }
+
+        window.addEventListener('click', function(event) {
+            if (event.target === settingsModal) {
+                settingsModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+
+        const profileForm = document.getElementById('profileForm');
+        if (profileForm) {
+            profileForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                user.name = document.getElementById('inputName').value;
+                user.country = document.getElementById('inputCountry').value;
+                localStorage.setItem('user', JSON.stringify(user));
+
+                const userName = document.getElementById('userName');
+                const userAvatar = document.getElementById('userAvatar');
+                const dropdownName = document.getElementById('dropdownName');
+                if (userName && user.name) {
+                    userName.textContent = user.name;
+                    userAvatar.textContent = user.name.charAt(0).toUpperCase();
+                    if (dropdownName) dropdownName.textContent = user.name;
+                }
+
+                alert('Settings saved successfully!');
+                settingsModal.style.display = 'none';
+                document.body.style.overflow = '';
+            });
+        }
+    });
+    </script>
 </body>
 </html>

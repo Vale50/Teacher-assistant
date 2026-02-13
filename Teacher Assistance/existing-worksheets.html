@@ -417,130 +417,6 @@
             }
         }
 
-        /* Login Prompt Modal */
-        .login-prompt-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-        }
-
-        .login-prompt-overlay.show {
-            display: flex;
-        }
-
-        .login-prompt-box {
-            background: white;
-            border-radius: 16px;
-            max-width: 480px;
-            width: 100%;
-            padding: 2.5rem;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: popIn 0.3s ease;
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .login-prompt-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.25rem;
-        }
-
-        .login-prompt-icon i {
-            font-size: 1.75rem;
-            color: white;
-        }
-
-        .login-prompt-box h3 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-        }
-
-        .login-prompt-box p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 1.25rem;
-            line-height: 1.5;
-        }
-
-        .login-features {
-            text-align: left;
-            background: var(--light-bg);
-            border-radius: 10px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .login-feature-item {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.4rem 0;
-            font-size: 0.88rem;
-            color: var(--text-primary);
-        }
-
-        .login-feature-item i {
-            color: var(--primary-color);
-            font-size: 0.85rem;
-            width: 18px;
-            text-align: center;
-        }
-
-        .login-prompt-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .btn-login-prompt {
-            flex: 1;
-            padding: 0.75rem 1.25rem;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s ease;
-        }
-
-        .btn-login-go {
-            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
-            color: white;
-        }
-
-        .btn-login-go:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-        }
-
-        .btn-login-cancel {
-            background: var(--light-bg);
-            color: var(--text-secondary);
-            border: 2px solid var(--border-color);
-        }
-
-        .btn-login-cancel:hover {
-            background: var(--border-color);
-        }
 
         @media (max-width: 768px) {
             .page-header {
@@ -623,28 +499,6 @@
         </div>
     </div>
 
-    <!-- Login Prompt Modal -->
-    <div id="loginPromptOverlay" class="login-prompt-overlay">
-        <div class="login-prompt-box">
-            <div class="login-prompt-icon">
-                <i class="fas fa-lock-open"></i>
-            </div>
-            <h3>Unlock Full Access</h3>
-            <p>Log in to access powerful tools for managing your worksheets and tracking student progress.</p>
-            <div class="login-features">
-                <div class="login-feature-item"><i class="fas fa-chart-bar"></i> View student worksheet scores &amp; performance reports</div>
-                <div class="login-feature-item"><i class="fas fa-book-open"></i> Lesson plan creator</div>
-                <div class="login-feature-item"><i class="fas fa-shapes"></i> Generate geometry shapes &amp; graphs</div>
-                <div class="login-feature-item"><i class="fas fa-layer-group"></i> Flashcard creator</div>
-            </div>
-            <div class="login-prompt-actions">
-                <button class="btn-login-prompt btn-login-cancel" onclick="dismissLoginPrompt()">Cancel</button>
-                <button class="btn-login-prompt btn-login-go" onclick="window.location.href='/index.html'">
-                    <i class="fas fa-sign-in-alt"></i> Log In
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
@@ -662,21 +516,7 @@
             document.getElementById('topicSearch').addEventListener('input', debounce(filterWorksheets, 300));
             document.getElementById('modeFilter').addEventListener('change', filterWorksheets);
 
-            // Show login prompt after 2.5s if user is not logged in
-            setTimeout(() => {
-                const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
-                const dismissed = sessionStorage.getItem('loginPromptDismissed');
-                if (!token && !dismissed) {
-                    document.getElementById('loginPromptOverlay').classList.add('show');
-                }
-            }, 2500);
         });
-
-        // Dismiss login prompt
-        function dismissLoginPrompt() {
-            document.getElementById('loginPromptOverlay').classList.remove('show');
-            sessionStorage.setItem('loginPromptDismissed', 'true');
-        }
 
         // Debounce function
         function debounce(func, wait) {
