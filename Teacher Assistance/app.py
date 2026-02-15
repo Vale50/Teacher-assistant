@@ -18860,7 +18860,7 @@ class GeometryLockoutManager:
             },
             'quadrilaterals': {
                 'generateData': self._generate_quadrilateral_data,
-                'validate': lambda data: 'length' in data or 'width' in data
+                'validate': lambda data: 'length' in data or 'width' in data or 'side' in data or 'shape_type' in data
             },
             'circles': {
                 'generateData': self._generate_circle_data,
@@ -19642,9 +19642,10 @@ class EnhancedFixedGeometryRenderer:
         """FIXED: Complete render_shape_correctly method with all shapes"""
         try:
             print(f"🔧 render_shape_correctly called with data: {data}")
-            
+
             # Extract shape information
-            shape_type = data.get('type', 'triangle')
+            # CRITICAL FIX: Don't default to 'triangle' - try to detect from question text
+            shape_type = data.get('type') or data.get('shape_type')
             measurements = data.get('measurements', {})
             dimensions = data.get('dimensions', {})
             question_context = data.get('question_context', {})
@@ -19653,7 +19654,18 @@ class EnhancedFixedGeometryRenderer:
             all_measurements = {**measurements, **dimensions}
             hide_answer = question_context.get('hide_answer', False)
             question_text = question_context.get('text', '')
-            
+
+            # CRITICAL FIX: If shape_type is missing, try to detect from measurements or question text
+            if not shape_type:
+                shape_type = all_measurements.get('shape_type')
+            if not shape_type and question_text:
+                shape_type = detect_shape_type_from_question(question_text)
+                if shape_type == 'unknown':
+                    shape_type = None
+            if not shape_type:
+                print(f"⚠️ No shape type detected, defaulting to 'triangle'")
+                shape_type = 'triangle'
+
             print(f"🎯 Processing shape: {shape_type} with measurements: {all_measurements}")
 
             # ====== QUALITY ASSURANCE: Shape Type Validation ======
@@ -23081,14 +23093,54 @@ class GeometryValueAssignmentSystem:
             if 'width' not in complete_values:
                 complete_values['width'] = 6
                 
-        elif shape_type == 'triangle':
+        elif 'triangle' in shape_type:
+            # Handle all triangle types: triangle, right_triangle, equilateral_triangle, etc.
             if 'base' not in complete_values:
                 complete_values['base'] = 8
             if 'height' not in complete_values:
                 complete_values['height'] = 6
-        
+
+        elif shape_type in ['pentagon', 'hexagon', 'heptagon', 'octagon', 'polygon']:
+            # Polygons need sides count and side_length
+            shape_to_sides = {
+                'pentagon': 5, 'hexagon': 6, 'heptagon': 7, 'octagon': 8, 'polygon': 6
+            }
+            if 'sides' not in complete_values and 'num_sides' not in complete_values:
+                complete_values['sides'] = shape_to_sides.get(shape_type, 6)
+                complete_values['num_sides'] = complete_values['sides']
+            if 'side_length' not in complete_values and 'side' not in complete_values:
+                complete_values['side_length'] = 5
+                complete_values['side'] = 5
+
+        elif shape_type in ['triangular_prism']:
+            if 'base' not in complete_values:
+                complete_values['base'] = 6
+            if 'height' not in complete_values:
+                complete_values['height'] = 10
+
+        elif shape_type in ['rectangular_prism']:
+            if 'length' not in complete_values:
+                complete_values['length'] = 10
+            if 'width' not in complete_values:
+                complete_values['width'] = 6
+            if 'height' not in complete_values:
+                complete_values['height'] = 8
+
+        elif shape_type == 'parallel_lines':
+            if 'angle1' not in complete_values:
+                complete_values['angle1'] = 60
+                complete_values['angle2'] = 60
+
+        elif shape_type in ['complementary_angles', 'supplementary_angles']:
+            if 'angle1' not in complete_values:
+                complete_values['angle1'] = 35 if shape_type == 'complementary_angles' else 65
+                if shape_type == 'complementary_angles':
+                    complete_values['angle2'] = 90 - complete_values['angle1']
+                else:
+                    complete_values['angle2'] = 180 - complete_values['angle1']
+
         return complete_values
-    
+
     def calculate_derived_values(self, shape_type, values):
         """Calculate area, volume, etc. from basic measurements"""
         result = values.copy()
@@ -23831,20 +23883,32 @@ class GeometryTransformationsSystem:
         return dilated
     
     def detect_transformation_from_question(self, question_text):
-        """Detect transformation type from question text"""
+        """Detect transformation type from question text
+
+        CRITICAL FIX: Uses word-boundary matching (regex \\b) instead of substring
+        matching to prevent false positives like:
+        - 'scalene' matching 'scale' (dilation)
+        - 'return' matching 'turn' (rotation)
+        - 'removed' matching 'moved' (translation)
+        """
+        import re
         text_lower = question_text.lower()
-        
+
         transformation_keywords = {
             'reflection': ['reflect', 'reflected', 'reflection', 'mirror', 'flip'],
-            'rotation': ['rotate', 'rotated', 'rotation', 'turn', 'turned'],
-            'translation': ['translate', 'translated', 'translation', 'slide', 'moved', 'shift'],
-            'dilation': ['dilate', 'dilated', 'dilation', 'scale', 'resize', 'enlarge', 'shrink']
+            'rotation': ['rotate', 'rotated', 'rotation', 'turned'],
+            'translation': ['translate', 'translated', 'translation', 'slide'],
+            'dilation': ['dilate', 'dilated', 'dilation', 'scale factor', 'resize', 'enlarge', 'enlarged', 'shrink']
         }
-        
+
         for transform_type, keywords in transformation_keywords.items():
-            if any(keyword in text_lower for keyword in keywords):
-                return transform_type
-        
+            for keyword in keywords:
+                # Use word boundary matching to avoid false positives
+                pattern = r'\b' + re.escape(keyword) + r'\b'
+                if re.search(pattern, text_lower):
+                    logging.info(f"🔄 Transformation keyword matched: '{keyword}' → {transform_type}")
+                    return transform_type
+
         return None
     
     def process_transformation_question(self, question_text, grade_level='high'):
@@ -23877,22 +23941,39 @@ class GeometryTransformationsSystem:
         }
     
     def _detect_shape_from_question(self, question_text):
-        """Detect shape type from question text"""
+        """Detect shape type from question text
+
+        CRITICAL FIX: Added ALL shape types and removed 'triangle' default.
+        Previously only had 5 shapes and defaulted to 'triangle' for everything else,
+        causing circles, cylinders, cubes, etc. to be rendered as triangles.
+        """
         text_lower = question_text.lower()
-        
+
+        # Check in priority order (more specific shapes first)
         shape_keywords = {
+            'triangular_prism': ['triangular prism'],
+            'rectangular_prism': ['rectangular prism', 'cuboid'],
+            'cylinder': ['cylinder', 'cylindrical'],
+            'cone': ['cone', 'conical'],
+            'sphere': ['sphere', 'spherical'],
+            'cube': ['cube', 'cubic'],
+            'trapezium': ['trapezium', 'trapezoid'],
             'triangle': ['triangle', 'triangular'],
             'square': ['square'],
             'rectangle': ['rectangle', 'rectangular'],
             'pentagon': ['pentagon'],
-            'hexagon': ['hexagon']
+            'hexagon': ['hexagon'],
+            'heptagon': ['heptagon'],
+            'octagon': ['octagon'],
+            'circle': ['circle', 'circular'],
+            'polygon': ['polygon'],
         }
-        
+
         for shape_type, keywords in shape_keywords.items():
             if any(keyword in text_lower for keyword in keywords):
                 return shape_type
-        
-        return 'triangle'  # Default shape
+
+        return 'triangle'  # Default only if absolutely nothing detected
 
 
 # Initialize the transformations system
@@ -23914,15 +23995,29 @@ class EnhancedGeometryValueAssignmentSystem(GeometryValueAssignmentSystem):
         }
     
     def process_question_for_ai_values(self, question_text, grade_level='high'):
-        """Enhanced method that includes transformation detection"""
-        # First check if it's a transformation question
+        """Enhanced method that includes transformation detection
+
+        CRITICAL FIX: Check for EXPLICIT SHAPES FIRST, transformations SECOND.
+        This prevents questions like 'Calculate the area of a scalene triangle' from
+        being classified as a dilation (because 'scale' is in 'scalene').
+        """
+        # PRIORITY 1: Check for explicit shapes FIRST
+        # Use the parent's comprehensive shape detection
+        shape_type = self.detect_shape_from_question(question_text)
+
+        if shape_type is not None:
+            # Explicit shape found - use regular shape processing
+            logging.info(f"✅ EXPLICIT SHAPE DETECTED: {shape_type} - skipping transformation check")
+            return super().process_question_for_ai_values(question_text)
+
+        # PRIORITY 2: Only check transformations if NO explicit shape was found
         transformation_data = self.transformations.process_transformation_question(question_text, grade_level)
-        
-        if transformation_data.get('ai_assigned'):
-            logging.info(f"🔄 TRANSFORMATION: Detected {transformation_data['transformation_type']}")
+
+        if transformation_data and transformation_data.get('ai_assigned'):
+            logging.info(f"🔄 TRANSFORMATION: Detected {transformation_data.get('transformation_type')} (no explicit shape found)")
             return transformation_data
-        
-        # Otherwise, use the original shape detection
+
+        # PRIORITY 3: Fallback to regular shape detection
         return super().process_question_for_ai_values(question_text)
 
     def extract_values_from_question(self, question_text, shape_type):
