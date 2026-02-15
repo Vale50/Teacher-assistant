@@ -2638,15 +2638,32 @@ function renderGeometryShapeInPreview(question, index) {
     
     // If no shape data but has geometry info, try to create basic data
     if (!shapeData && question.requires_geometry && question.geometry_type) {
+        // Map category names to specific shape types
+        const categoryToShape = {
+            'circles': 'circle',
+            'triangles': 'triangle',
+            'quadrilaterals': 'rectangle',
+            'polygons': 'polygon',
+            '3d_shapes': 'cube',
+            'angles': 'complementary_angles',
+            'volume_surface': 'cylinder'
+        };
+        const mappedType = categoryToShape[question.geometry_type] || question.geometry_type;
         shapeData = {
             ai_assigned: true,
-            shape_type: question.geometry_type === 'circles' ? 'circle' : question.geometry_type,
-            radius: 5, // default values
+            shape_type: mappedType,
+            radius: 5,
             validation_passed: true
         };
         console.log(`Created fallback shape data for Q${index}:`, shapeData);
     }
-    
+
+    // If still no shape data but question has geometry keywords, try to analyze
+    if (!shapeData && question.text && hasGeometryKeywords(question.text)) {
+        shapeData = analyzeQuestionForShapeData(question.text);
+        console.log(`Analyzed question text for shape data Q${index}:`, shapeData);
+    }
+
     // If still no shape data, show no geometry message
     if (!shapeData || !shapeData.ai_assigned) {
         console.log(`No shape data for Q${index}`);
@@ -2782,15 +2799,30 @@ function retryShapeRender(questionIndex) {
 // ADD these helper functions:
 function analyzeQuestionForShape(questionText) {
     const text = questionText.toLowerCase();
-    
-    // Detect shape type
-    let shapeType = 'circle'; // default for circle questions
-    if (text.includes('sphere')) shapeType = 'sphere';
+
+    // Detect shape type - comprehensive detection for ALL shapes
+    let shapeType = 'circle'; // default
+    if (text.includes('sector') || (text.includes('central angle') && text.includes('circle'))) shapeType = 'sector';
+    else if (text.includes('triangular prism') || text.includes('prism')) shapeType = 'triangular_prism';
+    else if (text.includes('rectangular prism') || text.includes('cuboid')) shapeType = 'rectangular_prism';
+    else if (text.includes('sphere')) shapeType = 'sphere';
     else if (text.includes('cone')) shapeType = 'cone';
     else if (text.includes('cylinder')) shapeType = 'cylinder';
     else if (text.includes('cube')) shapeType = 'cube';
+    else if (text.includes('trapezium') || text.includes('trapezoid')) shapeType = 'trapezium';
+    else if (text.includes('right') && text.includes('triangle')) shapeType = 'right_triangle';
+    else if (text.includes('equilateral') && text.includes('triangle')) shapeType = 'equilateral_triangle';
+    else if (text.includes('isosceles') && text.includes('triangle')) shapeType = 'isosceles_triangle';
+    else if (text.includes('scalene') && text.includes('triangle')) shapeType = 'scalene_triangle';
     else if (text.includes('triangle')) shapeType = 'triangle';
     else if (text.includes('rectangle') || text.includes('rectangular')) shapeType = 'rectangle';
+    else if (text.includes('square')) shapeType = 'square';
+    else if (text.includes('pentagon')) shapeType = 'pentagon';
+    else if (text.includes('hexagon')) shapeType = 'hexagon';
+    else if (text.includes('octagon')) shapeType = 'octagon';
+    else if (text.includes('polygon')) shapeType = 'polygon';
+    else if (text.includes('circle')) shapeType = 'circle';
+    else if (text.includes('parallel')) shapeType = 'parallel_lines';
     
     // Detect question type
     let questionType = 'DISPLAY_ONLY';
@@ -2875,9 +2907,11 @@ function hasGeometryKeywords(questionText) {
     const geometryKeywords = [
         'circle', 'radius', 'diameter', 'circumference', 'sector', 'arc',
         'sphere', 'cone', 'cylinder', 'cube', 'triangle', 'rectangle',
+        'square', 'trapezium', 'trapezoid', 'pentagon', 'hexagon', 'octagon',
+        'polygon', 'prism', 'parallel', 'perimeter',
         'area', 'volume', 'angle', 'central angle'
     ];
-    
+
     const text = questionText.toLowerCase();
     return geometryKeywords.some(keyword => text.includes(keyword));
 }
@@ -3937,16 +3971,28 @@ function renderGeometryShapeInPreview(question, index) {
     console.log(`🎯 Checking question ${index} for shape data:`, question);
     
     // Check for shape data in the question
-    let shapeData = question.shape_data || 
-                   question.shapeData || 
+    let shapeData = question.shape_data ||
+                   question.shapeData ||
                    question.geometry_data ||
                    question.geometryData;
-    
+
+    // If no shape data but has geometry info, try category mapping
+    if (!shapeData && question.requires_geometry && question.geometry_type) {
+        const categoryToShape = {
+            'circles': 'circle', 'triangles': 'triangle', 'quadrilaterals': 'rectangle',
+            'polygons': 'polygon', '3d_shapes': 'cube', 'angles': 'complementary_angles',
+            'volume_surface': 'cylinder'
+        };
+        const mappedType = categoryToShape[question.geometry_type] || question.geometry_type;
+        shapeData = { ai_assigned: true, shape_type: mappedType, validation_passed: true };
+        console.log(`Created fallback shape data for Q${index} from category:`, shapeData);
+    }
+
     // If no explicit shape data, analyze question text for geometry content
-    if (!shapeData && hasGeometryKeywords(question.text)) {
+    if (!shapeData && question.text && hasGeometryKeywords(question.text)) {
         shapeData = analyzeQuestionForShapeData(question.text);
     }
-    
+
     if (!shapeData) {
         shapeContainer.innerHTML = `
             <div style="padding: 15px; font-style: italic; color: #718096; text-align: center;">
@@ -3955,7 +4001,7 @@ function renderGeometryShapeInPreview(question, index) {
         `;
         return;
     }
-    
+
     // Show loading
     shapeContainer.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; padding: 25px;">
@@ -3963,10 +4009,13 @@ function renderGeometryShapeInPreview(question, index) {
             <p style="margin-top: 10px; color: #666;">Rendering geometry shape...</p>
         </div>
     `;
-    
+
+    // Determine the shape type to send - use the most specific available
+    const shapeType = shapeData.shape_type || shapeData.type || 'circle';
+
     // Prepare API request
     const requestData = {
-        type: shapeData.shape_type || shapeData.type || 'circle',
+        type: shapeType,
         measurements: shapeData,
         question_context: {
             text: question.text,
@@ -4016,34 +4065,79 @@ function renderGeometryShapeInPreview(question, index) {
 }
 
 // Analyze question text to create shape data
+// CRITICAL FIX: Added comprehensive shape detection for ALL shape types
 function analyzeQuestionForShapeData(questionText) {
     const text = questionText.toLowerCase();
-    
-    // Detect shape type
-    let shapeType = 'circle';
-    if (text.includes('pentagon')) shapeType = 'polygon';
-    else if (text.includes('hexagon')) shapeType = 'polygon';
+
+    // Detect shape type - comprehensive detection matching backend logic
+    let shapeType = null;
+
+    // Check for specific shapes in priority order
+    if (text.includes('sector') || (text.includes('central angle') && text.includes('circle'))) shapeType = 'sector';
+    else if (text.includes('triangular prism') || text.includes('prism')) shapeType = 'triangular_prism';
+    else if (text.includes('rectangular prism') || text.includes('cuboid')) shapeType = 'rectangular_prism';
+    else if (text.includes('cylinder')) shapeType = 'cylinder';
+    else if (text.includes('cone')) shapeType = 'cone';
+    else if (text.includes('sphere')) shapeType = 'sphere';
     else if (text.includes('cube')) shapeType = 'cube';
+    else if (text.includes('trapezium') || text.includes('trapezoid')) shapeType = 'trapezium';
+    else if (text.includes('right') && text.includes('triangle')) shapeType = 'right_triangle';
+    else if (text.includes('equilateral') && text.includes('triangle')) shapeType = 'equilateral_triangle';
+    else if (text.includes('isosceles') && text.includes('triangle')) shapeType = 'isosceles_triangle';
+    else if (text.includes('scalene') && text.includes('triangle')) shapeType = 'scalene_triangle';
+    else if (text.includes('triangle')) shapeType = 'triangle';
+    else if (text.includes('rectangle')) shapeType = 'rectangle';
+    else if (text.includes('square')) shapeType = 'square';
+    else if (text.includes('pentagon')) shapeType = 'pentagon';
+    else if (text.includes('hexagon')) shapeType = 'hexagon';
+    else if (text.includes('octagon')) shapeType = 'octagon';
     else if (text.includes('polygon')) shapeType = 'polygon';
-    
+    else if (text.includes('circle')) shapeType = 'circle';
+    else if (text.includes('parallel')) shapeType = 'parallel_lines';
+    else shapeType = 'circle'; // Ultimate fallback
+
     // Extract basic measurements
     const measurements = { ai_assigned: true, shape_type: shapeType };
-    
-    if (shapeType === 'polygon') {
-        if (text.includes('pentagon')) measurements.sides = 5;
-        else if (text.includes('hexagon')) measurements.sides = 6;
-        else measurements.sides = 6; // default
+
+    // Extract numbers from question
+    const numbers = text.match(/\d+(?:\.\d+)?/g);
+
+    if (shapeType === 'pentagon' || shapeType === 'hexagon' || shapeType === 'octagon' || shapeType === 'polygon') {
+        const shapeSides = { pentagon: 5, hexagon: 6, octagon: 8, polygon: 6 };
+        measurements.sides = shapeSides[shapeType] || 6;
+        if (numbers && numbers.length > 0) measurements.side_length = parseFloat(numbers[0]);
     } else if (shapeType === 'cube') {
-        const sideMatch = text.match(/(\d+)\s*cm/);
-        measurements.side = sideMatch ? parseInt(sideMatch[1]) : 6;
+        measurements.side = (numbers && numbers.length > 0) ? parseFloat(numbers[0]) : 6;
+    } else if (shapeType === 'circle' || shapeType === 'sphere') {
+        measurements.radius = (numbers && numbers.length > 0) ? parseFloat(numbers[0]) : 5;
+    } else if (shapeType === 'cylinder' || shapeType === 'cone') {
+        measurements.radius = (numbers && numbers.length > 0) ? parseFloat(numbers[0]) : 5;
+        measurements.height = (numbers && numbers.length > 1) ? parseFloat(numbers[1]) : 10;
+    } else if (shapeType === 'rectangle' || shapeType === 'rectangular_prism') {
+        measurements.length = (numbers && numbers.length > 0) ? parseFloat(numbers[0]) : 10;
+        measurements.width = (numbers && numbers.length > 1) ? parseFloat(numbers[1]) : 6;
+    } else if (shapeType === 'square') {
+        measurements.side = (numbers && numbers.length > 0) ? parseFloat(numbers[0]) : 5;
+    } else if (shapeType === 'trapezium') {
+        measurements.parallel_side1 = (numbers && numbers.length > 0) ? parseFloat(numbers[0]) : 10;
+        measurements.parallel_side2 = (numbers && numbers.length > 1) ? parseFloat(numbers[1]) : 6;
+        measurements.height = (numbers && numbers.length > 2) ? parseFloat(numbers[2]) : 8;
+    } else if (shapeType.includes('triangle')) {
+        measurements.base = (numbers && numbers.length > 0) ? parseFloat(numbers[0]) : 8;
+        measurements.height = (numbers && numbers.length > 1) ? parseFloat(numbers[1]) : 6;
     }
-    
+
     return measurements;
 }
 
 // Check if question has geometry keywords
 function hasGeometryKeywords(questionText) {
-    const keywords = ['pentagon', 'hexagon', 'cube', 'polygon', 'triangle', 'circle', 'sphere', 'cylinder', 'cone'];
+    const keywords = [
+        'pentagon', 'hexagon', 'octagon', 'cube', 'polygon', 'triangle', 'circle',
+        'sphere', 'cylinder', 'cone', 'rectangle', 'square', 'trapezium', 'trapezoid',
+        'prism', 'sector', 'parallel', 'angle', 'radius', 'diameter', 'area', 'volume',
+        'perimeter', 'circumference'
+    ];
     const text = questionText.toLowerCase();
     return keywords.some(keyword => text.includes(keyword));
 }
