@@ -1053,7 +1053,7 @@ def extract_worked_examples(text):
         return extract_numbered_items(text)
 
 
-def parse_stem_lesson_content(content, topic, subject, features):
+def parse_stem_lesson_content(content, topic, subject, features, content_type='calculation'):
     """Parse the generated content into structured lesson plan data"""
     lesson_data = {}
 
@@ -1065,8 +1065,8 @@ def parse_stem_lesson_content(content, topic, subject, features):
         'KEY FORMULAS', 'KEY CONCEPTS', 'FORMULAS',
         'STEP-BY-STEP',
         'LESSON NOTES',
-        'WORKED EXAMPLES', 'EXAMPLES',
-        'PRACTICE PROBLEMS', 'PRACTICE',
+        'WORKED EXAMPLES', 'EXAMPLES', 'ILLUSTRATIVE EXAMPLES',
+        'PRACTICE PROBLEMS', 'PRACTICE', 'REVIEW QUESTIONS',
         'REAL-WORLD APPLICATIONS', 'REAL WORLD APPLICATIONS', 'APPLICATIONS',
         'ASSESSMENT METHODS', 'ASSESSMENT',
         'FUN FACTS',
@@ -1126,17 +1126,17 @@ def parse_stem_lesson_content(content, topic, subject, features):
             steps = extract_numbered_items(section)
             lesson_data['step_by_step'] = steps
 
-        # Parse worked examples
+        # Parse worked examples / illustrative examples
         elif 'WORKED EXAMPLES' in section_upper or (
             'EXAMPLES' in section_upper and 'WORKED' in section_upper[:50]
-        ):
+        ) or 'ILLUSTRATIVE EXAMPLES' in section_upper:
             examples = extract_worked_examples(section)
             lesson_data['worked_examples'] = examples
 
-        # Parse practice problems
+        # Parse practice problems / review questions
         elif 'PRACTICE PROBLEMS' in section_upper or (
             'PRACTICE' in section_upper and 'PROBLEM' in section_upper
-        ):
+        ) or 'REVIEW QUESTIONS' in section_upper:
             problems = extract_numbered_items(section)
             lesson_data['practice_problems'] = problems
 
@@ -1183,6 +1183,12 @@ def parse_stem_lesson_content(content, topic, subject, features):
             if len(parts) > 1 and not lesson_data.get('lesson_notes'):
                 notes = re.sub(r'^\s*(?:\([^)]*\))?\s*[:\s]*', '', parts[1])
                 lesson_data['lesson_notes'] = notes.strip()
+
+    # For conceptual content, remove step-by-step if it was accidentally generated
+    # and store content_type so frontends can adapt rendering
+    lesson_data['content_type'] = content_type
+    if content_type == 'conceptual':
+        lesson_data.pop('step_by_step', None)
 
     return lesson_data
 
@@ -1969,6 +1975,86 @@ def update_lesson_youtube():
     return _update_youtube()
 
 
+def topic_requires_calculations(subject, topic):
+    """
+    Determine whether a topic requires calculation-based content (step-by-step
+    solutions, worked numerical examples) or conceptual content (process
+    descriptions, explanations, case studies).
+
+    Returns True if the topic is calculation-heavy, False if conceptual.
+    """
+    topic_lower = topic.lower().strip()
+
+    # Mathematics: virtually all topics are calculation-based
+    if subject == 'mathematics':
+        return True
+
+    # Physics: most topics are calculation-based, with few conceptual exceptions
+    if subject == 'physics':
+        conceptual_physics = [
+            'history of physics', 'scientific method', 'nature of physics',
+            'modern physics overview', 'quantum theory concepts',
+            'relativity concepts', 'philosophy of science',
+        ]
+        for phrase in conceptual_physics:
+            if phrase in topic_lower:
+                return False
+        return True
+
+    # Chemistry: mixed — check for calculation-related keywords
+    if subject == 'chemistry':
+        calculation_keywords = [
+            'stoichiometry', 'mole', 'molar', 'molarity', 'concentration',
+            'dilution', 'titration', 'ph ', 'poh', 'equilibrium constant',
+            'gas law', 'ideal gas', 'boyle', 'charles', 'avogadro',
+            'thermochemistry', 'enthalpy', 'hess', 'calorimetry',
+            'reaction rate', 'rate law', 'order of reaction',
+            'electrochemistry', 'cell potential', 'nernst',
+            'mass percent', 'empirical formula', 'molecular formula',
+            'percent composition', 'yield', 'limiting reagent',
+            'colligative', 'osmotic pressure', 'boiling point elevation',
+            'freezing point depression', 'solubility product',
+            'buffer', 'henderson', 'acid-base calculation',
+            'half-life', 'radioactive decay', 'nuclear equation',
+            'dalton', 'partial pressure',
+        ]
+        for kw in calculation_keywords:
+            if kw in topic_lower:
+                return True
+        return False
+
+    # Biology: mostly conceptual, with a few quantitative exceptions
+    if subject == 'biology':
+        calculation_keywords = [
+            'punnett', 'hardy-weinberg', 'hardy weinberg',
+            'chi-square', 'chi square', 'population growth rate',
+            'carrying capacity calculation', 'enzyme kinetics',
+            'michaelis', 'lineweaver', 'genetics probability',
+            'allele frequency', 'genotype frequency',
+            'water potential', 'dilution', 'serial dilution',
+            'hemocytometer', 'cell counting',
+        ]
+        for kw in calculation_keywords:
+            if kw in topic_lower:
+                return True
+        return False
+
+    # General Science: mostly conceptual
+    if subject == 'general':
+        calculation_keywords = [
+            'measurement', 'unit conversion', 'significant figures',
+            'scientific notation', 'data analysis', 'graphing data',
+            'density calculation', 'speed calculation',
+        ]
+        for kw in calculation_keywords:
+            if kw in topic_lower:
+                return True
+        return False
+
+    # Fallback: default to calculations for unknown subjects
+    return True
+
+
 @lesson_plan_bp.route('/api/generate-math-lesson-plan', methods=['POST'])
 def generate_stem_lesson_plan():
     """Generate comprehensive STEM lesson plans (Math, Physics, Chemistry, Biology, General)"""
@@ -2014,8 +2100,14 @@ def generate_stem_lesson_plan():
             }
             subject_display = subject_names.get(subject, subject.title())
 
-            # Build comprehensive STEM-focused prompt
-            core_prompt = f"""
+            # Determine if this topic requires calculations or is conceptual
+            needs_calculations = topic_requires_calculations(subject, topic)
+            content_type = 'calculation' if needs_calculations else 'conceptual'
+
+            # Build comprehensive STEM-focused prompt adapted to content type
+            if needs_calculations:
+                # ===== CALCULATION-BASED PROMPT (Math, Physics, calc-heavy Chemistry) =====
+                core_prompt = f"""
 Create a comprehensive {subject_display} lesson plan on "{topic}" for {grade_level_text} students. Duration: {duration} minutes. Difficulty: {difficulty}.
 
 IMPORTANT: This is a {subject_display.upper()} lesson plan that should focus on:
@@ -2108,9 +2200,97 @@ Include 2-3 interesting facts related to {topic}.
 
 IMPORTANT: Each section MUST start with its number and title on a new line (e.g., "1. LEARNING OBJECTIVES", "5. LESSON NOTES", "6. WORKED EXAMPLES", etc.). Do NOT merge sections together.
 """
+            else:
+                # ===== CONCEPTUAL PROMPT (Biology, General, conceptual Chemistry) =====
+                core_prompt = f"""
+Create a comprehensive {subject_display} lesson plan on "{topic}" for {grade_level_text} students. Duration: {duration} minutes. Difficulty: {difficulty}.
+
+IMPORTANT: This is a {subject_display.upper()} lesson plan that should focus on:
+- Clear conceptual explanations and descriptions of processes
+- Key terminology, definitions, and principles
+- Illustrative examples and case studies (NOT numerical calculations)
+- Critical thinking and analysis questions
+- Scientific reasoning and understanding
+- Real-world connections and relevance
+
+DO NOT include mathematical calculations, numerical problem-solving steps, or formula-based worked examples.
+This topic is conceptual in nature and should be taught through explanation, description, and understanding — not through calculations.
+
+Generate content with proper scientific notation where relevant:
+- Subscripts for chemical formulas: H_2O, CO_2, etc.
+- Greek letters for scientific terms: alpha, beta, etc.
+- Standard scientific terminology and nomenclature
+
+Structure the lesson plan as follows:
+
+1. LEARNING OBJECTIVES (3-4 specific, measurable objectives)
+Create clear learning objectives that start with "Students will be able to..."
+Focus on understanding, explaining, comparing, analyzing, and describing — not calculating.
+
+2. INSPIRATIONAL QUOTE
+Select a meaningful quote from a famous scientist or expert related to {topic}.
+
+3. KEY CONCEPTS
+List the 4-6 most important concepts, principles, or terms related to {topic}.
+Format each as: "Concept Name: clear definition or description"
+These should be definitions, principles, and key ideas — NOT mathematical formulas.
+
+4. LESSON NOTES (500-700 words)
+Write comprehensive lesson notes that serve as study material for students. These notes should:
+- Provide a clear, detailed explanation of {topic} suitable for {grade_level_text} students
+- Cover the fundamental concepts, definitions, and principles
+- Explain the "why" behind the concepts, not just the "what"
+- Describe processes, mechanisms, or phenomena step by step in words
+- Include relevant examples integrated into the explanation
+- Use clear, student-friendly language while maintaining scientific accuracy
+- Connect concepts to prior knowledge students may have
+- Highlight key terms and their definitions
+- Explain common misconceptions to avoid
+- Build understanding progressively from basic to more complex ideas
+The lesson notes should read like a well-written textbook section that students can use for independent study and revision.
+
+5. ILLUSTRATIVE EXAMPLES
+Create exactly 2 illustrative examples (one basic, one advanced):
+
+Example 1 (Basic): A straightforward scenario that clearly demonstrates the core concept
+Example 2 (Advanced): A more complex scenario requiring deeper analysis and understanding
+
+For each example:
+- Describe the scenario or case study clearly
+- Explain how the concept applies in this context
+- Walk through the reasoning or process in a logical sequence
+- Highlight the key takeaway or conclusion
+Do NOT include numerical calculations or formula substitutions.
+
+6. REVIEW QUESTIONS
+Generate 5 review questions of varying difficulty:
+- 2 basic questions (recall and understanding)
+- 2 intermediate questions (application and analysis)
+- 1 advanced question (evaluation or synthesis)
+These should be descriptive, analytical, or discussion-based questions — NOT calculation problems.
+
+7. REAL-WORLD APPLICATIONS (300-350 words)
+Describe 2-3 concrete real-world applications of {topic} with:
+- Specific examples from industry, science, medicine, or daily life
+- How this concept impacts the real world
+- Why this concept is important to understand
+Keep the real-world applications section between 300-350 words. Format with proper paragraphs.
+
+8. ASSESSMENT METHODS
+Describe specific ways to assess student understanding including:
+- Formative assessment techniques
+- Concept-mapping or diagram-based demonstrations
+- Common misconceptions to watch for
+
+9. FUN FACTS
+Include 2-3 interesting facts related to {topic}.
+
+IMPORTANT: Each section MUST start with its number and title on a new line (e.g., "1. LEARNING OBJECTIVES", "4. LESSON NOTES", "5. ILLUSTRATIVE EXAMPLES", etc.). Do NOT merge sections together.
+"""
 
             # Graphs and visual aids are handled programmatically, not by AI
-            core_prompt += f"""
+            if needs_calculations:
+                core_prompt += f"""
 
 CONTENT REQUIREMENTS:
 - Use precise scientific language and notation
@@ -2119,6 +2299,19 @@ CONTENT REQUIREMENTS:
 - Provide solutions with proper significant figures/decimal places
 - Use appropriate units throughout
 - Include error analysis or checking methods where applicable
+
+SUBJECT-SPECIFIC GUIDELINES:
+"""
+            else:
+                core_prompt += f"""
+
+CONTENT REQUIREMENTS:
+- Use precise scientific language and terminology
+- Explain processes, mechanisms, and concepts clearly in words
+- Use proper scientific nomenclature
+- Include descriptive examples, analogies, and case studies
+- Focus on understanding and critical thinking, NOT calculations
+- Describe relationships between concepts clearly
 
 SUBJECT-SPECIFIC GUIDELINES:
 """
@@ -2132,36 +2325,55 @@ SUBJECT-SPECIFIC GUIDELINES:
 - Use mathematical modeling for real-world problems
 """
             elif subject == 'physics':
-                core_prompt += """
+                if needs_calculations:
+                    core_prompt += """
 - Include fundamental physics principles and laws
 - Show dimensional analysis and unit conversions
 - Emphasize experimental verification and measurement
 - Connect mathematical equations to physical phenomena
 - Include vector analysis where applicable
 """
+                else:
+                    core_prompt += """
+- Explain fundamental physics principles and laws conceptually
+- Emphasize understanding of physical phenomena
+- Describe experimental methods and observations
+- Connect concepts to everyday experiences
+"""
             elif subject == 'chemistry':
-                core_prompt += """
+                if needs_calculations:
+                    core_prompt += """
 - Include chemical equations and stoichiometry
 - Show molecular and ionic calculations
 - Emphasize laboratory safety and experimental procedures
 - Use periodic table properties and trends
 - Include concentration calculations and reaction rates
 """
+                else:
+                    core_prompt += """
+- Describe chemical processes, structures, and properties clearly
+- Explain bonding, reactions, and trends conceptually
+- Emphasize laboratory safety and experimental procedures
+- Use periodic table properties and trends
+- Focus on understanding molecular behavior and chemical principles
+- Include diagrams and descriptions of molecular structures
+"""
             elif subject == 'biology':
                 core_prompt += """
-- Include biological processes and mechanisms
-- Show quantitative analysis of biological data
+- Describe biological processes and mechanisms in clear detail
+- Explain structures and their functions
 - Emphasize experimental design and data interpretation
-- Use diagrams of biological structures
-- Include ecological and evolutionary concepts where applicable
+- Include descriptions of biological structures and diagrams
+- Connect concepts to ecological and evolutionary frameworks where applicable
+- Use analogies to help students understand complex processes
 """
             elif subject == 'general':
                 core_prompt += """
-- Include data analysis and interpretation
-- Show calculations with real-world data
-- Emphasize scientific method and critical thinking
-- Use graphical representations of data
+- Explain scientific concepts and phenomena clearly
+- Emphasize the scientific method and critical thinking
+- Use real-world observations and examples
 - Include cross-disciplinary connections
+- Focus on understanding and analysis over memorization
 """
 
             core_prompt += f"""
@@ -2172,7 +2384,7 @@ FORMATTING REQUIREMENTS:
 - Include proper notation
 - Use bullet points for lists
 - Separate major concepts clearly
-- Ensure all calculations are accurate
+{"- Ensure all calculations are accurate" if needs_calculations else "- Ensure all explanations are scientifically accurate"}
 
 The lesson should be practical, engaging, and rigorous for {grade_level_text} students.
 """
@@ -2190,7 +2402,7 @@ The lesson should be practical, engaging, and rigorous for {grade_level_text} st
                 logger.info(f"Generated STEM lesson content: {len(core_content)} characters")
 
                 # Parse the generated content into structured sections
-                lesson_data = parse_stem_lesson_content(core_content, topic, subject, features)
+                lesson_data = parse_stem_lesson_content(core_content, topic, subject, features, content_type)
 
                 # Generate graphs if requested
                 if features.get('autoGraphs', True):
@@ -2219,14 +2431,15 @@ The lesson should be practical, engaging, and rigorous for {grade_level_text} st
                 except Exception as yt_error:
                     logger.error(f"Failed to search YouTube video: {str(yt_error)}")
 
-                # Add metadata
+                # Add metadata including content_type for frontend rendering
                 lesson_data.update({
                     'title': f"{topic} - {subject_display} Lesson Plan",
                     'subject': subject,
                     'grade_level': grade_level_text,
                     'duration': f"{duration} minutes",
                     'difficulty': difficulty,
-                    'topic': topic
+                    'topic': topic,
+                    'content_type': content_type
                 })
 
                 # Store in database
